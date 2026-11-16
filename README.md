@@ -6,7 +6,7 @@ Tableros de clase para profesores de idiomas, organizados por idioma y nivel (A1
 
 | Archivo | Qué es | Quién la ve |
 |---|---|---|
-| `index.html` | Portada pública y formulario para solicitar acceso | Cualquiera |
+| `index.html` | Portada pública | Cualquiera |
 | `entrar.html` | Entrar con Google o con correo, cambiar la contraseña, completar la solicitud y ver su estado | Cualquiera |
 | `tableros.html` | Catálogo por idioma (español, inglés, portugués), nivel y filtros | Profesores aprobados |
 | `admin.html` | Aprobar o rechazar solicitudes de acceso | Administración |
