@@ -86,16 +86,6 @@
 .idiomas li { display: inline-flex; align-items: center; gap: 10px; }
 .idiomas i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
 
-/* nota del profe */
-.profe { background: var(--paper-2); }
-.profe .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 48px 72px; }
-.profe__foto { flex: 1 1 340px; min-width: 0; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; transform: rotate(-1.5deg); }
-.carta { flex: 1.2 1 400px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: clamp(28px, 4vw, 52px); box-shadow: 0 24px 50px -30px rgba(20,33,58,.5); display: flex; flex-direction: column; gap: 20px; transform: rotate(.6deg); }
-.carta h2 { font: 400 clamp(30px, 3vw, 44px)/1.1 var(--f-display); }
-.carta p { color: var(--ink-2); }
-.carta .firma { font-size: 40px; color: var(--ink); margin-top: 8px; }
-.carta .cargo { font-size: 15px; color: var(--muted); }
-
 /* cierre */
 .cierre .wrap { display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center; }
 .cierre .mano { font-size: 34px; color: var(--pt); transform: rotate(-2deg); }
@@ -240,19 +230,6 @@
     </div>
   </section>
 
-  <section class="profe pad" aria-labelledby="h-profe">
-    <div class="wrap">
-      <img class="profe__foto" src="assets/img/en-linea-1100.jpg" srcset="assets/img/en-linea-600.jpg 600w, assets/img/en-linea-1100.jpg 1100w" sizes="(max-width: 1023px) 100vw, 40vw" width="1100" height="733" loading="lazy" alt="Un estudiante con audífonos sigue la clase en su portátil">
-      <div class="carta" data-ver>
-        <h2 id="h-profe">Hice estos tableros para mis propias clases.</h2>
-        <p>Soy profe de idiomas y sé lo que es llegar a clase con el tiempo justo. Cada tablero nació de una clase real, con un estudiante real, y lo fui puliendo hasta que la hora pasara conversando.</p>
-        <p>Ahora están aquí para que tú también llegues con la clase lista.</p>
-        <p class="mano firma">Arley</p>
-        <p class="cargo">Profe de español, inglés y portugués</p>
-      </div>
-    </div>
-  </section>
-
   <section class="cierre pad" aria-labelledby="h-cierre">
     <div class="wrap">
       <p class="mano">¿tienes clase en un rato?</p>
@@ -265,7 +242,7 @@
 <footer class="pie">
   <div class="wrap">
     <span><img src="logo.svg" alt="" width="28" height="28">© 2026 Lingua's Academy</span>
-    <span>Fotografía de Unsplash, bajo la <a href="https://unsplash.com/license">licencia de Unsplash</a></span>
+    <span>Tableros de clase para profesores de idiomas</span>
   </div>
 </footer>
 
