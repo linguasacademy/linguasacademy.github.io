@@ -8,6 +8,7 @@
    prueba     true si es una clase de prueba
    vivo       true si el tablero funciona en sala en vivo */
 window.CATALOGO = [
+  {"archivo":"a1-esta-es-mi-familia.html","idioma":"es","nivel":"A1","titulo":"Esta es mi familia","desc":"La familia: este / esta es mi…, mi / mis, se llama, tengo … años, -o / -a","consignas":"en","publico":"ninos","prueba":false,"vivo":true},
   {"archivo":"a1-que-me-pongo-hoy.html","idioma":"es","nivel":"A1","titulo":"¿Qué me pongo hoy?","desc":"El tiempo y la ropa: hace calor / hace frío / llueve, Llevo… + colores","consignas":"en","publico":"ninos","prueba":false,"vivo":true},
   {"archivo":"a1-el-menu-de-chispa.html","idioma":"es","nivel":"A1","titulo":"El menú de Chispa","desc":"La comida, Me gusta / No me gusta, ¿Te gusta…?","consignas":"en","publico":"ninos","prueba":false,"vivo":false},
   {"archivo":"a1-los-numeros-del-pirata.html","idioma":"es","nivel":"A1","titulo":"Los números del pirata","desc":"Números del 9 al 15 y ¿Cuántos hay?","consignas":"en","publico":"ninos","prueba":false,"vivo":false},
