@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Entrar · Lingua's Academy</title>
+<meta name="description" content="Entrada al catálogo de tableros de Lingua's Academy, solo para profesores con acceso aprobado.">
+<meta name="theme-color" content="#F6F3EC">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.login { min-height: 100vh; min-height: 100svh; padding: calc(var(--nav) + 48px) 0 64px; display: flex; align-items: center; }
+.login .wrap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: center; }
+.login__panel { grid-column: 1 / span 5; display: grid; gap: 28px; }
+.login__panel h1 { font-size: clamp(38px, 2.2vw + 22px, 60px); }
+.login .photo { grid-column: 7 / span 6; aspect-ratio: 4 / 4.2; max-height: calc(100svh - var(--nav) - 112px); width: 100%; }
+.login .form .btn { justify-self: stretch; }
+.alt-links { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: var(--t-small); color: var(--muted); }
+.plain-btn { background-color: transparent; border: 0; padding: 0; font: inherit; cursor: pointer; min-height: 44px; }
+.alt-links .link { display: inline-block; padding: 11px 0; background-position: 0 calc(100% - 9px); }
+.alt-links .link:hover { background-position: 100% calc(100% - 9px); }
+[data-modo] { display: none; }
+[data-modo].on { display: grid; }
+@media (max-width: 1023px) { .login__panel { grid-column: 1 / span 8; } .login .photo { display: none; } }
+@media (max-width: 639px) { .login { padding-top: calc(var(--nav) + 32px); align-items: start; } .login__panel { grid-column: 1 / -1; } }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="skip-link" href="#top">Saltar al contenido</a>
+    <a class="brand" href="./" aria-label="Lingua's Academy, inicio"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <div class="nav__actions">
+      <a class="btn btn--secondary btn--sm" href="./">Volver al inicio</a>
+    </div>
+  </div>
+</header>
+
+<main id="top" class="login">
+  <div class="wrap">
+    <div class="login__panel">
+
+      <!-- 1 · entrar -->
+      <div data-modo="entrar" class="on" style="gap:28px">
+        <div style="display:grid;gap:16px">
+          <h1>Entrar al catálogo de tableros</h1>
+          <p class="lead">Solo para profesores con acceso aprobado.</p>
+        </div>
+        <div class="google-box">
+          <button class="btn btn--google" type="button" data-google><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.4c-.5 2.8-2.1 5.2-4.5 6.8l7.3 5.7c4.3-4 6.9-9.9 6.9-16.5z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.3-5.7c-2 1.4-4.7 2.3-8.6 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>Entrar con Google</button>
+          <p class="form__status" role="status" data-google-status></p>
+          <p class="o-sep">o con tu correo y contraseña</p>
+        </div>
+        <form class="form" id="f-entrar" novalidate>
+          <div class="field">
+            <label for="e-correo">Correo</label>
+            <input id="e-correo" name="correo" type="email" autocomplete="email" inputmode="email" aria-describedby="e-correo-error">
+            <p class="field__error" id="e-correo-error"></p>
+          </div>
+          <div class="field">
+            <label for="e-clave">Contraseña</label>
+            <input id="e-clave" name="clave" type="password" autocomplete="current-password" aria-describedby="e-clave-error">
+            <p class="field__error" id="e-clave-error"></p>
+          </div>
+          <button class="btn btn--primary" type="submit">Entrar</button>
+          <p class="form__status" role="status" data-form-status></p>
+        </form>
+        <div class="alt-links">
+          <button class="plain-btn link" type="button" data-ir="clave">Olvidé mi contraseña</button>
+          <span>¿Aún sin cuenta? <a class="link" href="./#acceso">Solicitar acceso</a></span>
+        </div>
+      </div>
+
+      <!-- 2 · cambiar la contraseña -->
+      <div data-modo="clave" style="gap:28px">
+        <div style="display:grid;gap:16px">
+          <h1>Cambiar la contraseña</h1>
+          <p class="lead">Te enviamos un enlace a tu correo para elegir una contraseña nueva.</p>
+        </div>
+        <form class="form" id="f-clave" novalidate>
+          <div class="field">
+            <label for="c-correo">Correo</label>
+            <input id="c-correo" name="correo" type="email" autocomplete="email" inputmode="email" aria-describedby="c-correo-error">
+            <p class="field__error" id="c-correo-error"></p>
+          </div>
+          <button class="btn btn--primary" type="submit">Enviar el enlace</button>
+          <p class="form__status" role="status" data-form-status></p>
+        </form>
+        <div class="alt-links"><button class="plain-btn link" type="button" data-ir="entrar">Volver a entrar</button></div>
+      </div>
+
+      <!-- 3 · primera vez con Google: completar la solicitud -->
+      <div data-modo="completar" style="gap:28px">
+        <div style="display:grid;gap:16px">
+          <h1>Completa tu solicitud</h1>
+          <p class="lead">Entraste como <b data-completar-correo></b>. Revisamos cada solicitud a mano. Cuando la aprobemos, entra otra vez con Google y verás el catálogo.</p>
+        </div>
+        <form class="form" id="f-completar" novalidate>
+          <div class="field">
+            <label for="k-nombre">Nombre y apellido</label>
+            <input id="k-nombre" name="nombre" type="text" autocomplete="name" maxlength="80" aria-describedby="k-nombre-error">
+            <p class="field__error" id="k-nombre-error"></p>
+          </div>
+          <div class="field">
+            <label for="k-idioma">Idioma que enseñas</label>
+            <select id="k-idioma" name="idioma">
+              <option value="es">Español</option>
+              <option value="en">Inglés</option>
+              <option value="pt">Portugués</option>
+              <option value="varios">Más de uno</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="k-mensaje">Dónde das clase (opcional)</label>
+            <textarea id="k-mensaje" name="mensaje" maxlength="600"></textarea>
+          </div>
+          <button class="btn btn--primary" type="submit">Enviar la solicitud</button>
+          <p class="form__status" role="status" data-form-status></p>
+        </form>
+        <div class="alt-links"><button class="plain-btn link" type="button" data-salir>Usar otra cuenta</button></div>
+      </div>
+
+      <!-- 4 · solicitud en revisión o rechazada -->
+      <div data-modo="estado" style="gap:24px">
+        <h1 data-estado-titulo>Tu solicitud está en revisión</h1>
+        <p class="lead" data-estado-texto>La revisamos a mano. Cuando la aprobemos, entra otra vez con este correo y verás el catálogo.</p>
+        <p class="muted">Sesión abierta como <b data-estado-correo></b>.</p>
+        <div class="btn-row"><button class="btn btn--secondary" type="button" data-salir>Salir</button></div>
+      </div>
+
+    </div>
+    <div class="photo">
+      <picture><source media="(min-width: 1024px)" srcset="assets/img/tablero-entrar-v.jpg"><img src="assets/img/tablero-entrar-1100.jpg" srcset="assets/img/tablero-entrar-600.jpg 600w, assets/img/tablero-entrar-1100.jpg 1100w" sizes="46vw" width="1100" height="826" alt="Tablero ¿Qué está pasando aquí?, nivel A2, con cuatro fotos para describir y las pistas de la actividad"></picture>
+    </div>
+  </div>
+</main>
+
+<script src="assets/site.js"></script>
+<script src="assets/auth.js"></script>
+<script>
+(() => {
+  'use strict';
+  const q = new URLSearchParams(location.search);
+  const volver = /^[a-z0-9-]+\.html(\?[a-z0-9=&-]*)?$/i.test(q.get('volver') || '') ? q.get('volver') : 'tableros.html';
+
+  const modos = [...document.querySelectorAll('[data-modo]')];
+  const ir = m => { modos.forEach(x => x.classList.toggle('on', x.dataset.modo === m)); const h = document.querySelector('[data-modo="' + m + '"] h1'); h.tabIndex = -1; h.focus(); };
+  document.querySelectorAll('[data-ir]').forEach(b => b.addEventListener('click', () => ir(b.dataset.ir)));
+
+  function mostrar(perfil) {
+    if (!perfil) return false;
+    if (perfil.estado === 'aprobado' || perfil.admin) { location.replace(volver); return true; }
+    if (perfil.estado === 'sin-solicitud') {
+      document.querySelector('[data-completar-correo]').textContent = perfil.correo;
+      document.getElementById('k-nombre').value = perfil.nombreGoogle || '';
+      ir('completar');
+      return true;
+    }
+    const t = document.querySelector('[data-estado-titulo]'), x = document.querySelector('[data-estado-texto]');
+    if (perfil.estado === 'rechazado') {
+      t.textContent = 'Tu solicitud no fue aprobada';
+      x.textContent = 'Por ahora esta cuenta no tiene acceso al catálogo. Si crees que es un error, escríbele a la administración de Lingua’s Academy.';
+    }
+    document.querySelector('[data-estado-correo]').textContent = perfil.correo;
+    ir('estado');
+    return true;
+  }
+
+  /* ¿Ya hay una sesión abierta? */
+  LA.estado().then(({ perfil }) => mostrar(perfil)).catch(() => {});
+
+  const fe = document.getElementById('f-entrar');
+  fe.addEventListener('submit', async e => {
+    e.preventDefault(); Forma.limpiar(fe);
+    const d = Object.fromEntries(new FormData(fe));
+    if (!Forma.correoValido(d.correo)) Forma.error(fe, 'correo', 'Escribe tu correo con @ y dominio.');
+    if (!d.clave) Forma.error(fe, 'clave', 'Escribe tu contraseña.');
+    const n = Forma.enfocarPrimero(fe);
+    if (n) { Forma.estado(fe, n === 1 ? 'Revisa el campo marcado.' : 'Revisa los ' + n + ' campos marcados.', 'error'); return; }
+    const b = fe.querySelector('button[type="submit"]'); b.disabled = true;
+    const t = setTimeout(() => Forma.estado(fe, 'Entrando…'), 300);
+    try {
+      let p = await LA.entrar(d.correo, d.clave);
+      if (p && p.estado === 'sin-solicitud' && !p.admin) {
+        /* cuenta creada a mano en Firebase, sin solicitud: se registra como pendiente */
+        const F = await LA.app();
+        await F.db.ref('profes/' + p.uid).set({ nombre: F.auth.currentUser.displayName || d.correo.split('@')[0], correo: d.correo.trim().toLowerCase(), idioma: 'es', mensaje: '', estado: 'pendiente', creado: F.TS });
+        p.estado = 'pendiente';
+      }
+      clearTimeout(t); Forma.estado(fe, '');
+      mostrar(p);
+    } catch (err) {
+      clearTimeout(t); console.warn(err);
+      Forma.estado(fe, LA.motivo(err), 'error');
+    }
+    b.disabled = false;
+  });
+
+  const fc = document.getElementById('f-clave');
+  fc.addEventListener('submit', async e => {
+    e.preventDefault(); Forma.limpiar(fc);
+    const d = Object.fromEntries(new FormData(fc));
+    if (!Forma.correoValido(d.correo)) { Forma.error(fc, 'correo', 'Escribe tu correo con @ y dominio.'); Forma.enfocarPrimero(fc); Forma.estado(fc, 'Revisa el campo marcado.', 'error'); return; }
+    const b = fc.querySelector('button[type="submit"]'); b.disabled = true;
+    try {
+      await LA.restablecer(d.correo);
+      Forma.estado(fc, 'Listo: si ese correo tiene cuenta, te llegará el enlace en unos minutos. Revisa también el correo no deseado.', 'ok');
+    } catch (err) { console.warn(err); Forma.estado(fc, LA.motivo(err), 'error'); }
+    b.disabled = false;
+  });
+
+  /* Entrar con Google */
+  const bg = document.querySelector('[data-google]'), sg = document.querySelector('[data-google-status]');
+  bg.addEventListener('click', async () => {
+    bg.disabled = true; sg.textContent = ''; delete sg.dataset.tone;
+    try {
+      const p = await LA.conGoogle();
+      if (p) mostrar(p);
+    } catch (err) {
+      console.warn(err);
+      sg.textContent = LA.motivo(err); sg.dataset.tone = 'error';
+    }
+    bg.disabled = false;
+  });
+
+  /* Primera vez con Google: enviar la solicitud */
+  const fk = document.getElementById('f-completar');
+  fk.addEventListener('submit', async e => {
+    e.preventDefault(); Forma.limpiar(fk);
+    const d = Object.fromEntries(new FormData(fk));
+    if (!d.nombre.trim()) { Forma.error(fk, 'nombre', 'Escribe tu nombre y apellido.'); Forma.enfocarPrimero(fk); Forma.estado(fk, 'Revisa el campo marcado.', 'error'); return; }
+    const b = fk.querySelector('button[type="submit"]'); b.disabled = true;
+    try {
+      mostrar(await LA.completarSolicitud(d));
+    } catch (err) { console.warn(err); Forma.estado(fk, LA.motivo(err), 'error'); }
+    b.disabled = false;
+  });
+
+  document.querySelectorAll('[data-salir]').forEach(x => x.addEventListener('click', async () => { await LA.salir().catch(() => {}); location.reload(); }));
+})();
+</script>
+</body>
+</html>

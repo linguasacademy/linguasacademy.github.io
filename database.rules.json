@@ -1,0 +1,61 @@
+{
+  "rules": {
+    "admins": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid"
+      }
+    },
+    "profes": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && ((auth.uid === $uid && !data.exists() && newData.child('estado').val() === 'pendiente') || root.child('admins').child(auth.uid).val() === true)",
+        ".validate": "newData.hasChildren(['nombre', 'correo', 'estado'])",
+        "estado": {
+          ".validate": "newData.val() === 'pendiente' || newData.val() === 'aprobado' || newData.val() === 'rechazado'"
+        },
+        "nombre": {
+          ".validate": "newData.isString() && newData.val().length <= 80"
+        },
+        "correo": {
+          ".validate": "newData.isString() && newData.val().length <= 120"
+        },
+        "mensaje": {
+          ".validate": "newData.isString() && newData.val().length <= 600"
+        }
+      }
+    },
+    "claves": {
+      "$tablero": {
+        ".read": "auth != null && auth.provider !== 'anonymous' && (root.child('profes').child(auth.uid).child('estado').val() === 'aprobado' || root.child('admins').child(auth.uid).val() === true)",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        ".validate": "newData.isString() && newData.val().length >= 40 && newData.val().length <= 60"
+      }
+    },
+    "salas": {
+      "$sala": {
+        ".read": "auth != null",
+        "dueno": {
+          ".write": "auth != null && !data.exists() && newData.val() === auth.uid && (root.child('profes').child(auth.uid).child('estado').val() === 'aprobado' || root.child('admins').child(auth.uid).val() === true)"
+        },
+        "clave": {
+          ".write": "auth != null && root.child('salas').child($sala).child('dueno').val() === auth.uid",
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "d": {
+          ".write": "auth != null && root.child('salas').child($sala).child('dueno').val() === auth.uid"
+        },
+        "pres": {
+          "$p": {
+            ".write": "auth != null && (auth.uid === $p || ($p === 'P' && root.child('salas').child($sala).child('dueno').val() === auth.uid))"
+          }
+        },
+        "ev": {
+          "$u": {
+            ".write": "auth != null && auth.uid === $u"
+          }
+        }
+      }
+    }
+  }
+}

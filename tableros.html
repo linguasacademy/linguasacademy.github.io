@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Catálogo de tableros · Lingua's Academy</title>
+<meta name="description" content="Catálogo de tableros de clase de Lingua's Academy por idioma y nivel, solo para profesores.">
+<meta name="theme-color" content="#F6F3EC">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.app { padding: calc(var(--nav) + 56px) 0 96px; min-height: 100vh; min-height: 100svh; }
+.app__head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; margin-bottom: 40px; }
+.app__head > div { grid-column: 1 / span 8; display: grid; gap: 12px; }
+.app__head h1 { font-size: clamp(40px, 2.6vw + 22px, 66px); }
+
+/* idiomas */
+.idiomas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); margin-bottom: 32px; }
+.idiomas button {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 20px 24px 20px 0;
+  background: none; border: 0; border-right: 1px solid var(--line-2); text-align: left; cursor: pointer; color: var(--ink);
+  position: relative; min-height: 76px; font: inherit;
+}
+.idiomas button + button { padding-left: 24px; }
+.idiomas button:last-child { border-right: 0; }
+.idiomas button::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--c); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease); }
+.idiomas button + button::after { left: 24px; }
+.idiomas button[aria-selected="true"]::after { transform: scaleX(1); }
+.idiomas button:hover::after { transform: scaleX(.35); }
+.idiomas button[aria-selected="true"]:hover::after { transform: scaleX(1); }
+.idiomas .nombre { font: 400 28px/1.1 var(--f-display); font-variation-settings: 'opsz' 30; }
+.idiomas .cuenta { font: 500 14px/1 var(--f-mono); color: var(--muted); }
+.idiomas .dot { width: 11px; height: 11px; }
+@media (max-width: 639px) {
+  .idiomas { grid-template-columns: 1fr; }
+  .idiomas button, .idiomas button + button { padding: 16px 0; border-right: 0; min-height: 60px; }
+  .idiomas button + button { border-top: 1px solid var(--line); }
+  .idiomas button + button::after { left: 0; }
+  .idiomas .nombre { font-size: 24px; }
+}
+
+/* filtros */
+.filtros { display: grid; grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(140px, 1fr)) auto; gap: 16px; align-items: end; margin-bottom: 16px; }
+.filtros .field label { font-size: 14px; }
+.filtros .field input, .filtros .field select { min-height: 48px; }
+.chk { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 16px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); background: var(--card); cursor: pointer; font-weight: 500; white-space: nowrap; }
+.chk input { width: 18px; height: 18px; accent-color: var(--action); margin: 0; }
+.chk:has(input:checked) { border-color: var(--action); }
+.resumen { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; min-height: 44px; margin-bottom: 40px; color: var(--muted); font-size: var(--t-small); }
+@media (max-width: 1023px) { .filtros { grid-template-columns: 1fr 1fr; } .filtros .buscar { grid-column: 1 / -1; } }
+@media (max-width: 639px) { .filtros { grid-template-columns: 1fr; } .chk { justify-content: flex-start; } }
+
+/* niveles y tarjetas */
+.nivel { margin-bottom: 64px; }
+.nivel__head { display: flex; align-items: baseline; gap: 20px; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--line-2); }
+.nivel__head b { font: 400 56px/.9 var(--f-display); letter-spacing: -.03em; font-variation-settings: 'opsz' 72; }
+.nivel__head h2 { font-size: 26px; }
+.nivel__head p { color: var(--muted); font-size: var(--t-small); }
+.nivel__head .label { margin-left: auto; white-space: nowrap; }
+.lista { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 1023px) { .lista { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 639px) { .lista { grid-template-columns: 1fr; gap: 12px; } .nivel__head { flex-wrap: wrap; gap: 4px 16px; } .nivel__head b { font-size: 44px; } .nivel__head .label { margin-left: 0; width: 100%; } }
+
+.t {
+  display: grid; grid-template-rows: auto 1fr auto; gap: 12px; min-height: 212px; padding: 22px 24px;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); text-decoration: none; color: var(--ink);
+  transition: transform .2s var(--ease), border-color .2s, box-shadow .2s;
+}
+.t:hover { transform: translateY(-2px); border-color: var(--line-2); box-shadow: 0 18px 32px -24px rgba(20,33,58,.45); }
+.t__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 26px; }
+.t__top .label { color: var(--c); }
+.t h3 { font-size: 24px; margin-bottom: 6px; }
+.t p { color: var(--ink-2); font-size: 16px; line-height: 1.5; }
+.t__meta { display: flex; flex-wrap: wrap; gap: 6px; }
+@media (max-width: 639px) { .t { min-height: 0; } }
+
+.vacio { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: center; }
+.vacio .photo { grid-column: 1 / span 6; aspect-ratio: 3 / 2; }
+.vacio > div:last-child { grid-column: 8 / span 5; display: grid; gap: 20px; }
+@media (max-width: 1023px) { .vacio .photo, .vacio > div:last-child { grid-column: 1 / -1; } }
+
+.cargando { display: grid; place-items: center; min-height: 50vh; color: var(--muted); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="skip-link" href="#top">Saltar al contenido</a>
+    <a class="brand" href="./" aria-label="Lingua's Academy, inicio"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <nav aria-label="Plataforma">
+      <ul class="nav__links">
+        <li><a href="tableros.html" aria-current="page">Catálogo</a></li>
+        <li data-solo-admin hidden><a href="admin.html">Solicitudes</a></li>
+      </ul>
+    </nav>
+    <div class="nav__actions">
+      <span class="nav__user" data-nombre></span>
+      <button class="btn btn--secondary btn--sm" type="button" data-salir>Salir</button>
+      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú"><span>Menú</span></button>
+    </div>
+  </div>
+</header>
+<div class="sheet" id="menu" hidden>
+  <a href="tableros.html">Catálogo</a>
+  <a href="admin.html" data-solo-admin hidden>Solicitudes</a>
+  <a href="./">Inicio</a>
+  <button class="btn btn--secondary" type="button" data-salir>Salir</button>
+</div>
+
+<main id="top" class="app">
+  <div class="wrap">
+    <p class="cargando" data-cargando role="status">Comprobando tu acceso…</p>
+
+    <div data-contenido hidden>
+      <div class="app__head">
+        <div>
+          <h1>Catálogo de tableros</h1>
+          <p class="lead" data-saludo>Elige el idioma que enseñas y filtra por nivel.</p>
+        </div>
+      </div>
+
+      <div class="idiomas" role="tablist" aria-label="Idioma que se enseña">
+        <button type="button" role="tab" id="i-es" data-lang="es" data-idioma="es" aria-selected="true" aria-controls="resultados"><span class="dot" aria-hidden="true"></span><span class="nombre">Español</span><span class="cuenta" data-cuenta-idioma="es"></span></button>
+        <button type="button" role="tab" id="i-en" data-lang="en" data-idioma="en" aria-selected="false" aria-controls="resultados" tabindex="-1"><span class="dot" aria-hidden="true"></span><span class="nombre">Inglés</span><span class="cuenta" data-cuenta-idioma="en"></span></button>
+        <button type="button" role="tab" id="i-pt" data-lang="pt" data-idioma="pt" aria-selected="false" aria-controls="resultados" tabindex="-1"><span class="dot" aria-hidden="true"></span><span class="nombre">Portugués</span><span class="cuenta" data-cuenta-idioma="pt"></span></button>
+      </div>
+
+      <section id="resultados" role="tabpanel" aria-labelledby="i-es">
+        <form class="filtros" data-filtros role="search" onsubmit="return false">
+          <div class="field buscar">
+            <label for="b-texto">Buscar por tema o gramática</label>
+            <input id="b-texto" name="texto" type="search" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="b-nivel">Nivel</label>
+            <select id="b-nivel" name="nivel"><option value="">Todos</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select>
+          </div>
+          <div class="field">
+            <label for="b-consignas">Consignas en</label>
+            <select id="b-consignas" name="consignas"><option value="">Cualquier idioma</option><option value="en">Inglés</option><option value="pt">Portugués</option><option value="es">Español</option></select>
+          </div>
+          <div class="field">
+            <label for="b-publico">Para</label>
+            <select id="b-publico" name="publico"><option value="">Todos</option><option value="ninos">Niños</option><option value="adultos">Adultos</option><option value="prueba">Clase de prueba</option></select>
+          </div>
+          <label class="chk"><input type="checkbox" name="vivo"> Solo en vivo</label>
+        </form>
+        <div class="resumen"><span role="status" data-resumen></span><button class="plain-btn link" type="button" data-limpiar hidden style="background-color:transparent;border:0;padding:0;font:inherit;cursor:pointer;min-height:44px">Quitar los filtros</button></div>
+
+        <div data-lista></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<template id="tpl-vacio">
+  <div class="vacio">
+    <div class="photo"><img alt="" width="1100" height="733" loading="lazy"></div>
+    <div>
+      <h2></h2>
+      <p class="lead"></p>
+      <div class="btn-row"><button class="btn btn--secondary" type="button" data-a-espanol>Ver los tableros de español</button></div>
+    </div>
+  </div>
+</template>
+
+<script src="assets/catalogo.js"></script>
+<script src="assets/site.js"></script>
+<script src="assets/auth.js"></script>
+<script>
+(() => {
+  'use strict';
+  const C = window.CATALOGO || [];
+  const NIVELES = {
+    A1: ['Acceso', 'Presentarse, la rutina, los gustos, comprar.'],
+    A2: ['Plataforma', 'El pasado y los planes, viajes, comparar.'],
+    B1: ['Umbral', 'Narrar, opinar, aconsejar e hipótesis sencillas.'],
+    B2: ['Avanzado', 'Argumentar, matizar y discrepar con cortesía.'],
+    C1: ['Dominio operativo', 'Registro, ironía y atenuación.'],
+    C2: ['Maestría', 'Precisión y estilo en cualquier contexto.']
+  };
+  const IDIOMA = { es: 'español', en: 'inglés', pt: 'portugués' };
+  const VACIO = {
+    en: { img: 'assets/img/londres', alt: 'El río Támesis atraviesa Londres, visto desde el aire' },
+    pt: { img: 'assets/img/lisboa', alt: 'Un tranvía amarillo sube por una calle de Lisboa' }
+  };
+  const $ = s => document.querySelector(s);
+  const sinTildes = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+  /* ---------- acceso ---------- */
+  document.querySelectorAll('[data-salir]').forEach(b => b.addEventListener('click', async () => { await LA.salir().catch(() => {}); location.replace('./'); }));
+  const aEntrar = () => location.replace('entrar.html?volver=' + encodeURIComponent('tableros.html' + location.search));
+
+  LA.estado().then(({ usuario, perfil }) => {
+    if (!usuario || !perfil || (perfil.estado !== 'aprobado' && !perfil.admin)) return aEntrar();
+    const nombre = (perfil.nombre || usuario.displayName || usuario.email || '').trim();
+    $('[data-nombre]').textContent = nombre;
+    if (nombre) $('[data-saludo]').textContent = 'Hola, ' + nombre.split(' ')[0] + '. Elige el idioma que enseñas y filtra por nivel.';
+    if (perfil.admin) document.querySelectorAll('[data-solo-admin]').forEach(el => { el.hidden = false; });
+    $('[data-cargando]').hidden = true;
+    $('[data-contenido]').hidden = false;
+    pintar();
+  }).catch(err => {
+    console.warn(err);
+    $('[data-cargando]').textContent = 'No hay conexión con el servidor de acceso. Revisa tu internet y recarga la página.';
+  });
+
+  /* ---------- estado de la vista ---------- */
+  const url = new URLSearchParams(location.search);
+  let idioma = ['es', 'en', 'pt'].includes(url.get('idioma')) ? url.get('idioma') : 'es';
+  const form = $('[data-filtros]');
+  ['nivel', 'consignas', 'publico', 'texto'].forEach(k => { if (url.get(k)) form.elements[k].value = url.get(k); });
+  if (url.get('vivo') === '1') form.elements.vivo.checked = true;
+
+  ['es', 'en', 'pt'].forEach(i => { $('[data-cuenta-idioma="' + i + '"]').textContent = C.filter(t => t.idioma === i).length || 'pronto'; });
+
+  const tabs = [...document.querySelectorAll('.idiomas [role="tab"]')];
+  tabs.forEach((t, n) => {
+    t.addEventListener('click', () => { idioma = t.dataset.idioma; pintar(); });
+    t.addEventListener('keydown', e => {
+      const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+      if (!d) return; e.preventDefault();
+      const s = tabs[(n + d + tabs.length) % tabs.length]; idioma = s.dataset.idioma; pintar(); s.focus();
+    });
+  });
+  form.addEventListener('input', () => pintar());
+  $('[data-limpiar]').addEventListener('click', () => { form.reset(); pintar(); form.elements.texto.focus(); });
+
+  function guardarUrl(f) {
+    const p = new URLSearchParams();
+    if (idioma !== 'es') p.set('idioma', idioma);
+    for (const k of ['nivel', 'consignas', 'publico', 'texto']) if (f[k]) p.set(k, f[k]);
+    if (f.vivo) p.set('vivo', '1');
+    history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
+  }
+
+  function tarjeta(t) {
+    const a = document.createElement('a');
+    a.className = 't'; a.href = t.archivo; a.dataset.lang = t.idioma;
+    const etiquetas = ['Consignas en ' + IDIOMA[t.consignas], t.publico === 'ninos' ? 'Niños' : 'Adultos'];
+    if (t.prueba) etiquetas.push('Clase de prueba');
+    a.innerHTML = '<div class="t__top"><span class="label"></span></div><div><h3></h3><p></p></div><div class="t__meta"></div>';
+    a.querySelector('.label').textContent = t.nivel;
+    if (t.vivo) a.querySelector('.t__top').insertAdjacentHTML('beforeend', '<span class="tag tag--live">En vivo</span>');
+    a.querySelector('h3').textContent = t.titulo;
+    a.querySelector('p').textContent = t.desc;
+    const m = a.querySelector('.t__meta');
+    etiquetas.forEach(x => { const s = document.createElement('span'); s.className = 'tag'; s.textContent = x; m.appendChild(s); });
+    return a;
+  }
+
+  function pintar() {
+    tabs.forEach(t => { const on = t.dataset.idioma === idioma; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; });
+    $('#resultados').setAttribute('aria-labelledby', 'i-' + idioma);
+    const f = Object.fromEntries(new FormData(form));
+    f.vivo = form.elements.vivo.checked;
+    guardarUrl(f);
+
+    const delIdioma = C.filter(t => t.idioma === idioma);
+    const lista = $('[data-lista]');
+    lista.textContent = '';
+    form.hidden = !delIdioma.length;
+
+    if (!delIdioma.length) {
+      const v = document.getElementById('tpl-vacio').content.cloneNode(true);
+      const img = v.querySelector('img'), cfg = VACIO[idioma];
+      img.src = cfg.img + '-1100.jpg'; img.srcset = cfg.img + '-600.jpg 600w, ' + cfg.img + '-1100.jpg 1100w'; img.sizes = '(max-width: 1023px) 100vw, 48vw'; img.alt = cfg.alt;
+      v.querySelector('h2').textContent = 'Tableros de ' + IDIOMA[idioma] + ' en preparación';
+      v.querySelector('.lead').textContent = 'Aparecerán aquí, ordenados por nivel, en cuanto estén listos. Mientras tanto, ' + C.filter(t => t.idioma === 'es' && t.consignas === idioma).length + ' tableros de español tienen las consignas en ' + IDIOMA[idioma] + '.';
+      const ir = v.querySelector('[data-a-espanol]');
+      ir.textContent = 'Ver los de español con consignas en ' + IDIOMA[idioma];
+      ir.addEventListener('click', () => { const antes = idioma; idioma = 'es'; form.reset(); form.elements.consignas.value = antes; pintar(); $('#i-es').focus(); });
+      lista.appendChild(v);
+      $('[data-resumen]').textContent = 'Todavía no hay tableros de ' + IDIOMA[idioma] + '.';
+      $('[data-limpiar]').hidden = true;
+      return;
+    }
+
+    const txt = sinTildes(f.texto || '').trim();
+    const hay = delIdioma.filter(t =>
+      (!f.nivel || t.nivel === f.nivel) &&
+      (!f.consignas || t.consignas === f.consignas) &&
+      (!f.publico || (f.publico === 'prueba' ? t.prueba : t.publico === f.publico)) &&
+      (!f.vivo || t.vivo) &&
+      (!txt || sinTildes(t.titulo + ' ' + t.desc).includes(txt))
+    );
+    const filtrando = !!(f.nivel || f.consignas || f.publico || f.vivo || txt);
+    $('[data-limpiar]').hidden = !filtrando;
+    $('[data-resumen]').textContent = hay.length === 1 ? '1 tablero' : hay.length + ' tableros' + (filtrando ? ' con estos filtros' : '');
+
+    if (!hay.length) {
+      const p = document.createElement('p'); p.className = 'lead';
+      p.textContent = 'Ningún tablero coincide con estos filtros. Prueba con otro nivel o quita la búsqueda.';
+      lista.appendChild(p); return;
+    }
+    for (const n of Object.keys(NIVELES)) {
+      const deN = hay.filter(t => t.nivel === n);
+      if (!deN.length) continue;
+      const s = document.createElement('section'); s.className = 'nivel'; s.setAttribute('aria-labelledby', 'n-' + n);
+      s.innerHTML = '<header class="nivel__head"><b aria-hidden="true">' + n + '</b><div><h2 id="n-' + n + '"></h2><p></p></div><span class="label"></span></header><div class="lista"></div>';
+      s.querySelector('h2').innerHTML = '<span class="visually-hidden">' + n + ', </span>';
+      s.querySelector('h2').append(NIVELES[n][0]);
+      s.querySelector('p').textContent = NIVELES[n][1];
+      s.querySelector('.label').textContent = deN.length === 1 ? '1 tablero' : deN.length + ' tableros';
+      const l = s.querySelector('.lista'); deN.forEach(t => l.appendChild(tarjeta(t)));
+      lista.appendChild(s);
+    }
+  }
+})();
+</script>
+</body>
+</html>
