@@ -49,14 +49,33 @@
     return new Promise(ok => { const fin = F.auth.onAuthStateChanged(u => { fin(); ok(u); }); });
   }
 
-  async function perfil(u) {
+  /* Lectura que espera a la conexión (get() falla a los 3 s con internet lento) y reintenta una vez */
+  const leer = (ref, ms) => new Promise((ok, ko) => {
+    let fin = false; const t = setTimeout(() => { if (!fin) { fin = true; ko(new Error('tiempo')); } }, ms || 12000);
+    ref.once('value').then(s => { if (!fin) { fin = true; clearTimeout(t); ok(s.val()); } }, e => { if (!fin) { fin = true; clearTimeout(t); ko(e); } });
+  });
+  const denegado = e => /permission/i.test((e && (e.code || e.message)) || '');
+  const leer2 = async ref => { try { return await leer(ref); } catch (e) { if (denegado(e)) throw e; return leer(ref, 20000); } };
+
+  /* El perfil se guarda en este navegador: las páginas abren al instante y se confirma por detrás */
+  const CK = 'la-perfil';
+  const conAcceso = p => !!p && (p.estado === 'aprobado' || p.admin === true);
+  function guardado(uid) { try { const c = JSON.parse(localStorage.getItem(CK) || 'null'); return c && c.uid === uid ? c : null; } catch (e) { return null; } }
+  async function perfilRed(u) {
     const F = await app();
+    const [p, adm] = await Promise.all([leer2(F.db.ref('profes/' + u.uid)), leer2(F.db.ref('admins/' + u.uid)).then(v => v === true)]);
+    const r = Object.assign({ uid: u.uid, correo: u.email, estado: 'sin-solicitud', nombre: '', nombreGoogle: u.displayName || '' }, p || {}, { admin: adm });
+    try { localStorage.setItem(CK, JSON.stringify(r)); } catch (e) {}
+    return r;
+  }
+  async function perfil(u, fresco) {
     if (!u || u.isAnonymous) return null;
-    const [p, adm] = await Promise.all([
-      F.db.ref('profes/' + u.uid).get().then(s => s.val()).catch(() => null),
-      F.db.ref('admins/' + u.uid).get().then(s => s.val() === true).catch(() => false)
-    ]);
-    return Object.assign({ uid: u.uid, correo: u.email, estado: 'sin-solicitud', nombre: '', nombreGoogle: u.displayName || '' }, p || {}, { admin: adm });
+    const c = guardado(u.uid);
+    if (c && !fresco && conAcceso(c)) {
+      perfilRed(u).then(n => { if (!conAcceso(n)) location.reload(); }).catch(() => {});
+      return c;
+    }
+    try { return await perfilRed(u); } catch (e) { if (c) return c; throw e; }
   }
 
   /* Estado completo para una página: { usuario, perfil } */
@@ -68,7 +87,7 @@
   async function entrar(correo, clave) {
     const F = await app();
     const r = await F.auth.signInWithEmailAndPassword(correo.trim(), clave);
-    return perfil(r.user);
+    return perfil(r.user, true);
   }
 
   async function solicitar({ nombre, correo, clave, idioma, mensaje }) {
@@ -94,7 +113,7 @@
     if (actual && actual.isAnonymous) await F.auth.signOut();
     try {
       const r = await F.auth.signInWithPopup(p);
-      return perfil(r.user);
+      return perfil(r.user, true);
     } catch (e) {
       if (/popup-blocked|operation-not-supported-in-this-environment/.test(e.code || '')) {
         await F.auth.signInWithRedirect(p);
@@ -114,16 +133,19 @@
       nombre: n, correo: (u.email || '').toLowerCase(), idioma: idioma || 'es',
       mensaje: (mensaje || '').trim().slice(0, 600), estado: 'pendiente', creado: F.TS
     });
-    return perfil(u);
+    return perfil(u, true);
   }
 
-  async function salir() { const F = await app(); await F.auth.signOut(); }
+  async function salir() {
+    try { Object.keys(localStorage).filter(k => k === CK || k.indexOf('la-clave:') === 0).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+    const F = await app(); await F.auth.signOut();
+  }
 
   async function restablecer(correo) { const F = await app(); await F.auth.sendPasswordResetEmail(correo.trim()); }
 
   async function solicitudes() {
     const F = await app();
-    const s = await F.db.ref('profes').get();
+    const s = await F.db.ref('profes').once('value');
     const l = []; s.forEach(c => { l.push(Object.assign({ uid: c.key }, c.val())); });
     return l.sort((a, b) => (b.creado || 0) - (a.creado || 0));
   }

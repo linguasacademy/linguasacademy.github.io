@@ -33,26 +33,48 @@
   const conTiempo = (p, ms) => Promise.race([p, new Promise((_, ko) => setTimeout(() => ko(new Error('tiempo')), ms))]);
   const unb64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - s.length % 4) % 4)), c => c.charCodeAt(0));
 
+  /* Lectura que espera a la conexión (get() falla a los 3 s con internet lento) y reintenta una vez */
+  const leer = (ref, ms) => new Promise((ok, ko) => {
+    let fin = false; const t = setTimeout(() => { if (!fin) { fin = true; ko(new Error('tiempo')); } }, ms || 12000);
+    ref.once('value').then(s => { if (!fin) { fin = true; clearTimeout(t); ok(s.val()); } }, e => { if (!fin) { fin = true; clearTimeout(t); ko(e); } });
+  });
+  const denegado = e => /permission/i.test((e && (e.code || e.message)) || '');
+  const leer2 = async ref => { try { return await leer(ref); } catch (e) { if (denegado(e)) throw e; return leer(ref, 20000); } };
+
+  /* El archivo cifrado se pide de una vez, mientras se consigue la clave */
+  const binP = fetch('t/' + NOMBRE + '.bin').then(r => { if (!r.ok) throw new Error('sin-archivo'); return r.arrayBuffer(); });
+  binP.catch(() => {});
   async function descifrar(clave) {
-    const r = await fetch('t/' + NOMBRE + '.bin', { cache: 'no-cache' });
-    if (!r.ok) throw new Error('sin-archivo');
-    const buf = new Uint8Array(await r.arrayBuffer());
+    const buf = new Uint8Array(await binP);
     const k = await crypto.subtle.importKey('raw', unb64u(clave), 'AES-GCM', false, ['decrypt']);
     const plano = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.slice(0, 12) }, k, buf.slice(12));
     return new TextDecoder().decode(plano);
   }
+  const CK = 'la-clave:' + NOMBRE;
+  function pintar(html, clave) {
+    try { sessionStorage.setItem(CK, clave); } catch (e) {}
+    window.LA_CLAVE = clave;
+    document.open(); document.write(html); document.close();
+  }
 
   async function principal() {
+    /* 0 · profe que ya abrió este tablero en este navegador: abre sin esperar al servidor */
+    if (!COMO_ALUMNO) {
+      let c = null; try { c = localStorage.getItem(CK); } catch (e) {}
+      if (c) { try { return pintar(await descifrar(c), c); } catch (e) { try { localStorage.removeItem(CK); } catch (e2) {} } }
+    }
+
     await carga(SDK + 'firebase-app-compat.js');
     await Promise.all([carga(SDK + 'firebase-auth-compat.js'), carga(SDK + 'firebase-database-compat.js')]);
     const app = firebase.apps.find(a => a.name === '[DEFAULT]') || firebase.initializeApp(CFG);
     const auth = app.auth(), db = app.database();
     let u = await new Promise(ok => { const fin = auth.onAuthStateChanged(x => { fin(); ok(x); }); });
-    let clave = null;
+    let clave = null, deProfe = false;
 
     /* 1 · profe con sesión (y no la vista de prueba del estudiante) */
     if (u && !u.isAnonymous && !COMO_ALUMNO) {
-      clave = await db.ref('claves/' + NOMBRE).get().then(s => s.val()).catch(() => null);
+      try { clave = await leer2(db.ref('claves/' + NOMBRE)); deProfe = !!clave; }
+      catch (e) { if (!denegado(e)) throw e; }
     }
     /* 2 · enlace de una sala */
     if (!clave && SALA.length >= 8) {
@@ -65,7 +87,7 @@
       } else if (!u) {
         u = (await auth.signInAnonymously()).user;
       }
-      clave = await dbSala.ref('salas/' + SALA + '/clave').get().then(s => s.val()).catch(() => null);
+      clave = await leer2(dbSala.ref('salas/' + SALA + '/clave'));
       if (!clave) {
         decir('Esta sala no existe o ya cerró. Pídele a tu profe un enlace nuevo.');
         return;
@@ -81,12 +103,11 @@
     }
 
     const html = await descifrar(clave);
-    try { sessionStorage.setItem('la-clave:' + NOMBRE, clave); } catch (e) {}
-    window.LA_CLAVE = clave;
-    document.open(); document.write(html); document.close();
+    if (deProfe) { try { localStorage.setItem(CK, clave); } catch (e) {} }
+    pintar(html, clave);
   }
 
-  conTiempo(principal(), 30000).catch(err => {
+  conTiempo(principal(), 45000).catch(err => {
     console.error(err);
     decir('No se pudo abrir el tablero. Revisa tu conexión y <a href="">vuelve a intentarlo</a>.');
   });

@@ -10,6 +10,11 @@
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://linguas-tableros-default-rtdb.firebaseio.com">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js">
 <link rel="stylesheet" href="assets/site.css">
 <style>
 .app { padding: calc(var(--nav) + 56px) 0 96px; min-height: 100vh; min-height: 100svh; }
@@ -195,19 +200,37 @@
   document.querySelectorAll('[data-salir]').forEach(b => b.addEventListener('click', async () => { await LA.salir().catch(() => {}); location.replace('./'); }));
   const aEntrar = () => location.replace('entrar.html?volver=' + encodeURIComponent('tableros.html' + location.search));
 
-  LA.estado().then(({ usuario, perfil }) => {
-    if (!usuario || !perfil || (perfil.estado !== 'aprobado' && !perfil.admin)) return aEntrar();
-    const nombre = (perfil.nombre || usuario.displayName || usuario.email || '').trim();
+  let mostrado = false;
+  function mostrar(perfil, usuario) {
+    const nombre = (perfil.nombre || (usuario && (usuario.displayName || usuario.email)) || perfil.correo || '').trim();
     $('[data-nombre]').textContent = nombre;
     if (nombre) $('[data-saludo]').textContent = 'Hola, ' + nombre.split(' ')[0] + '. Elige el idioma que enseñas y filtra por nivel.';
-    if (perfil.admin) document.querySelectorAll('[data-solo-admin]').forEach(el => { el.hidden = false; });
+    document.querySelectorAll('[data-solo-admin]').forEach(el => { el.hidden = !perfil.admin; });
+    if (mostrado) return;
+    mostrado = true;
     $('[data-cargando]').hidden = true;
     $('[data-contenido]').hidden = false;
     pintar();
-  }).catch(err => {
-    console.warn(err);
-    $('[data-cargando]').textContent = 'No hay conexión con el servidor de acceso. Revisa tu internet y recarga la página.';
+  }
+  const conAcceso = p => !!p && (p.estado === 'aprobado' || p.admin === true);
+  /* Si este navegador ya entró antes, el catálogo se pinta de una vez y la sesión se confirma por detrás */
+  Promise.resolve().then(() => {
+    let c = null; try { c = JSON.parse(localStorage.getItem('la-perfil') || 'null'); } catch (e) {}
+    if (conAcceso(c)) mostrar(c, null);
   });
+  function comprobar() {
+    LA.estado().then(({ usuario, perfil }) => {
+      if (!usuario || !conAcceso(perfil)) return aEntrar();
+      mostrar(perfil, usuario);
+    }).catch(err => {
+      console.warn(err);
+      if (mostrado) return;
+      const c = $('[data-cargando]');
+      c.innerHTML = 'La conexión está lenta y no se pudo comprobar tu sesión. <button class="btn btn--secondary btn--sm" type="button">Reintentar</button>';
+      c.querySelector('button').addEventListener('click', () => { c.textContent = 'Comprobando tu acceso…'; comprobar(); });
+    });
+  }
+  comprobar();
 
   /* ---------- estado de la vista ---------- */
   const url = new URLSearchParams(location.search);

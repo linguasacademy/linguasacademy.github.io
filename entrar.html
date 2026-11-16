@@ -9,14 +9,24 @@
 <meta name="theme-color" content="#F6F3EC">
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Caveat:wght@600&display=swap">
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://linguas-tableros-default-rtdb.firebaseio.com">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js">
 <link rel="stylesheet" href="assets/site.css">
 <style>
 .login { min-height: 100vh; min-height: 100svh; padding: calc(var(--nav) + 48px) 0 64px; display: flex; align-items: center; }
 .login .wrap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: center; }
 .login__panel { grid-column: 1 / span 5; display: grid; gap: 28px; }
 .login__panel h1 { font-size: clamp(38px, 2.2vw + 22px, 60px); }
-.login .photo { grid-column: 7 / span 6; aspect-ratio: 4 / 4.2; max-height: calc(100svh - var(--nav) - 112px); width: 100%; }
+.pila { grid-column: 7 / span 6; position: relative; width: 100%; aspect-ratio: 10 / 8.6; max-height: calc(100svh - var(--nav) - 112px); }
+.pila img { position: absolute; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top left; border-radius: 12px; border: 1px solid var(--line-2); box-shadow: 0 22px 44px -22px rgba(20,33,58,.6); }
+.pila img:nth-child(1) { left: 34%; top: 0; width: 62%; transform: rotate(4deg); }
+.pila img:nth-child(2) { left: 0; top: 17%; width: 68%; transform: rotate(-3deg); }
+.pila img:nth-child(3) { left: 27%; top: 46%; width: 72%; transform: rotate(1.5deg); }
+.pila__nota { position: absolute; left: 2%; bottom: 4%; background: #FFE9A8; padding: 6px 16px 8px; font: 600 clamp(22px, 2.2vw, 30px)/1.1 'Caveat', cursive; transform: rotate(-4deg); box-shadow: 0 6px 14px -8px rgba(20,33,58,.5); }
 .login .form .btn { justify-self: stretch; }
 .alt-links { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: var(--t-small); color: var(--muted); }
 .plain-btn { background-color: transparent; border: 0; padding: 0; font: inherit; cursor: pointer; min-height: 44px; }
@@ -24,7 +34,7 @@
 .alt-links .link:hover { background-position: 100% calc(100% - 9px); }
 [data-modo] { display: none; }
 [data-modo].on { display: grid; }
-@media (max-width: 1023px) { .login__panel { grid-column: 1 / span 8; } .login .photo { display: none; } }
+@media (max-width: 1023px) { .login__panel { grid-column: 1 / span 8; } .pila { display: none; } }
 @media (max-width: 639px) { .login { padding-top: calc(var(--nav) + 32px); align-items: start; } .login__panel { grid-column: 1 / -1; } }
 </style>
 </head>
@@ -131,8 +141,11 @@
       </div>
 
     </div>
-    <div class="photo">
-      <picture><source media="(min-width: 1024px)" srcset="assets/img/tablero-entrar-v.jpg"><img src="assets/img/tablero-entrar-1100.jpg" srcset="assets/img/tablero-entrar-600.jpg 600w, assets/img/tablero-entrar-1100.jpg 1100w" sizes="46vw" width="1100" height="826" alt="Tablero ¿Qué está pasando aquí?, nivel A2, con cuatro fotos para describir y las pistas de la actividad"></picture>
+    <div class="pila" aria-hidden="true">
+      <img src="assets/tableros/b1-que-harias-si-960.jpg" width="960" height="600" alt="">
+      <img src="assets/tableros/a1-monstruos-gigantes-960.jpg" width="960" height="600" alt="">
+      <img src="assets/tableros/a2-a-como-esta-la-pina-960.jpg" width="960" height="600" alt="">
+      <span class="pila__nota">tu clase te espera</span>
     </div>
   </div>
 </main>

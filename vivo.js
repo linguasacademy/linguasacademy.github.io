@@ -52,17 +52,29 @@
     return _base;
   }
 
-  /* ¿Hay un profe con acceso aprobado en este navegador? (entra en entrar.html) */
+  /* Lectura que espera a la conexión (get() falla a los 3 s con internet lento) y reintenta una vez */
+  const leer = (ref, ms) => new Promise((ok, ko) => {
+    let fin = false; const t = setTimeout(() => { if (!fin) { fin = true; ko(new Error('tiempo')); } }, ms || 12000);
+    ref.once('value').then(s => { if (!fin) { fin = true; clearTimeout(t); ok(s.val()); } }, e => { if (!fin) { fin = true; clearTimeout(t); ko(e); } });
+  });
+  const denegado = e => /permission/i.test((e && (e.code || e.message)) || '');
+  const leer2 = async ref => { try { return await leer(ref); } catch (e) { if (denegado(e)) throw e; return leer(ref, 20000); } };
+
+  /* ¿Hay un profe con acceso aprobado en este navegador? (entra en entrar.html)
+     Si la red falla, vale el perfil guardado por auth.js; sin él, el error sube y se ofrece reintentar. */
   async function profeAprobado() {
     const app = await baseLista();
     const u = await new Promise(ok => { const fin = app.auth().onAuthStateChanged(x => { fin(); ok(x); }); });
     if (!u || u.isAnonymous) return false;
     const db = app.database();
-    const [estado, admin] = await Promise.all([
-      db.ref('profes/' + u.uid + '/estado').get().then(s => s.val()).catch(() => null),
-      db.ref('admins/' + u.uid).get().then(s => s.val() === true).catch(() => false)
-    ]);
-    return estado === 'aprobado' || admin;
+    try {
+      const [estado, admin] = await Promise.all([leer2(db.ref('profes/' + u.uid + '/estado')), leer2(db.ref('admins/' + u.uid)).then(v => v === true)]);
+      return estado === 'aprobado' || admin;
+    } catch (e) {
+      let c = null; try { c = JSON.parse(localStorage.getItem('la-perfil') || 'null'); } catch (e2) {}
+      if (c && c.uid === u.uid) return c.estado === 'aprobado' || c.admin === true;
+      throw e;
+    }
   }
 
   let _fb = null;
@@ -93,7 +105,7 @@
     _sala = (async () => {
       const F = await firebaseListo();
       const raiz = F.db.ref('salas/' + SALA);
-      const dueno = (await raiz.child('dueno').get()).val();
+      const dueno = await leer2(raiz.child('dueno'));
       return Object.assign({ raiz, profe: !!dueno && dueno === F.uid, existe: !!dueno }, F);
     })();
     return _sala;
@@ -114,7 +126,7 @@
         const r = S.raiz.child('d').child(clave(ruta));
         return {
           set: data => r.set({ j: JSON.stringify(data === undefined ? null : data), t: S.TS }),
-          get: () => r.get().then(foto),
+          get: () => r.once('value').then(foto),
           onSnapshot(cb, err) {
             const h = s => cb(foto(s));
             r.on('value', h, e => err && err(e));
@@ -233,7 +245,13 @@
       if (!SALA) {
         /* solo un profe con acceso aprobado puede abrir una sala */
         let profe = false;
-        try { profe = await profeAprobado(); } catch (e) { console.warn('[vivo] sin conexión:', e); }
+        try { profe = await profeAprobado(); } catch (e) {
+          console.warn('[vivo] sin conexión:', e);
+          c.innerHTML = '<button class="reint">● Sala en vivo: sin conexión. Reintentar</button><button class="x" aria-label="Ocultar">✕</button>';
+          c.querySelector('.reint').onclick = () => { c.querySelector('.reint').textContent = 'Conectando…'; pintar(); };
+          c.querySelector('.x').onclick = plegar;
+          return;
+        }
         if (!profe) {
           const volver = encodeURIComponent(location.pathname.split('/').pop() || '');
           c.innerHTML = '<a class="entra" href="entrar.html?volver=' + volver + '">● Entrar como profe para abrir una sala</a><button class="x" aria-label="Ocultar">✕</button>';
@@ -257,7 +275,12 @@
         };
         return;
       }
-      let S; try { S = await sala(); } catch (e) { c.remove(); return; }
+      let S; try { S = await sala(); } catch (e) {
+        console.warn('[vivo] sala sin conexión:', e); _sala = null;
+        c.innerHTML = '<button class="reint">● Sin conexión con la sala. Reintentar</button>';
+        c.querySelector('.reint').onclick = () => { c.querySelector('.reint').textContent = 'Conectando…'; pintar(); };
+        return;
+      }
       if (!S.profe) { c.remove(); document.body.classList.remove('con-sala'); if (!S.existe) avisar('Esta sala no existe o ya cerró. Pídele a tu profe un enlace nuevo.', 8000); return; }
       c.innerHTML = `<span class="txt">Sala <b>${SALA}</b></span><button class="ok cp">⧉ Copiar enlace del estudiante</button><button class="prueba" title="Abre en otra pestaña lo que ve el estudiante">Ver como estudiante</button><button class="sale" title="Volver al tablero sin sala">Salir</button><button class="x" aria-label="Ocultar">✕</button>`;
       c.querySelector('.cp').onclick = async e => {
