@@ -14,7 +14,7 @@ Uso:
 
 Formato de .bin: 12 bytes de IV + texto cifrado AES-256-GCM (con la etiqueta al final).
 """
-import base64, json, os, sys
+import base64, html as _html, json, os, sys
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -44,7 +44,7 @@ def main():
             f.write(iv + AESGCM(clave).encrypt(iv, html, None))
         titulo = html.split(b'<title>', 1)[1].split(b'</title>', 1)[0].decode('utf-8') if b'<title>' in html else nombre
         with open(os.path.join(REPO, nombre + '.html'), 'w', encoding='utf-8') as f:
-            f.write(plantilla.replace('{{TITULO}}', titulo.strip()))
+            f.write(plantilla.replace('{{TITULO}}', _html.escape(_html.unescape(titulo.strip()), quote=True)))
         print('cifrado', nombre)
     json.dump(claves, open(claves_json, 'w'), indent=1, sort_keys=True)
 

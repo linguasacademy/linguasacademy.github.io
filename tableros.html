@@ -175,6 +175,7 @@
 
 <script src="assets/catalogo.js"></script>
 <script src="assets/site.js"></script>
+<script src="assets/fb.js"></script>
 <script src="assets/auth.js"></script>
 <script>
 (() => {
@@ -190,11 +191,12 @@
   };
   const IDIOMA = { es: 'español', en: 'inglés', pt: 'portugués' };
   const VACIO = {
+    es: { img: 'assets/img/londres', alt: 'Tableros en preparación' },
     en: { img: 'assets/img/londres', alt: 'El río Támesis atraviesa Londres, visto desde el aire' },
     pt: { img: 'assets/img/lisboa', alt: 'Un tranvía amarillo sube por una calle de Lisboa' }
   };
   const $ = s => document.querySelector(s);
-  const sinTildes = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const sinTildes = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
   /* ---------- acceso ---------- */
   document.querySelectorAll('[data-salir]').forEach(b => b.addEventListener('click', async () => { await LA.salir().catch(() => {}); location.replace('./'); }));

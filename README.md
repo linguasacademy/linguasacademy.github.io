@@ -10,6 +10,7 @@ Tableros de clase para profesores de idiomas, organizados por idioma y nivel (A1
 | `entrar.html` | Entrar con Google o con correo, cambiar la contraseña, completar la solicitud y ver su estado | Cualquiera |
 | `tableros.html` | Catálogo por idioma (español, inglés, portugués), nivel y filtros | Profesores aprobados |
 | `admin.html` | Aprobar o rechazar solicitudes de acceso | Administración |
+| `404.html` | Página de error 404 en español con enlaces al inicio y al catálogo | Cualquiera |
 | `<nivel>-<tema>.html` | Cargador de cada tablero; el tablero va cifrado en `t/<nivel>-<tema>.bin` | Profesores aprobados y estudiantes con enlace de sala |
 
 - Cada tablero es un solo `.html`, sin nombres de estudiantes, reutilizable por cualquier profesor.
@@ -42,6 +43,20 @@ Proyecto `linguas-tableros`:
    - crea `admins/<tu uid>` con el valor `true` (el uid está en Authentication → Users);
    - crea `profes/<tu uid>` con `nombre`, `correo`, `idioma` (`es`) y `estado` (`aprobado`).
 5. Desde entonces apruebas a los demás profesores en `admin.html`.
+
+## Verificación
+
+Antes de subir cambios puedes comprobar la paridad 1:1 entre `assets/catalogo.js`, los `<nombre>.html` de la raíz y `t/*.bin`, la validez de `database.rules.json`, la sintaxis de los archivos `.js` y las referencias locales de los HTML principales ejecutando:
+
+```sh
+python3 herramientas/verificar.py
+```
+
+Para activar el hook local de `pre-push` en tu copia del repositorio:
+
+```sh
+git config core.hooksPath .githooks
+```
 
 ## Límites
 

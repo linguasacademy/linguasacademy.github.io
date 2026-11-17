@@ -17,28 +17,38 @@
   'use strict';
   if (window.claude && window.claude.use) return;   // dentro de claude.ai no se toca nada
 
-  const CFG = {
-    apiKey: 'AIzaSyAGz-__ICvH7XJyxJ7co0evyuCEIUBKH4k',
-    authDomain: 'linguas-tableros.firebaseapp.com',
-    databaseURL: 'https://linguas-tableros-default-rtdb.firebaseio.com',
-    projectId: 'linguas-tableros',
-    storageBucket: 'linguas-tableros.firebasestorage.app',
-    messagingSenderId: '992339561971',
-    appId: '1:992339561971:web:37615c68f465fadb565686'
-  };
-  const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
+  const FB = window.LA_FB || (() => {
+    const CFG = {
+      apiKey: 'AIzaSyAGz-__ICvH7XJyxJ7co0evyuCEIUBKH4k',
+      authDomain: 'linguas-tableros.firebaseapp.com',
+      databaseURL: 'https://linguas-tableros-default-rtdb.firebaseio.com',
+      projectId: 'linguas-tableros',
+      storageBucket: 'linguas-tableros.firebasestorage.app',
+      messagingSenderId: '992339561971',
+      appId: '1:992339561971:web:37615c68f465fadb565686'
+    };
+    const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
+    const yaEsta = src => !!window.firebase && (/app-compat/.test(src) || (/auth-compat/.test(src) && !!firebase.auth) || (/database-compat/.test(src) && !!firebase.database));
+    const carga = src => new Promise((ok, ko) => {
+      if (yaEsta(src)) return ok();
+      const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => ko(new Error('red')); document.head.appendChild(s);
+    });
+    const conTiempo = (p, ms) => Promise.race([p, new Promise((_, ko) => setTimeout(() => ko(new Error('tiempo')), ms))]);
+    const leer = (ref, ms) => new Promise((ok, ko) => {
+      let fin = false; const t = setTimeout(() => { if (!fin) { fin = true; ko(new Error('tiempo')); } }, ms || 12000);
+      ref.once('value').then(s => { if (!fin) { fin = true; clearTimeout(t); ok(s.val()); } }, e => { if (!fin) { fin = true; clearTimeout(t); ko(e); } });
+    });
+    const denegado = e => /permission/i.test((e && (e.code || e.message)) || '');
+    const leer2 = async ref => { try { return await leer(ref); } catch (e) { if (denegado(e)) throw e; return leer(ref, 20000); } };
+    return { CFG, SDK, carga, conTiempo, leer, denegado, leer2 };
+  })();
+  const { CFG, SDK, carga, conTiempo, leer2 } = FB;
+
   const SALA = (new URLSearchParams(location.search).get('sala') || '').replace(/[^a-z0-9]/gi, '').slice(0, 24);
   const COMO_ALUMNO = new URLSearchParams(location.search).get('como') === 'estudiante';
   const enlaceAlumno = id => location.origin + location.pathname + '?sala=' + id;
 
   /* ---------- carga de Firebase y acceso anónimo ---------- */
-  /* si el tablero lo abrió el cargador (abrir.js), Firebase ya está cargado */
-  const yaEsta = src => !!window.firebase && (/app-compat/.test(src) || (/auth-compat/.test(src) && !!firebase.auth) || (/database-compat/.test(src) && !!firebase.database));
-  const carga = src => new Promise((ok, ko) => {
-    if (yaEsta(src)) return ok();
-    const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s);
-  });
-  const conTiempo = (p, ms) => Promise.race([p, new Promise((_, ko) => setTimeout(() => ko(new Error('tiempo')), ms))]);
   /* SDK y app principal, sin abrir ninguna sesión */
   let _base = null;
   function baseLista() {
@@ -52,19 +62,11 @@
     return _base;
   }
 
-  /* Lectura que espera a la conexión (get() falla a los 3 s con internet lento) y reintenta una vez */
-  const leer = (ref, ms) => new Promise((ok, ko) => {
-    let fin = false; const t = setTimeout(() => { if (!fin) { fin = true; ko(new Error('tiempo')); } }, ms || 12000);
-    ref.once('value').then(s => { if (!fin) { fin = true; clearTimeout(t); ok(s.val()); } }, e => { if (!fin) { fin = true; clearTimeout(t); ko(e); } });
-  });
-  const denegado = e => /permission/i.test((e && (e.code || e.message)) || '');
-  const leer2 = async ref => { try { return await leer(ref); } catch (e) { if (denegado(e)) throw e; return leer(ref, 20000); } };
-
   /* ¿Hay un profe con acceso aprobado en este navegador? (entra en entrar.html)
      Si la red falla, vale el perfil guardado por auth.js; sin él, el error sube y se ofrece reintentar. */
   async function profeAprobado() {
     const app = await baseLista();
-    const u = await new Promise(ok => { const fin = app.auth().onAuthStateChanged(x => { fin(); ok(x); }); });
+    const u = await new Promise(ok => { let fin; let ya = false; fin = app.auth().onAuthStateChanged(x => { if (ya) return; ya = true; if (fin) fin(); ok(x); }); if (ya && fin) fin(); });
     if (!u || u.isAnonymous) return false;
     const db = app.database();
     try {
@@ -88,13 +90,19 @@
       const auth = app.auth();
       if (COMO_ALUMNO) await auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
       const user = await new Promise((ok, ko) => {
-        const fin = auth.onAuthStateChanged(async u => {
-          fin();
+        let fin;
+        let ya = false;
+        fin = auth.onAuthStateChanged(async u => {
+          if (ya) return;
+          ya = true;
+          if (fin) fin();
           try { ok(u || (await auth.signInAnonymously()).user); } catch (e) { ko(e); }
         }, ko);
+        if (ya && fin) fin();
       });
       return { uid: user.uid, db: app.database(), TS: firebase.database.ServerValue.TIMESTAMP };
     })(), 12000);
+    _fb.catch(() => { _fb = null; });
     return _fb;
   }
 
@@ -108,6 +116,7 @@
       const dueno = await leer2(raiz.child('dueno'));
       return Object.assign({ raiz, profe: !!dueno && dueno === F.uid, existe: !!dueno }, F);
     })();
+    _sala.catch(() => { _sala = null; });
     return _sala;
   }
 
@@ -141,20 +150,21 @@
     const pres = S.raiz.child('pres'), ev = S.raiz.child('ev');
     const mia = S.profe ? 'P' : S.uid;
     const yo = pres.child(mia), miEv = ev.child(S.uid);
-    let lista = [], previos = new Map(), actual = {}, ultimo = null, tEnvio = 0, pendiente = false, nEv = 0;
-    const subs = [], errs = [], oyentes = {};
+    let lista = [], cargado = false, previos = new Map(), actual = {}, ultimo = null, tEnvio = 0, pendiente = false, nEv = 0;
+    const subs = [], presErrs = [], evErrs = [], oyentes = {};
     const empaqueta = () => ({ j: JSON.stringify(actual), t: S.TS });
     /* presencia acumulativa: cada llamada mezcla sus campos con los anteriores (null borra un campo) */
     function envia() {
       const ahora = Date.now();
-      if (ahora - tEnvio < 90) { if (!pendiente) { pendiente = true; setTimeout(() => { pendiente = false; envia(); }, 95); } return Promise.resolve(); }
+      if (ahora - tEnvio < 90) { if (!pendiente) { pendiente = true; setTimeout(() => { pendiente = false; envia().catch(() => {}); }, 95); } return Promise.resolve(); }
       tEnvio = ahora; ultimo = empaqueta(); return yo.set(ultimo);
     }
     pres.on('value', s => {
       const l = [];
       s.forEach(c => {
-        let pr = {}; try { pr = JSON.parse(c.val().j); } catch (e) {}
-        l.push({ peer: c.key, isMe: c.key === mia, kind: 'viewer', sameTab: false, presence: pr, updatedAt: c.val().t || Date.now() });
+        const v = c.val() || {};
+        let pr = {}; try { pr = JSON.parse(v.j); } catch (e) {}
+        l.push({ peer: c.key, isMe: c.key === mia, kind: 'viewer', sameTab: false, presence: pr, updatedAt: v.t || Date.now() });
       });
       const ahora = new Map(l.map(x => [x.peer, x]));
       const ch = {
@@ -163,16 +173,20 @@
         left: [...previos.values()].filter(x => !ahora.has(x.peer)),
         updated: l.filter(x => previos.has(x.peer) && previos.get(x.peer).updatedAt !== x.updatedAt)
       };
-      lista = l; previos = ahora;
+      lista = l; cargado = true; previos = ahora;
       subs.forEach(f => { try { f(ch); } catch (e) { console.error(e); } });
-    }, e => errs.forEach(f => f(e)));
+    }, e => presErrs.forEach(f => f(e)));
     /* mensajes: cada quien escribe en su propio buzón; los demás lo escuchan */
     const oye = s => {
       if (s.key === S.uid) return;
       const v = s.val(); if (!v || !v.n) return;
       (oyentes[v.n] || []).forEach(f => { try { f({ peer: v.de, kind: 'viewer', data: v.d, sentAt: v.t }); } catch (e) { console.error(e); } });
     };
-    ev.on('child_added', oye); ev.on('child_changed', oye);
+    let listo = false;
+    const onEvErr = e => evErrs.forEach(f => f(e));
+    ev.on('child_added', s => { if (listo) oye(s); }, onEvErr);
+    ev.on('child_changed', oye, onEvErr);
+    ev.once('value', () => { listo = true; }, onEvErr);
     S.db.ref('.info/connected').on('value', s => {
       if (!s.val()) return;
       yo.onDisconnect().remove(); miEv.onDisconnect().remove();
@@ -184,9 +198,37 @@
         return envia();
       },
       peers: () => lista,
-      onPeers(cb, err) { subs.push(cb); if (err) errs.push(err); return () => {}; },
+      onPeers(cb, err) {
+        subs.push(cb);
+        if (err) presErrs.push(err);
+        let activo = true;
+        if (cargado) {
+          Promise.resolve().then(() => {
+            if (activo) {
+              try { cb({ peers: lista, joined: lista, left: [], updated: [] }); } catch (e) { console.error(e); }
+            }
+          });
+        }
+        return () => {
+          if (!activo) return;
+          activo = false;
+          const i = subs.indexOf(cb); if (i !== -1) subs.splice(i, 1);
+          if (err) { const j = presErrs.indexOf(err); if (j !== -1) presErrs.splice(j, 1); }
+        };
+      },
       emit(nombre, data) { return miEv.set({ n: String(nombre), d: data === undefined ? null : JSON.parse(JSON.stringify(data)), de: mia, k: ++nEv, t: S.TS }); },
-      on(nombre, cb, err) { (oyentes[nombre] = oyentes[nombre] || []).push(cb); if (err) errs.push(err); return () => {}; }
+      on(nombre, cb, err) {
+        const l = oyentes[nombre] = oyentes[nombre] || [];
+        l.push(cb);
+        if (err) evErrs.push(err);
+        let activo = true;
+        return () => {
+          if (!activo) return;
+          activo = false;
+          const i = l.indexOf(cb); if (i !== -1) l.splice(i, 1);
+          if (err) { const j = evErrs.indexOf(err); if (j !== -1) evErrs.splice(j, 1); }
+        };
+      }
     };
   }
 
