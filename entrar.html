@@ -3,9 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>document.documentElement.classList.add('js')</script>
+<script src="assets/i18n.js"></script>
 <meta name="robots" content="noindex">
-<title>Entrar · Lingua's Academy</title>
-<meta name="description" content="Entrada al catálogo de tableros de Lingua's Academy.">
+<title data-i18n="entrar.meta.titulo">Entrar · Lingua's Academy</title>
+<meta name="description" content="Entrada al catálogo de tableros de Lingua's Academy." data-i18n-content="entrar.meta.descripcion">
 <meta name="theme-color" content="#F6F3EC">
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +17,7 @@
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js">
+<link rel="preconnect" href="https://images.unsplash.com">
 <link rel="stylesheet" href="assets/site.css">
 <style>
 .login { min-height: 100vh; min-height: 100svh; padding: calc(var(--nav) + 48px) 0 64px; display: flex; align-items: center; }
@@ -22,7 +25,7 @@
 .login__panel { grid-column: 1 / span 5; display: grid; gap: 28px; }
 .login__panel h1 { font-size: clamp(38px, 2.2vw + 22px, 60px); }
 .pila { grid-column: 7 / span 6; position: relative; width: 100%; aspect-ratio: 10 / 8.6; max-height: calc(100svh - var(--nav) - 112px); }
-.pila img { position: absolute; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top left; border-radius: 12px; border: 1px solid var(--line-2); box-shadow: 0 22px 44px -22px rgba(20,33,58,.6); }
+.pila img { position: absolute; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: center; border-radius: 12px; background: var(--paper-2); border: 1px solid var(--line-2); box-shadow: 0 22px 44px -22px rgba(20,33,58,.6); }
 .pila img:nth-child(1) { left: 34%; top: 0; width: 62%; transform: rotate(4deg); }
 .pila img:nth-child(2) { left: 0; top: 17%; width: 68%; transform: rotate(-3deg); }
 .pila img:nth-child(3) { left: 27%; top: 46%; width: 72%; transform: rotate(1.5deg); }
@@ -39,15 +42,30 @@
 </style>
 </head>
 <body>
-<header class="nav">
+<header class="nav nav--larga">
   <div class="wrap">
-    <a class="skip-link" href="#top">Saltar al contenido</a>
-    <a class="brand" href="./" aria-label="Lingua's Academy, inicio"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <a class="skip-link" href="#top" data-i18n="nav.saltar">Saltar al contenido</a>
+    <a class="brand" href="./" aria-label="Lingua's Academy, inicio" data-i18n-aria="nav.inicio_aria"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <nav aria-label="Principal" data-i18n-aria="nav.principal_aria">
+      <ul class="nav__links">
+        <li><a href="./#tableros" data-i18n="nav.tableros">Tableros</a></li>
+        <li><a href="./#en-vivo" data-i18n="nav.como">Cómo funciona</a></li>
+        <li><a href="./#preguntas" data-i18n="nav.preguntas">Preguntas</a></li>
+      </ul>
+    </nav>
     <div class="nav__actions">
-      <a class="btn btn--secondary btn--sm" href="./">Volver al inicio</a>
+      <div class="nav__idioma" data-selector-idioma></div>
+      <a class="nav__entrar" href="entrar.html" aria-current="page" data-i18n="nav.entrar">Entrar</a>
+      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.menu_abrir_aria" data-txt-abrir="Menú" data-txt-cerrar="Cerrar" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir="nav.menu" data-i18n-txt-cerrar="nav.cerrar" data-i18n-txt-abrir-aria="nav.menu_abrir_aria" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><span data-i18n="nav.menu">Menú</span></button>
     </div>
   </div>
 </header>
+<nav class="sheet" id="menu" aria-label="Menú" data-i18n-aria="nav.menu" hidden>
+  <a href="./#tableros" data-i18n="nav.tableros">Tableros</a>
+  <a href="./#en-vivo" data-i18n="nav.como">Cómo funciona</a>
+  <a href="./#preguntas" data-i18n="nav.preguntas">Preguntas</a>
+  <a class="sheet__sec" href="entrar.html" aria-current="page" data-i18n="nav.entrar_largo">Entrar con mi cuenta</a>
+</nav>
 
 <main id="top" class="login">
   <div class="wrap">
@@ -56,96 +74,96 @@
       <!-- 1 · entrar -->
       <div data-modo="entrar" class="on" style="gap:28px">
         <div style="display:grid;gap:16px">
-          <h1>Entrar al catálogo de tableros</h1>
-          <p class="lead">Elige un tablero y empieza tu clase.</p>
+          <h1 data-i18n="entrar.titulo">Entrar al catálogo de tableros</h1>
+          <p class="lead" data-i18n="entrar.lead">Elige un tablero y empieza tu clase.</p>
         </div>
         <div class="google-box">
-          <button class="btn btn--google" type="button" data-google><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.4c-.5 2.8-2.1 5.2-4.5 6.8l7.3 5.7c4.3-4 6.9-9.9 6.9-16.5z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.3-5.7c-2 1.4-4.7 2.3-8.6 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>Entrar con Google</button>
+          <button class="btn btn--google" type="button" data-google><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.4c-.5 2.8-2.1 5.2-4.5 6.8l7.3 5.7c4.3-4 6.9-9.9 6.9-16.5z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.3-5.7c-2 1.4-4.7 2.3-8.6 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg><span data-i18n="entrar.google">Entrar con Google</span></button>
           <p class="form__status" role="status" data-google-status></p>
-          <p class="o-sep">o con tu correo y contraseña</p>
+          <p class="o-sep" data-i18n="entrar.sep">o con tu correo y contraseña</p>
         </div>
         <form class="form" id="f-entrar" novalidate>
           <div class="field">
-            <label for="e-correo">Correo</label>
+            <label for="e-correo" data-i18n="entrar.correo">Correo</label>
             <input id="e-correo" name="correo" type="email" autocomplete="email" inputmode="email" aria-describedby="e-correo-error">
             <p class="field__error" id="e-correo-error"></p>
           </div>
           <div class="field">
-            <label for="e-clave">Contraseña</label>
+            <label for="e-clave" data-i18n="entrar.clave">Contraseña</label>
             <input id="e-clave" name="clave" type="password" autocomplete="current-password" aria-describedby="e-clave-error">
             <p class="field__error" id="e-clave-error"></p>
           </div>
-          <button class="btn btn--primary" type="submit">Entrar</button>
+          <button class="btn btn--primary" type="submit" data-i18n="entrar.boton">Entrar</button>
           <p class="form__status" role="status" data-form-status></p>
         </form>
         <div class="alt-links">
-          <button class="plain-btn link" type="button" data-ir="clave">Olvidé mi contraseña</button>
+          <button class="plain-btn link" type="button" data-ir="clave" data-i18n="entrar.olvide">Olvidé mi contraseña</button>
         </div>
       </div>
 
       <!-- 2 · cambiar la contraseña -->
       <div data-modo="clave" style="gap:28px">
         <div style="display:grid;gap:16px">
-          <h1>Cambiar la contraseña</h1>
-          <p class="lead">Te enviamos un enlace a tu correo para elegir una contraseña nueva.</p>
+          <h1 data-i18n="clave.titulo">Cambiar la contraseña</h1>
+          <p class="lead" data-i18n="clave.lead">Te enviamos un enlace a tu correo para elegir una contraseña nueva.</p>
         </div>
         <form class="form" id="f-clave" novalidate>
           <div class="field">
-            <label for="c-correo">Correo</label>
+            <label for="c-correo" data-i18n="entrar.correo">Correo</label>
             <input id="c-correo" name="correo" type="email" autocomplete="email" inputmode="email" aria-describedby="c-correo-error">
             <p class="field__error" id="c-correo-error"></p>
           </div>
-          <button class="btn btn--primary" type="submit">Enviar el enlace</button>
+          <button class="btn btn--primary" type="submit" data-i18n="clave.boton">Enviar el enlace</button>
           <p class="form__status" role="status" data-form-status></p>
         </form>
-        <div class="alt-links"><button class="plain-btn link" type="button" data-ir="entrar">Volver a entrar</button></div>
+        <div class="alt-links"><button class="plain-btn link" type="button" data-ir="entrar" data-i18n="clave.volver">Volver a entrar</button></div>
       </div>
 
       <!-- 3 · primera vez con Google: completar la solicitud -->
       <div data-modo="completar" style="gap:28px">
         <div style="display:grid;gap:16px">
-          <h1>Completa tu solicitud</h1>
-          <p class="lead">Entraste como <b data-completar-correo></b>. Revisamos cada solicitud a mano. Cuando la aprobemos, entra otra vez con Google y verás el catálogo.</p>
+          <h1 data-i18n="solicitud.titulo">Completa tu solicitud</h1>
+          <p class="lead"><span data-i18n="solicitud.como">Entraste como</span> <b data-completar-correo></b>. <span data-i18n="solicitud.lead">Revisamos cada solicitud a mano. Cuando la aprobemos, entra otra vez con Google y verás el catálogo.</span></p>
         </div>
         <form class="form" id="f-completar" novalidate>
           <div class="field">
-            <label for="k-nombre">Nombre y apellido</label>
+            <label for="k-nombre" data-i18n="solicitud.nombre">Nombre y apellido</label>
             <input id="k-nombre" name="nombre" type="text" autocomplete="name" maxlength="80" aria-describedby="k-nombre-error">
             <p class="field__error" id="k-nombre-error"></p>
           </div>
           <div class="field">
-            <label for="k-idioma">Idioma que enseñas</label>
+            <label for="k-idioma" data-i18n="solicitud.idioma">Idioma que enseñas</label>
             <select id="k-idioma" name="idioma">
-              <option value="es">Español</option>
-              <option value="en">Inglés</option>
-              <option value="pt">Portugués</option>
-              <option value="varios">Más de uno</option>
+              <option value="es" data-i18n="idiomas.es">Español</option>
+              <option value="en" data-i18n="idiomas.en">Inglés</option>
+              <option value="pt" data-i18n="idiomas.pt">Portugués</option>
+              <option value="varios" data-i18n="solicitud.varios">Más de uno</option>
             </select>
           </div>
           <div class="field">
-            <label for="k-mensaje">Dónde das clase (opcional)</label>
+            <label for="k-mensaje" data-i18n="solicitud.donde">Dónde das clase (opcional)</label>
             <textarea id="k-mensaje" name="mensaje" maxlength="600"></textarea>
           </div>
-          <button class="btn btn--primary" type="submit">Enviar la solicitud</button>
+          <button class="btn btn--primary" type="submit" data-i18n="solicitud.boton">Enviar la solicitud</button>
           <p class="form__status" role="status" data-form-status></p>
         </form>
-        <div class="alt-links"><button class="plain-btn link" type="button" data-salir>Usar otra cuenta</button></div>
+        <div class="alt-links"><button class="plain-btn link" type="button" data-salir data-i18n="solicitud.otra">Usar otra cuenta</button></div>
       </div>
 
       <!-- 4 · solicitud en revisión o rechazada -->
       <div data-modo="estado" style="gap:24px">
-        <h1 data-estado-titulo>Tu solicitud está en revisión</h1>
-        <p class="lead" data-estado-texto>La revisamos a mano. Cuando la aprobemos, entra otra vez con este correo y verás el catálogo.</p>
-        <p class="muted">Sesión abierta como <b data-estado-correo></b>.</p>
-        <div class="btn-row"><button class="btn btn--secondary" type="button" data-salir>Salir</button></div>
+        <h1 data-estado-titulo data-i18n="estado.titulo">Tu solicitud está en revisión</h1>
+        <p class="lead" data-estado-texto data-i18n="estado.texto">La revisamos a mano. Cuando la aprobemos, entra otra vez con este correo y verás el catálogo.</p>
+        <p class="muted"><span data-i18n="estado.sesion">Sesión abierta como</span> <b data-estado-correo></b>.</p>
+        <div class="btn-row"><button class="btn btn--secondary" type="button" data-salir data-i18n="estado.salir">Salir</button></div>
       </div>
 
     </div>
     <div class="pila" aria-hidden="true">
-      <img src="assets/tableros/b1-que-harias-si-960.jpg" width="960" height="600" alt="">
-      <img src="assets/tableros/a1-monstruos-gigantes-960.jpg" width="960" height="600" alt="">
-      <img src="assets/tableros/a2-a-como-esta-la-pina-960.jpg" width="960" height="600" alt="">
-      <span class="pila__nota">tu clase te espera</span>
+      <img src="https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="36vw" width="800" height="500" alt="" data-foto="b1-que-harias-si">
+      <img src="https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="36vw" width="800" height="500" alt="" data-foto="a1-monstruos-gigantes">
+      <img src="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="36vw" width="800" height="500" alt="" data-foto="a2-a-como-esta-la-pina">
+      <span class="pila__nota" data-i18n="entrar.nota">tu clase te espera</span>
     </div>
   </div>
 </main>
@@ -156,6 +174,24 @@
 <script>
 (() => {
   'use strict';
+  /* Textos del script: claves de assets/i18n.js (entrar.msg.*, auth.err.*), con respaldo en español */
+  const T = (k, es) => (window.LAi18n ? LAi18n.t(k) : null) || es;
+  const motivo = e => {
+    const c = (e && e.code) || (e && e.message) || '';
+    const k = /invalid-credential|wrong-password|user-not-found|invalid-login/.test(c) ? 'credenciales'
+      : /email-already-in-use/.test(c) ? 'en_uso'
+      : /weak-password/.test(c) ? 'clave_debil'
+      : /invalid-email/.test(c) ? 'correo'
+      : /too-many-requests/.test(c) ? 'intentos'
+      : /popup-closed-by-user|cancelled-popup-request|user-cancelled/.test(c) ? 'popup'
+      : /account-exists-with-different-credential/.test(c) ? 'otra_credencial'
+      : /unauthorized-domain/.test(c) ? 'dominio'
+      : /operation-not-allowed/.test(c) ? 'no_activado'
+      : /permission[_-]denied|PERMISSION_DENIED/i.test(c) ? 'permiso'
+      : /red|tiempo|network/.test(c) ? 'red' : 'otro';
+    return T('auth.err.' + k, LA.motivo(e));
+  };
+  const revisa = n => n === 1 ? T('entrar.msg.revisa_uno', 'Revisa el campo marcado.') : T('entrar.msg.revisa_varios', 'Revisa los {n} campos marcados.').replace('{n}', n);
   const q = new URLSearchParams(location.search);
   const volver = /^[a-z0-9-]+\.html(\?[a-z0-9=&-]*)?$/i.test(q.get('volver') || '') ? q.get('volver') : 'tableros.html';
 
@@ -165,7 +201,7 @@
 
   function mostrar(perfil) {
     if (!perfil) return false;
-    if (perfil.estado === 'aprobado' || perfil.admin) { location.replace(volver); return true; }
+    if (perfil.estado === 'aprobado' || perfil.admin) { location.replace(window.LAi18n ? LAi18n.enlace(volver) : volver); return true; }
     if (perfil.estado === 'sin-solicitud') {
       document.querySelector('[data-completar-correo]').textContent = perfil.correo;
       document.getElementById('k-nombre').value = perfil.nombreGoogle || '';
@@ -174,8 +210,9 @@
     }
     const t = document.querySelector('[data-estado-titulo]'), x = document.querySelector('[data-estado-texto]');
     if (perfil.estado === 'rechazado') {
-      t.textContent = 'Tu solicitud no fue aprobada';
-      x.textContent = 'Por ahora esta cuenta no tiene acceso al catálogo. Si crees que es un error, escríbele a la administración de Lingua’s Academy.';
+      t.dataset.i18n = 'estado.rechazado_titulo'; x.dataset.i18n = 'estado.rechazado_texto';
+      t.textContent = T('estado.rechazado_titulo', 'Tu solicitud no fue aprobada');
+      x.textContent = T('estado.rechazado_texto', 'Por ahora esta cuenta no tiene acceso al catálogo. Si crees que es un error, escríbele a la administración de Lingua’s Academy.');
     }
     document.querySelector('[data-estado-correo]').textContent = perfil.correo;
     ir('estado');
@@ -189,12 +226,12 @@
   fe.addEventListener('submit', async e => {
     e.preventDefault(); Forma.limpiar(fe);
     const d = Object.fromEntries(new FormData(fe));
-    if (!Forma.correoValido(d.correo)) Forma.error(fe, 'correo', 'Escribe tu correo con @ y dominio.');
-    if (!d.clave) Forma.error(fe, 'clave', 'Escribe tu contraseña.');
+    if (!Forma.correoValido(d.correo)) Forma.error(fe, 'correo', T('entrar.msg.correo', 'Escribe tu correo con @ y dominio.'));
+    if (!d.clave) Forma.error(fe, 'clave', T('entrar.msg.clave', 'Escribe tu contraseña.'));
     const n = Forma.enfocarPrimero(fe);
-    if (n) { Forma.estado(fe, n === 1 ? 'Revisa el campo marcado.' : 'Revisa los ' + n + ' campos marcados.', 'error'); return; }
+    if (n) { Forma.estado(fe, revisa(n), 'error'); return; }
     const b = fe.querySelector('button[type="submit"]'); b.disabled = true;
-    const t = setTimeout(() => Forma.estado(fe, 'Entrando…'), 300);
+    const t = setTimeout(() => Forma.estado(fe, T('entrar.msg.entrando', 'Entrando…')), 300);
     try {
       let p = await LA.entrar(d.correo, d.clave);
       if (p && p.estado === 'sin-solicitud' && !p.admin) {
@@ -207,7 +244,7 @@
       mostrar(p);
     } catch (err) {
       clearTimeout(t); console.warn(err);
-      Forma.estado(fe, LA.motivo(err), 'error');
+      Forma.estado(fe, motivo(err), 'error');
     }
     b.disabled = false;
   });
@@ -216,12 +253,12 @@
   fc.addEventListener('submit', async e => {
     e.preventDefault(); Forma.limpiar(fc);
     const d = Object.fromEntries(new FormData(fc));
-    if (!Forma.correoValido(d.correo)) { Forma.error(fc, 'correo', 'Escribe tu correo con @ y dominio.'); Forma.enfocarPrimero(fc); Forma.estado(fc, 'Revisa el campo marcado.', 'error'); return; }
+    if (!Forma.correoValido(d.correo)) { Forma.error(fc, 'correo', T('entrar.msg.correo', 'Escribe tu correo con @ y dominio.')); Forma.enfocarPrimero(fc); Forma.estado(fc, revisa(1), 'error'); return; }
     const b = fc.querySelector('button[type="submit"]'); b.disabled = true;
     try {
       await LA.restablecer(d.correo);
-      Forma.estado(fc, 'Listo: si ese correo tiene cuenta, te llegará el enlace en unos minutos. Revisa también el correo no deseado.', 'ok');
-    } catch (err) { console.warn(err); Forma.estado(fc, LA.motivo(err), 'error'); }
+      Forma.estado(fc, T('entrar.msg.enviado', 'Listo: si ese correo tiene cuenta, te llegará el enlace en unos minutos. Revisa también el correo no deseado.'), 'ok');
+    } catch (err) { console.warn(err); Forma.estado(fc, motivo(err), 'error'); }
     b.disabled = false;
   });
 
@@ -234,7 +271,7 @@
       if (p) mostrar(p);
     } catch (err) {
       console.warn(err);
-      sg.textContent = LA.motivo(err); sg.dataset.tone = 'error';
+      sg.textContent = motivo(err); sg.dataset.tone = 'error';
     }
     bg.disabled = false;
   });
@@ -244,11 +281,11 @@
   fk.addEventListener('submit', async e => {
     e.preventDefault(); Forma.limpiar(fk);
     const d = Object.fromEntries(new FormData(fk));
-    if (!d.nombre.trim()) { Forma.error(fk, 'nombre', 'Escribe tu nombre y apellido.'); Forma.enfocarPrimero(fk); Forma.estado(fk, 'Revisa el campo marcado.', 'error'); return; }
+    if (!d.nombre.trim()) { Forma.error(fk, 'nombre', T('entrar.msg.nombre', 'Escribe tu nombre y apellido.')); Forma.enfocarPrimero(fk); Forma.estado(fk, revisa(1), 'error'); return; }
     const b = fk.querySelector('button[type="submit"]'); b.disabled = true;
     try {
       mostrar(await LA.completarSolicitud(d));
-    } catch (err) { console.warn(err); Forma.estado(fk, LA.motivo(err), 'error'); }
+    } catch (err) { console.warn(err); Forma.estado(fk, motivo(err), 'error'); }
     b.disabled = false;
   });
 

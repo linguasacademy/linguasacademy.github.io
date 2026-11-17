@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
+<script src="assets/i18n.js"></script>
 <title>Solicitudes de acceso · Lingua's Academy</title>
 <meta name="description" content="Revisión de las solicitudes de acceso de profesores a Lingua's Academy.">
 <meta name="theme-color" content="#F6F3EC">
@@ -34,24 +35,25 @@
 <body>
 <header class="nav">
   <div class="wrap">
-    <a class="skip-link" href="#top">Saltar al contenido</a>
-    <a class="brand" href="./" aria-label="Lingua's Academy, inicio"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
-    <nav aria-label="Plataforma">
+    <a class="skip-link" href="#top" data-i18n="nav.saltar">Saltar al contenido</a>
+    <a class="brand" href="./" aria-label="Lingua's Academy, inicio" data-i18n-aria="nav.marca"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <nav aria-label="Plataforma" data-i18n-aria="nav.plataforma">
       <ul class="nav__links">
-        <li><a href="tableros.html">Catálogo</a></li>
-        <li><a href="admin.html" aria-current="page">Solicitudes</a></li>
+        <li><a href="tableros.html" data-i18n="nav.catalogo">Catálogo</a></li>
+        <li><a href="admin.html" aria-current="page" data-i18n="nav.solicitudes">Solicitudes</a></li>
       </ul>
     </nav>
     <div class="nav__actions">
-      <button class="btn btn--secondary btn--sm" type="button" data-salir>Salir</button>
-      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú"><span>Menú</span></button>
+      <div class="nav__idioma" data-selector-idioma></div>
+      <button class="btn btn--secondary btn--sm" type="button" data-salir data-i18n="nav.salir">Salir</button>
+      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.abrirMenu" data-txt-abrir="Menú" data-txt-cerrar="Cerrar" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir="nav.menu" data-i18n-txt-cerrar="nav.cerrar" data-i18n-txt-abrir-aria="nav.abrirMenu" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><span data-i18n="nav.menu">Menú</span></button>
     </div>
   </div>
 </header>
 <div class="sheet" id="menu" hidden>
-  <a href="tableros.html">Catálogo</a>
-  <a href="admin.html">Solicitudes</a>
-  <button class="btn btn--secondary" type="button" data-salir>Salir</button>
+  <a href="tableros.html" data-i18n="nav.catalogo">Catálogo</a>
+  <a href="admin.html" data-i18n="nav.solicitudes">Solicitudes</a>
+  <button class="btn btn--secondary" type="button" data-salir data-i18n="nav.salir">Salir</button>
 </div>
 
 <main id="top" class="app">

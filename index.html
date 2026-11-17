@@ -3,16 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Lingua's Academy · La clase de mañana ya está lista</title>
-<meta name="description" content="Tableros interactivos para profes de idiomas: abres uno, compartes un enlace y empieza la clase, con actividades, juego y tarea.">
+<script>document.documentElement.classList.add('js')</script>
+<script src="assets/i18n.js"></script>
+<title data-i18n="meta.titulo">Lingua's Academy · La clase de mañana ya está lista</title>
+<meta name="description" content="Tableros interactivos para profes de idiomas: abres uno, compartes un enlace y empieza la clase, con actividades, juego y tarea." data-i18n-content="meta.descripcion">
 <meta name="theme-color" content="#F6F3EC">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Lingua's Academy · La clase de mañana ya está lista">
-<meta property="og:description" content="Tableros de clase para profes de idiomas: 50 minutos con actividades, juego y tarea, para proyectar o abrir en sala en vivo.">
-<meta property="og:image" content="https://linguasacademy.github.io/assets/tableros/a2-a-como-esta-la-pina-960.jpg">
+<meta property="og:locale" content="es_LA" data-i18n-content="meta.og_locale">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="pt_BR">
+<meta property="og:title" content="Lingua's Academy · La clase de mañana ya está lista" data-i18n-content="meta.titulo">
+<meta property="og:description" content="Tableros de clase para profes de idiomas: 50 minutos con actividades, juego y tarea, para proyectar o abrir en sala en vivo." data-i18n-content="meta.og_descripcion">
+<meta property="og:image" content="https://images.unsplash.com/photo-1730343464372-77500ccd307a?auto=format&amp;fit=crop&amp;w=1200&amp;h=630&amp;q=70">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:url" content="https://linguasacademy.github.io/">
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Caveat:wght@500;600&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 <style>
@@ -21,6 +29,10 @@
 .t2 { font: 400 clamp(36px, 4vw, 60px)/1.05 var(--f-display); letter-spacing: -.015em; }
 .btn--pill { border-radius: 999px; --bh: 58px; padding: 0 28px; font-size: 18px; font-weight: 600; }
 .btn--pill.btn--sm { --bh: 44px; padding: 0 22px; font-size: 16px; }
+.credito { font-size: 12.5px; line-height: 1.4; color: var(--muted); }
+.credito a { color: inherit; text-underline-offset: 3px; }
+.sec-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 48px; }
+.sec-head p:not(.mano) { color: var(--ink-2); max-width: 26em; }
 
 /* entrada */
 .hero { padding-top: calc(var(--nav) + clamp(32px, 5vw, 72px)); padding-bottom: clamp(56px, 7vw, 104px); }
@@ -31,55 +43,60 @@
 .hero h1 em { color: var(--action); }
 .hero__lead { font-size: clamp(18px, 1.5vw, 21px); color: var(--ink-2); max-width: 30em; }
 .hero__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
-.mesa { flex: 1 1 520px; min-width: 0; }
+.mesa { flex: 1 1 520px; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
 .mesa__in { position: relative; width: 100%; aspect-ratio: 10 / 8.8; }
-.mesa__board { position: absolute; aspect-ratio: 16 / 10; height: auto; object-fit: cover; object-position: top left; border-radius: 12px; border: 1px solid var(--line-2); box-shadow: 0 22px 44px -22px rgba(20,33,58,.6); transition: transform .5s var(--ease); }
+.mesa__board { position: absolute; aspect-ratio: 16 / 10; height: auto; object-fit: cover; object-position: center; border-radius: 12px; border: 1px solid var(--line-2); box-shadow: 0 22px 44px -22px rgba(20,33,58,.6); transition: transform 450ms var(--ease-out); background: var(--paper-2); }
 .mesa__board--back { left: 2%; top: 8%; width: 64%; transform: rotate(-2.5deg); z-index: 1; }
 .mesa__board--front { left: 24%; top: 24%; width: 72%; transform: rotate(1.5deg); z-index: 2; }
-.mesa:hover .mesa__board--back { transform: rotate(-3.5deg) translate(-4px, -4px); }
-.mesa:hover .mesa__board--front { transform: rotate(1deg) translate(4px, 4px); }
-.mesa__foto { position: absolute; aspect-ratio: 4 / 3; height: auto; object-fit: cover; border-radius: 14px; border: 3px solid var(--card); box-shadow: 0 18px 36px -18px rgba(20,33,58,.55); transition: transform .5s var(--ease); z-index: 3; }
+.mesa__foto { position: absolute; aspect-ratio: 4 / 3; height: auto; object-fit: cover; border-radius: 14px; border: 3px solid var(--card); box-shadow: 0 18px 36px -18px rgba(20,33,58,.55); transition: transform 450ms var(--ease-out); z-index: 3; background: var(--paper-2); }
 .mesa__foto--profe { left: 0; bottom: 4%; width: 38%; transform: rotate(-2deg); }
 .mesa__foto--estudiante { right: 0; top: 0; width: 34%; transform: rotate(2.5deg); }
-.mesa:hover .mesa__foto--profe { transform: rotate(-1deg) translate(-3px, 3px); }
-.mesa:hover .mesa__foto--estudiante { transform: rotate(1.5deg) translate(3px, -3px); }
+@media (hover: hover) and (pointer: fine) {
+  .mesa:hover .mesa__board--back { transform: rotate(-3.5deg) translate(-4px, -4px); }
+  .mesa:hover .mesa__board--front { transform: rotate(1deg) translate(4px, 4px); }
+  .mesa:hover .mesa__foto--profe { transform: rotate(-1deg) translate(-3px, 3px); }
+  .mesa:hover .mesa__foto--estudiante { transform: rotate(1.5deg) translate(3px, -3px); }
+}
+.mesa__credito { text-align: right; }
 .chip-ui { position: absolute; z-index: 4; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(255, 253, 248, .96); border: 1px solid var(--line-2); box-shadow: 0 12px 24px -12px rgba(20,33,58,.32); font: 600 13px/1.2 var(--f-text); color: var(--ink); white-space: nowrap; }
 .chip-ui__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; box-shadow: 0 0 0 3px var(--pt-soft); }
 .chip-ui--vivo { left: 4%; top: 0; }
-.chip-ui--idiomas { right: 2%; top: 44%; }
-.chip-ui--meta { right: 6%; bottom: 2%; font-family: var(--f-mono); font-weight: 500; }
-.chip-ui__flags { display: inline-flex; align-items: center; gap: 4px; }
 .nota { position: absolute; z-index: 4; padding: 6px 14px 8px; font-size: clamp(17px, 1.8vw, 24px); line-height: 1.1; box-shadow: 0 6px 14px -8px rgba(20,33,58,.5); }
 .nota--1 { left: 36%; bottom: 4%; background: #FFE9A8; transform: rotate(-3deg); }
 
-/* metricas */
-.metricas { background: var(--paper-2); border-top: 1px solid var(--line); padding: 32px 0; }
-.metricas__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px 32px; }
-.metrica { display: flex; flex-direction: column; gap: 4px; padding-left: 16px; border-left: 2px solid var(--line-2); }
-.metrica strong { font: 400 clamp(30px, 2.8vw, 42px)/1.05 var(--f-display); letter-spacing: -.02em; color: var(--mc, var(--ink)); }
-.metrica span { font-size: 15px; color: var(--ink-2); }
-
-/* una clase */
-.clase { background: var(--card); border-block: 1px solid var(--line); }
-.clase .wrap { display: flex; flex-direction: column; gap: 56px; }
-.clase h2 { max-width: 14em; }
-.momentos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.momento { min-width: 0; display: flex; flex-direction: column; gap: 14px; background: var(--paper); border: 1.5px solid var(--line-2); border-top: 4px solid var(--c); border-radius: var(--r-lg); padding: 26px; transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
-.momento:hover { transform: translateY(-3px); box-shadow: 0 16px 32px -24px rgba(20,33,58,.45); }
+/* tarjetas .momento: número en cuadrito, nota manuscrita y borde superior del mismo color */
+.momento { min-width: 0; display: flex; flex-direction: column; gap: 14px; background: var(--paper); border: 1.5px solid var(--line-2); border-top: 4px solid var(--c); border-radius: var(--r-lg); padding: 26px; }
 .momento__head { display: flex; align-items: center; gap: 12px; }
 .momento__num { width: 34px; height: 34px; border-radius: 10px; background: var(--c); color: #fff; display: grid; place-items: center; font: 600 16px/1 var(--f-mono); flex: none; }
 .momento .mano { font-size: 26px; color: var(--c); }
 .momento h3 { font: 500 28px/1.15 var(--f-display); }
 .momento__desc { color: var(--ink-2); }
+
+/* ruta de la clase, compacta, dentro de «en vivo» */
+.ruta { display: flex; flex-direction: column; gap: 14px; }
+.vivo__text .ruta__suma { font-size: 28px; color: #FFD27A; transform: rotate(-2deg); transform-origin: left center; }
+.ruta__lista { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.ruta__lista li { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(243,239,230,.24); background: rgba(243,239,230,.06); color: var(--on-night); font-size: 15px; font-weight: 500; white-space: nowrap; }
+.ruta__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+.ruta__min { font: 500 13px/1 var(--f-mono); color: var(--c); }
+.ruta__min::after { content: ' min'; }
+
+/* una clase por dentro */
+.clase { background: var(--card); border-block: 1px solid var(--line); }
+.clase .wrap { display: flex; flex-direction: column; gap: 56px; }
+.clase h2 { max-width: 14em; }
+.momentos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .momento__ui { margin-top: auto; padding: 14px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); display: grid; gap: 10px; font-size: 13px; color: var(--ink); }
 .ui-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .ui-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px; background: var(--paper-2); color: var(--ink-2); font: 600 12px/1 var(--f-text); }
 .ui-pill--cta { background: var(--es-soft); color: #7D2416; }
 .ui-title { font: 500 16px/1.2 var(--f-display); color: var(--ink); }
 .ui-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.ui-chip { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); font-size: 12px; font-weight: 500; }
+.ui-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); font-size: 12px; font-weight: 500; }
+.ui-chip svg { width: 13px; height: 13px; flex: none; }
 .ui-chip--sel { background: var(--en-soft); border-color: var(--en); color: var(--ink); font-weight: 600; }
 .ui-audio { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: var(--pt-soft); color: var(--ink); font: 500 12px/1 var(--f-mono); }
+.ui-audio svg { width: 12px; height: 12px; flex: none; }
 .ui-audio__bar { flex: 1; height: 6px; border-radius: 999px; background: rgba(11, 122, 94, .2); overflow: hidden; }
 .ui-audio__bar i { display: block; width: 62%; height: 100%; background: var(--pt); border-radius: 999px; }
 
@@ -94,263 +111,415 @@
 .vivo__video { flex: 1.5 1 480px; min-width: 0; position: relative; margin: 0; }
 .vivo__video video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; border-radius: 16px; border: 1px solid rgba(243,239,230,.25); background: #0B1322; }
 .vivo__play { position: absolute; right: 14px; bottom: 14px; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; background: rgba(16,27,48,.88); color: #fff; font: 600 15px/1 var(--f-text); cursor: pointer; }
-.vivo__play:focus-visible { outline: 3px solid #F4B51E; outline-offset: 2px; }
 
 /* lugares */
 .lugares .wrap { display: flex; flex-direction: column; gap: 48px; }
-.lugares__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 48px; }
-.lugares__head p { color: var(--ink-2); max-width: 24em; }
 .fila { display: flex; flex-wrap: wrap; gap: 28px; }
-.lugar { margin: 0; flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 14px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 14px 14px 20px; box-shadow: 0 10px 26px -22px rgba(20,33,58,.35); transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s; }
+.lugar { margin: 0; flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 14px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 14px 14px 20px; box-shadow: 0 10px 26px -22px rgba(20,33,58,.35); }
 .lugar--g { flex: 1.4 1 420px; }
 .lugar--m { flex: 1 1 320px; }
-.lugar:hover { transform: translateY(-3px); border-color: var(--line-2); box-shadow: 0 20px 38px -24px rgba(20,33,58,.5); }
-.lugar img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top left; border-radius: 10px; border: 1px solid var(--line); }
+.lugar img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: center; border-radius: 10px; border: 1px solid var(--line); background: var(--paper-2); }
 .lugar figcaption { display: flex; flex-direction: column; gap: 6px; padding: 0 4px; color: var(--ink-2); }
 .lugar__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 2px; }
 .lugar__titulo { font: 400 26px/1.15 var(--f-display); color: var(--ink); }
+.lugar .credito { margin-top: 4px; }
 .idiomas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; border-top: 1px solid var(--line); padding-top: 32px; margin: 0; list-style: none; padding-left: 0; }
-.idioma-card { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 18px 20px; background: var(--card); border: 1.5px solid var(--line-2); border-radius: var(--r-md); text-decoration: none; color: var(--ink); transition: transform .2s var(--ease), border-color .2s, box-shadow .2s; }
-a.idioma-card:hover { transform: translateY(-2px); border-color: var(--c); box-shadow: 0 14px 28px -22px rgba(20,33,58,.45); }
+.idioma-card { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 18px 20px; background: var(--card); border: 1.5px solid var(--line-2); border-radius: var(--r-md); text-decoration: none; color: var(--ink); transition: transform var(--dur-ui) var(--ease-out), border-color var(--dur-ui), box-shadow var(--dur-ui); }
+@media (hover: hover) and (pointer: fine) {
+  a.idioma-card:hover { transform: translateY(-2px); border-color: var(--c); box-shadow: 0 14px 28px -22px rgba(20,33,58,.45); }
+  a.idioma-card:hover .idioma-card__chev { transform: translateX(3px); color: var(--c); }
+}
+.cod { display: inline-grid; place-items: center; width: 40px; height: 30px; border-radius: 6px; background: var(--c-soft); color: var(--ink); border: 1.5px solid var(--c); font: 500 13px/1 var(--f-mono); flex: none; }
 .idioma-card__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .idioma-card__title { font: 500 20px/1.2 var(--f-display); color: var(--ink); }
 .idioma-card__meta { font-size: 14px; color: var(--muted); }
-.idioma-card__chev { font: 500 22px/1 var(--f-text); color: var(--ink-2); transition: transform .2s var(--ease); }
-a.idioma-card:hover .idioma-card__chev { transform: translateX(3px); color: var(--c); }
-.idioma-card--soon { background: var(--paper-2); border-style: dashed; opacity: .9; }
+.idioma-card__chev { font: 500 22px/1 var(--f-text); color: var(--ink-2); transition: transform var(--dur-ui) var(--ease-out), color var(--dur-ui); }
+.idioma-card--soon { background: var(--paper-2); border-style: dashed; }
 .idioma-card__soon { font: 500 12px/1 var(--f-mono); padding: 5px 9px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); color: var(--muted); }
+
+/* muestras */
+.muestras { background: var(--card); border-block: 1px solid var(--line); }
+.muestras .wrap { display: flex; flex-direction: column; gap: 40px; }
+.muestras .sec-head .mano { font-size: 28px; color: var(--es); transform: rotate(-2deg); transform-origin: left center; margin-bottom: 10px; }
+.muestras__lista { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.muestra { min-width: 0; display: flex; flex-direction: column; background: var(--paper); border: 1.5px solid var(--line-2); border-top: 4px solid var(--lvl); border-radius: var(--r-lg); overflow: hidden; }
+.muestra__foto { margin: 0; position: relative; }
+.muestra__foto img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; background: var(--lvl-bg); }
+.muestra .credito { margin-top: 2px; }
+.muestra__body { flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 18px; }
+.muestra__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.muestra__nivel { display: inline-grid; place-items: center; min-width: 34px; height: 28px; padding: 0 6px; border-radius: 8px; background: var(--lvl); color: #fff; font: 600 13px/1 var(--f-mono); }
+.muestra .tag { min-height: 24px; font-size: 12.5px; background: var(--card); }
+.muestra h3 { font: 500 24px/1.15 var(--f-display); }
+.muestra p { color: var(--ink-2); font-size: 15.5px; line-height: 1.5; }
+.muestra__cta { margin-top: auto; align-self: flex-start; }
+
+/* preguntas */
+.preguntas .wrap { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px 64px; align-items: start; }
+.preguntas__head { display: flex; flex-direction: column; gap: 16px; }
+.preguntas__head .mano { font-size: 28px; color: var(--pt); transform: rotate(-2deg); transform-origin: left center; }
+.preguntas__head p:not(.mano) { color: var(--ink-2); max-width: 24em; }
+.faq { border-top: 1px solid var(--line-2); }
+.faq details { border-bottom: 1px solid var(--line-2); }
+.faq summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; padding: 14px 0; font: 400 clamp(20px, 1.6vw, 24px)/1.25 var(--f-display); color: var(--ink); }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: ''; flex: none; width: 14px; height: 14px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform var(--dur-ui) var(--ease-out); }
+.faq details[open] summary::after { transform: translateY(3px) rotate(-135deg); }
+.faq details p { padding: 0 0 22px; max-width: 36em; color: var(--ink-2); }
 
 /* cierre */
 .cierre .wrap { display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center; }
 .cierre .mano { font-size: 34px; color: var(--pt); transform: rotate(-2deg); }
 .cierre h2 { font: 400 clamp(40px, 5vw, 76px)/1 var(--f-display); letter-spacing: -.02em; max-width: 12em; }
+.cierre .lead { max-width: 32em; }
+.cierre__cta { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 24px; }
 .pie { border-top: 1px solid var(--line); }
 .pie .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 32px; padding-top: 28px; padding-bottom: 28px; font-size: 15px; color: var(--muted); }
 .pie span:first-child { display: inline-flex; align-items: center; gap: 10px; }
 .pie a { color: var(--muted); }
 
-/* aparecer al bajar */
-.js [data-ver] { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+/* aparecer al bajar: una vez, 450 ms, escalonado de a 60 ms (máximo tres pasos) */
+.js [data-ver] { opacity: 0; transform: translateY(12px); transition: opacity var(--dur-reveal) var(--ease-out), transform var(--dur-reveal) var(--ease-out); }
 .js [data-ver].visto { opacity: 1; transform: none; }
+.js :is(.momentos, .muestras__lista) > [data-ver]:nth-child(2) { transition-delay: 60ms; }
+.js :is(.momentos, .muestras__lista) > [data-ver]:nth-child(3) { transition-delay: 120ms; }
+.js :is(.momentos, .muestras__lista) > [data-ver]:nth-child(n+4) { transition-delay: 180ms; }
 @media (prefers-reduced-motion: reduce) {
-  .js [data-ver] { opacity: 1; transform: none; transition: none; }
-  .mesa__board, .mesa__foto, .momento, .lugar, .idioma-card, .idioma-card__chev { transition: none; }
+  .js [data-ver] { transform: none; transition: opacity 150ms ease; transition-delay: 0s !important; }
+  .mesa__board, .mesa__foto, .idioma-card, .idioma-card__chev, .faq summary::after { transition-property: opacity, color, background-color, border-color, box-shadow !important; transition-duration: 150ms !important; }
+  .mesa:hover * { transform: none; }
 }
-@media (max-width: 959px) { .momentos { grid-template-columns: 1fr; } }
+
+@media (max-width: 1099px) {
+  .muestras__lista { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 959px) {
+  .momentos { grid-template-columns: 1fr; }
+  .preguntas .wrap { grid-template-columns: 1fr; }
+}
 @media (max-width: 899px) { .idiomas { grid-template-columns: 1fr; } }
-@media (max-width: 767px) { .metricas__grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 639px) {
   .btn--pill { width: 100%; }
   .btn--pill.btn--sm { width: auto; }
   .hero__para { font-size: 26px; }
   .chip-ui { padding: 6px 11px; font-size: 12px; }
   .nota--1 { display: none; }
+  .muestras__lista { grid-template-columns: 1fr; }
+  .vivo__text .ruta__suma { font-size: 24px; }
+  .momento { padding: 22px; }
+  .mesa__credito { text-align: left; }
 }
 </style>
 </head>
 <body>
-<header class="nav">
+<header class="nav nav--larga">
   <div class="wrap">
-    <a class="skip-link" href="#top">Saltar al contenido</a>
-    <a class="brand" href="./" aria-label="Lingua's Academy, inicio"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
-    <nav aria-label="Secciones">
+    <a class="skip-link" href="#top" data-i18n="nav.saltar">Saltar al contenido</a>
+    <a class="brand" href="./" aria-label="Lingua's Academy, inicio" data-i18n-aria="nav.inicio_aria"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <nav aria-label="Principal" data-i18n-aria="nav.principal_aria">
       <ul class="nav__links">
-        <li><a href="#clase">Una clase</a></li>
-        <li><a href="#en-vivo">En vivo</a></li>
-        <li><a href="#tableros">Tableros</a></li>
+        <li><a href="#tableros" data-i18n="nav.tableros">Tableros</a></li>
+        <li><a href="#en-vivo" data-i18n="nav.como">Cómo funciona</a></li>
+        <li><a href="#preguntas" data-i18n="nav.preguntas">Preguntas</a></li>
       </ul>
     </nav>
     <div class="nav__actions">
-      <a class="btn btn--primary btn--sm btn--pill" href="entrar.html" data-cuenta-link>Entrar</a>
-      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú"><span>Menú</span></button>
+      <div class="nav__idioma" data-selector-idioma></div>
+      <a class="nav__entrar" href="entrar.html" data-cuenta-link data-i18n="nav.entrar">Entrar</a>
+      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.menu_abrir_aria" data-txt-abrir="Menú" data-txt-cerrar="Cerrar" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir="nav.menu" data-i18n-txt-cerrar="nav.cerrar" data-i18n-txt-abrir-aria="nav.menu_abrir_aria" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><span data-i18n="nav.menu">Menú</span></button>
     </div>
   </div>
 </header>
-<div class="sheet" id="menu" hidden>
-  <a href="#clase">Una clase</a>
-  <a href="#en-vivo">En vivo</a>
-  <a href="#tableros">Tableros</a>
-  <a class="btn btn--primary" href="entrar.html" data-cuenta-link>Entrar</a>
-</div>
+<nav class="sheet" id="menu" aria-label="Menú" data-i18n-aria="nav.menu" hidden>
+  <a href="#tableros" data-i18n="nav.tableros">Tableros</a>
+  <a href="#en-vivo" data-i18n="nav.como">Cómo funciona</a>
+  <a href="#preguntas" data-i18n="nav.preguntas">Preguntas</a>
+  <a class="sheet__sec" href="entrar.html" data-cuenta-link data-i18n="nav.entrar_largo">Entrar con mi cuenta</a>
+</nav>
 
 <main id="top">
   <section class="hero" aria-labelledby="h1">
     <div class="wrap">
       <div class="hero__text">
-        <p class="mano hero__para">para profes de español, inglés y portugués</p>
-        <h1 id="h1">La clase de mañana <em>ya está lista.</em></h1>
-        <p class="hero__lead">Abres un tablero, compartes un enlace y empieza la clase: 50 minutos con actividades, un juego y la tarea. Tú te quedas con lo mejor del oficio, que es conversar con tu estudiante.</p>
+        <p class="mano hero__para" data-i18n="hero.para">para profes de español, inglés y portugués</p>
+        <h1 id="h1" data-i18n-html="hero.titulo">La clase de mañana <em>ya está lista.</em></h1>
+        <p class="hero__lead" data-i18n="hero.lead">Abres un tablero, compartes un enlace y empieza la clase: 50 minutos con actividades, un juego y la tarea. Tú te quedas con lo mejor del oficio, que es conversar con tu estudiante.</p>
         <div class="hero__cta">
-          <a class="btn btn--primary btn--pill" href="entrar.html" data-cuenta-link-largo>Entrar a mis tableros<svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a class="btn btn--primary btn--pill" href="#muestras"><span data-i18n="hero.cta">Probar una clase gratis</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         </div>
       </div>
-      <div class="mesa">
+      <figure class="mesa">
         <div class="mesa__in">
-          <img class="mesa__board mesa__board--back" src="assets/tableros/a2-me-lo-llevo-960.jpg" width="960" height="600" alt="Tablero Me lo llevo, con la foto de un mercado y etiquetas de precio">
-          <img class="mesa__board mesa__board--front" src="assets/tableros/a2-a-como-esta-la-pina-960.jpg" width="960" height="600" alt="Tablero ¿A cómo está la piña?, con un puesto de frutas y sus precios" fetchpriority="high">
-          <img class="mesa__foto mesa__foto--profe" src="assets/img/hero-profe-600.jpg" srcset="assets/img/hero-profe-600.jpg 600w, assets/img/hero-profe-1100.jpg 1100w" sizes="(max-width: 639px) 42vw, 220px" width="600" height="400" alt="Profesora explicando frente a su portátil">
-          <img class="mesa__foto mesa__foto--estudiante" src="assets/img/hero-estudiante-600.jpg" srcset="assets/img/hero-estudiante-600.jpg 600w, assets/img/hero-estudiante-1100.jpg 1100w" sizes="(max-width: 639px) 40vw, 200px" width="600" height="400" alt="Estudiante con audífonos participando en clase en vivo">
-          <span class="chip-ui chip-ui--vivo"><span class="chip-ui__dot" aria-hidden="true"></span>En vivo con tu estudiante</span>
-          <span class="mano nota nota--1">tocas la foto y<br>sale la palabra</span>
+          <img class="mesa__board mesa__board--back" src="https://images.unsplash.com/photo-1513542992587-cd39ba97057c?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1513542992587-cd39ba97057c?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1513542992587-cd39ba97057c?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 60vw, 36vw" width="800" height="500" alt="Escritorio con portátil y cuaderno abierto" data-i18n-alt="hero.foto.escritorio">
+          <img class="mesa__board mesa__board--front" src="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w, https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=1280&amp;q=70 1280w" sizes="(max-width: 639px) 68vw, 40vw" width="800" height="500" alt="Vendedor junto a su puesto de frutas" data-i18n-alt="hero.foto.mercado" fetchpriority="high">
+          <img class="mesa__foto mesa__foto--profe" src="https://images.unsplash.com/photo-1730343464372-77500ccd307a?auto=format&amp;fit=crop&amp;w=480&amp;q=70" srcset="https://images.unsplash.com/photo-1730343464372-77500ccd307a?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1730343464372-77500ccd307a?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 42vw, 220px" width="480" height="360" alt="Profesora con audífonos dando clase en línea desde su portátil" data-i18n-alt="hero.foto.profe">
+          <img class="mesa__foto mesa__foto--estudiante" src="https://images.unsplash.com/photo-1702669010463-3f2088abc0e9?auto=format&amp;fit=crop&amp;w=480&amp;q=70" srcset="https://images.unsplash.com/photo-1702669010463-3f2088abc0e9?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1702669010463-3f2088abc0e9?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 40vw, 200px" width="480" height="360" alt="Estudiante con audífonos sonriendo en una videollamada" data-i18n-alt="hero.foto.estudiante">
+          <span class="chip-ui chip-ui--vivo"><span class="chip-ui__dot" aria-hidden="true"></span><span data-i18n="hero.chip">En vivo con tu estudiante</span></span>
+          <span class="mano nota nota--1" data-i18n-html="hero.nota">tocas la foto y<br>sale la palabra</span>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="metricas" aria-label="En cifras">
-    <div class="wrap">
-      <div class="metricas__grid">
-        <div class="metrica" style="--mc: var(--es)"><strong>49</strong><span>Tableros listos para abrir</span></div>
-        <div class="metrica" style="--mc: var(--en)"><strong>A1–B2</strong><span>Conversación paso a paso</span></div>
-        <div class="metrica" style="--mc: var(--pt)"><strong>50 min</strong><span>Actividades, juego y tarea</span></div>
-        <div class="metrica" style="--mc: var(--ink)"><strong>Sin cuenta</strong><span>Tu estudiante entra con el enlace</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="clase pad" id="clase" aria-labelledby="h-clase">
-    <div class="wrap">
-      <h2 class="t2" id="h-clase" data-ver>Así se vive una clase con un tablero</h2>
-      <div class="momentos">
-        <article class="momento" style="--c: var(--es)" data-ver>
-          <div class="momento__head">
-            <span class="momento__num" aria-hidden="true">1</span>
-            <p class="mano">cinco minutos antes</p>
-          </div>
-          <h3>Eliges el tablero</h3>
-          <p class="momento__desc">Buscas por tema, por nivel o por el idioma de tu estudiante. No hay nada que imprimir ni que armar.</p>
-          <div class="momento__ui" aria-hidden="true">
-            <div class="ui-row"><span class="ui-pill">A2 · Adultos</span><span class="ui-pill">50 min</span></div>
-            <div class="ui-title">¿A cómo está la piña?</div>
-            <div class="ui-row"><span class="muted">«Me da dos libras, por favor»</span><span class="ui-pill ui-pill--cta">Abrir →</span></div>
-          </div>
-        </article>
-        <article class="momento" style="--c: var(--en)" data-ver>
-          <div class="momento__head">
-            <span class="momento__num" aria-hidden="true">2</span>
-            <p class="mano">durante la clase</p>
-          </div>
-          <h3>Tu estudiante participa</h3>
-          <p class="momento__desc">Vota, ordena frases y destapa palabras desde su pantalla. Tú conduces y ves cada respuesta en el momento.</p>
-          <div class="momento__ui" aria-hidden="true">
-            <div class="ui-row"><span class="tag tag--live">Sala en vivo</span><span class="muted">Ahora</span></div>
-            <div class="ui-title">¿Qué prefieres hacer?</div>
-            <div class="ui-chips"><span class="ui-chip ui-chip--sel">✓ Ir al mercado</span><span class="ui-chip">Pedir a domicilio</span></div>
-          </div>
-        </article>
-        <article class="momento" style="--c: var(--pt)" data-ver>
-          <div class="momento__head">
-            <span class="momento__num" aria-hidden="true">3</span>
-            <p class="mano">al despedirse</p>
-          </div>
-          <h3>La tarea ya está escrita</h3>
-          <p class="momento__desc">Cada tablero cierra con una misión corta para la semana, como una nota de voz de menos de un minuto.</p>
-          <div class="momento__ui" aria-hidden="true">
-            <div class="ui-row"><span class="ui-pill">Misión para la semana</span><span class="muted">Nota de voz</span></div>
-            <div class="ui-title" style="font-size:14px">«Cuéntame qué compraste hoy»</div>
-            <div class="ui-audio"><span>▶ 0:42</span><span class="ui-audio__bar"><i></i></span><span>1:00</span></div>
-          </div>
-        </article>
-      </div>
+        <figcaption><p class="credito mesa__credito"><span data-i18n="comun.fotos">Fotos:</span> <a href="https://unsplash.com/photos/a-woman-sitting-at-a-table-with-a-laptop-and-headphones-on-r3gxTlf46a4" rel="noopener" target="_blank">Julio Lopez</a>, <a href="https://unsplash.com/photos/a-woman-wearing-a-headset-and-smiling-at-the-camera-Ry3KyBpEGSs" rel="noopener" target="_blank">Vinicius &quot;amnx&quot; Amano</a>, <a href="https://unsplash.com/photos/silver-laptop-computer-table-table-beside-of-journal-book-N0NLGH5YU90" rel="noopener" target="_blank">Jess Bailey</a> <span data-i18n="comun.y">y</span> <a href="https://unsplash.com/photos/man-sitting-beside-fruit-stand-XQ7LF574HhY" rel="noopener" target="_blank">Julian Florez</a> · Unsplash</p></figcaption>
+      </figure>
     </div>
   </section>
 
   <section class="vivo pad" id="en-vivo" aria-labelledby="h-vivo">
     <div class="wrap">
       <div class="vivo__text" data-ver>
-        <p class="mano">clase en vivo</p>
-        <h2 class="t2" id="h-vivo">Tú conduces. Tu estudiante responde.</h2>
-        <p>Abres una sala, pegas el enlace en el chat y tu estudiante entra sin crear cuenta. Cuando tú avanzas, su pantalla avanza contigo.</p>
-        <a class="btn btn--claro btn--pill" href="entrar.html">Entrar y abrir una sala</a>
+        <p class="mano" data-i18n="vivo.mano">clase en vivo</p>
+        <h2 class="t2" id="h-vivo" data-i18n="vivo.titulo">Tú conduces. Tu estudiante responde.</h2>
+        <p data-i18n="vivo.texto">Abres una sala, pegas el enlace en el chat y tu estudiante entra sin crear cuenta. Cuando tú avanzas, su pantalla avanza contigo.</p>
+        <div class="ruta">
+          <p class="mano ruta__suma" id="h-ruta" data-i18n="ruta.suma">5 + 1 + 34 + 6 + 4 = 50 minutos</p>
+          <ol class="ruta__lista" aria-labelledby="h-ruta">
+            <li style="--c: #F4A592"><span class="ruta__dot" aria-hidden="true"></span><span data-i18n="ruta.1">Introducción</span><span class="ruta__min">5</span></li>
+            <li style="--c: #F2C46B"><span class="ruta__dot" aria-hidden="true"></span><span data-i18n="ruta.2">Objetivos</span><span class="ruta__min">1</span></li>
+            <li style="--c: #8EC1EE"><span class="ruta__dot" aria-hidden="true"></span><span data-i18n="ruta.3">Contenido</span><span class="ruta__min">34</span></li>
+            <li style="--c: #C9AAF0"><span class="ruta__dot" aria-hidden="true"></span><span data-i18n="ruta.4">Resumen</span><span class="ruta__min">6</span></li>
+            <li style="--c: #7FD3B4"><span class="ruta__dot" aria-hidden="true"></span><span data-i18n="ruta.5">Tarea</span><span class="ruta__min">4</span></li>
+          </ol>
+        </div>
       </div>
       <figure class="vivo__video" data-ver>
-        <video src="assets/video/recorrido.mp4" poster="assets/video/recorrido.jpg" width="1280" height="800" muted loop playsinline preload="metadata" aria-label="Recorrido de 36 segundos: buscar un tablero en el catálogo, resolver actividades con un toque, abrir una sala en vivo y ver cómo el estudiante sigue la clase desde su pantalla" data-video></video>
-        <button class="vivo__play" type="button" data-video-btn aria-label="Reproducir el video">Reproducir</button>
+        <video src="assets/video/recorrido.mp4" poster="assets/video/recorrido.jpg" width="1280" height="800" muted loop playsinline preload="metadata" aria-label="Recorrido de 36 segundos: buscar un tablero en el catálogo, resolver actividades con un toque, abrir una sala en vivo y ver cómo el estudiante sigue la clase desde su pantalla" data-i18n-aria="vivo.video_aria" data-video></video>
+        <button class="vivo__play" type="button" data-video-btn aria-label="Reproducir el video" data-txt-play="Reproducir" data-txt-pause="Pausar" data-txt-play-aria="Reproducir el video" data-txt-pause-aria="Pausar el video" data-i18n-txt-play="vivo.play" data-i18n-txt-pause="vivo.pause" data-i18n-txt-play-aria="vivo.play_aria" data-i18n-txt-pause-aria="vivo.pause_aria" data-i18n-aria="vivo.play_aria" data-i18n="vivo.play">Reproducir</button>
       </figure>
     </div>
   </section>
 
   <section class="lugares pad" id="tableros" aria-labelledby="h-tableros">
     <div class="wrap">
-      <div class="lugares__head" data-ver>
-        <h2 class="t2" id="h-tableros">Cada tablero es un lugar</h2>
-        <p>En vez de una lista de ejercicios, una escena: tu estudiante habla porque tiene algo que resolver ahí.</p>
+      <div class="sec-head" data-ver>
+        <h2 class="t2" id="h-tableros" data-i18n="lugares.titulo">Cada tablero es un lugar</h2>
+        <p data-i18n="lugares.lead">En vez de una lista de ejercicios, una escena: tu estudiante habla porque tiene algo que resolver ahí.</p>
       </div>
       <div class="fila" data-ver>
       <figure class="lugar lugar--g">
-        <img src="assets/tableros/a2-a-como-esta-la-pina-960.jpg" width="960" height="600" loading="lazy" alt="Puesto de frutas con precios por libra">
+        <img src="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, 33vw" width="800" height="500" loading="lazy" alt="Vendedor junto a su puesto de frutas" data-i18n-alt="lugares.pina.alt" data-foto="a2-a-como-esta-la-pina">
         <figcaption>
-          <div class="lugar__meta"><span class="tag">A2 · Adultos · 50 min</span></div>
-          <span class="lugar__titulo">Una plaza de mercado</span>
-          <span>Preguntar a cómo está la piña, pedir rebaja y llevarse la fruta.</span>
+          <div class="lugar__meta"><span class="tag" data-i18n="lugares.pina.meta">A2 · Adultos · 50 min</span></div>
+          <span class="lugar__titulo" data-i18n="lugares.pina.titulo">Una plaza de mercado</span>
+          <span data-i18n="lugares.pina.desc">Preguntar a cómo está la piña, pedir rebaja y llevarse la fruta.</span>
+          <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/man-sitting-beside-fruit-stand-XQ7LF574HhY" rel="noopener" target="_blank">Julian Florez</a> · Unsplash</p>
         </figcaption>
       </figure>
       <figure class="lugar lugar--m">
-        <img src="assets/tableros/a2-me-lo-llevo-960.jpg" width="960" height="600" loading="lazy" alt="Foto de un mercado con etiquetas de precio sobre los productos">
+        <img src="https://images.unsplash.com/photo-1772986221132-25a53d240941?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1772986221132-25a53d240941?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1772986221132-25a53d240941?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, 33vw" width="800" height="500" loading="lazy" alt="Tazas de cerámica de colores a la venta en un mercado" data-i18n-alt="lugares.llevo.alt" data-foto="a2-me-lo-llevo">
         <figcaption>
-          <div class="lugar__meta"><span class="tag">A2 · Adultos · 50 min</span></div>
-          <span class="lugar__titulo">Una tienda en Barcelona</span>
-          <span>Precios, colores y la frase que cierra la compra: «me lo llevo».</span>
+          <div class="lugar__meta"><span class="tag" data-i18n="lugares.llevo.meta">A2 · Adultos · 50 min</span></div>
+          <span class="lugar__titulo" data-i18n="lugares.llevo.titulo">Un puesto de artesanías</span>
+          <span data-i18n="lugares.llevo.desc">Precios, colores y la frase que cierra la compra: «me lo llevo».</span>
+          <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/colorful-ceramic-mugs-and-cups-hanging-for-sale-OThzbDjNn4Q" rel="noopener" target="_blank">diego cruz</a> · Unsplash</p>
         </figcaption>
       </figure>
       </div>
       <div class="fila" data-ver>
       <figure class="lugar">
-        <img src="assets/tableros/a1-monstruos-gigantes-960.jpg" width="960" height="600" loading="lazy" alt="Un monstruo para pintar con botes de colores">
+        <img src="https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, 33vw" width="800" height="500" loading="lazy" alt="Monstruo de peluche azul con ojos grandes" data-i18n-alt="lugares.monstruos.alt" data-foto="a1-monstruos-gigantes">
         <figcaption>
-          <div class="lugar__meta"><span class="tag">A1 · Niños · 50 min</span><span class="tag tag--live">En vivo</span></div>
-          <span class="lugar__titulo">Un taller de monstruos</span>
-          <span>Pintarlo y describirlo: colores, tamaños y partes del cuerpo.</span>
+          <div class="lugar__meta"><span class="tag" data-i18n="lugares.monstruos.meta">A1 · Niños · 50 min</span><span class="tag tag--live" data-i18n="comun.envivo">En vivo</span></div>
+          <span class="lugar__titulo" data-i18n="lugares.monstruos.titulo">Un taller de monstruos</span>
+          <span data-i18n="lugares.monstruos.desc">Pintarlo y describirlo: colores, tamaños y partes del cuerpo.</span>
+          <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/blue-and-brown-plush-toy--usSqel0j5U" rel="noopener" target="_blank">Ashkan Forouzani</a> · Unsplash</p>
         </figcaption>
       </figure>
       <figure class="lugar">
-        <img src="assets/tableros/b1-que-harias-si-960.jpg" width="960" height="600" loading="lazy" alt="Un edificio de noche con ventanas numeradas">
+        <img src="https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, 33vw" width="800" height="500" loading="lazy" alt="Mujer pensativa con una taza junto a la ventana" data-i18n-alt="lugares.harias.alt" data-foto="b1-que-harias-si">
         <figcaption>
-          <div class="lugar__meta"><span class="tag">B1 · Adultos · 50 min</span><span class="tag tag--live">En vivo</span></div>
-          <span class="lugar__titulo">Un edificio con vecinos</span>
-          <span>Detrás de cada ventana hay un dilema: ¿qué harías si…?</span>
+          <div class="lugar__meta"><span class="tag" data-i18n="lugares.harias.meta">B1 · Adultos · 50 min</span><span class="tag tag--live" data-i18n="comun.envivo">En vivo</span></div>
+          <span class="lugar__titulo" data-i18n="lugares.harias.titulo">Un edificio con vecinos</span>
+          <span data-i18n="lugares.harias.desc">Detrás de cada ventana hay un dilema: ¿qué harías si…?</span>
+          <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/woman-holding-teacup-while-standing-near-window-inside-room-during-daytime-3LbpZo8MG8A" rel="noopener" target="_blank">Daiga Ellaby</a> · Unsplash</p>
         </figcaption>
       </figure>
       <figure class="lugar">
-        <img src="assets/tableros/b2-radio-chisme-960.jpg" width="960" height="600" loading="lazy" alt="El guion de un programa de radio nocturno">
+        <img src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, 33vw" width="800" height="500" loading="lazy" alt="Micrófono de estudio de radio" data-i18n-alt="lugares.radio.alt" data-foto="b2-radio-chisme">
         <figcaption>
-          <div class="lugar__meta"><span class="tag">B2 · Adultos · 60 min</span></div>
-          <span class="lugar__titulo">Una emisora de radio</span>
-          <span>Un programa nocturno donde solo se habla de rumores.</span>
+          <div class="lugar__meta"><span class="tag" data-i18n="lugares.radio.meta">B2 · Adultos · 60 min</span></div>
+          <span class="lugar__titulo" data-i18n="lugares.radio.titulo">Una emisora de radio</span>
+          <span data-i18n="lugares.radio.desc">Un programa nocturno donde solo se habla de rumores.</span>
+          <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/macro-photography-of-silver-and-black-studio-microphone-condenser-c1ZN57GfDB0" rel="noopener" target="_blank">Jonathan Velasquez</a> · Unsplash</p>
         </figcaption>
       </figure>
       </div>
       <ul class="idiomas">
         <li>
-          <a class="idioma-card" href="tableros.html?idioma=es" data-lang="es">
-            <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#AA151B"/><rect y="6" width="32" height="12" fill="#F1BF00"/></svg>
-            <span class="idioma-card__body"><span class="idioma-card__title">Español</span><span class="idioma-card__meta">A1–B2 · 49 tableros</span></span>
+          <a class="idioma-card" href="#muestras" data-lang="es" data-idioma-es>
+            <span class="cod" aria-hidden="true">ES</span>
+            <span class="idioma-card__body"><span class="idioma-card__title" data-i18n="idiomas.es">Español</span><span class="idioma-card__meta"><span>A1–C2</span><span data-cuenta="es" hidden> · <span data-cuenta-n></span> <span data-i18n="idiomas.tableros">tableros</span></span><span data-pronto-idioma="es"> · <span data-pronto-txt data-i18n="idiomas.c_pronto">C1 y C2, pronto</span></span></span></span>
             <span class="idioma-card__chev" aria-hidden="true">›</span>
           </a>
         </li>
         <li>
           <div class="idioma-card idioma-card--soon" data-lang="en">
-            <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#012169"/><path d="M0 0L32 24M32 0L0 24" stroke="#FFF" stroke-width="4.5"/><path d="M0 0L32 24M32 0L0 24" stroke="#C8102E" stroke-width="2"/><path d="M16 0v24M0 12h32" stroke="#FFF" stroke-width="7"/><path d="M16 0v24M0 12h32" stroke="#C8102E" stroke-width="4"/></svg>
-            <span class="idioma-card__body"><span class="idioma-card__title">Inglés</span><span class="idioma-card__meta">En preparación</span></span>
-            <span class="idioma-card__soon">Pronto</span>
+            <span class="cod" aria-hidden="true">EN</span>
+            <span class="idioma-card__body"><span class="idioma-card__title" data-i18n="idiomas.en">Inglés</span><span class="idioma-card__meta" data-i18n="idiomas.preparacion">En preparación</span></span>
+            <span class="idioma-card__soon" data-i18n="idiomas.pronto">Pronto</span>
           </div>
         </li>
         <li>
           <div class="idioma-card idioma-card--soon" data-lang="pt">
-            <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#009B3A"/><polygon points="16,3 29,12 16,21 3,12" fill="#FEDF00"/><circle cx="16" cy="12" r="4.5" fill="#002776"/></svg>
-            <span class="idioma-card__body"><span class="idioma-card__title">Portugués</span><span class="idioma-card__meta">En preparación</span></span>
-            <span class="idioma-card__soon">Pronto</span>
+            <span class="cod" aria-hidden="true">PT</span>
+            <span class="idioma-card__body"><span class="idioma-card__title" data-i18n="idiomas.pt">Portugués</span><span class="idioma-card__meta" data-i18n="idiomas.preparacion">En preparación</span></span>
+            <span class="idioma-card__soon" data-i18n="idiomas.pronto">Pronto</span>
           </div>
         </li>
       </ul>
     </div>
   </section>
 
+  <section class="muestras pad" id="muestras" aria-labelledby="h-muestras">
+    <div class="wrap">
+      <div class="sec-head" data-ver>
+        <div>
+          <p class="mano" data-i18n="muestras.mano">sin cuenta, desde aquí</p>
+          <h2 class="t2" id="h-muestras" data-i18n="muestras.titulo">Prueba una clase antes de entrar</h2>
+        </div>
+        <p data-i18n="muestras.lead">Cada muestra abre una parte de un tablero real. Tócala como lo haría tu estudiante: voltea tarjetas, responde y escribe.</p>
+      </div>
+      <ul class="muestras__lista">
+        <li class="muestra" data-nivel="A2" data-ver>
+          <div class="muestra__foto">
+            <img src="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, (max-width: 1099px) 46vw, 25vw" width="800" height="600" loading="lazy" alt="Vendedor junto a su puesto de frutas" data-i18n-alt="muestras.pina.alt" data-foto="a2-a-como-esta-la-pina">
+          </div>
+          <div class="muestra__body">
+            <div class="muestra__meta"><span class="muestra__nivel">A2</span><span class="tag" data-i18n="muestras.pina.tag1">Adultos</span><span class="tag" data-i18n="muestras.pina.tag2">Consignas en portugués</span></div>
+            <h3 data-i18n="muestras.pina.titulo">¿A cómo está la piña?</h3>
+            <p data-i18n="muestras.pina.desc">En la plaza de mercado: preguntar precios, pedir rebaja y decir «me la llevo».</p>
+            <a class="btn btn--secondary btn--sm muestra__cta" href="muestra.html?t=a2-a-como-esta-la-pina"><span data-i18n="muestras.cta">Probar</span><span class="visually-hidden">: <span data-i18n="muestras.pina.titulo">¿A cómo está la piña?</span></span></a>
+            <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/man-sitting-beside-fruit-stand-XQ7LF574HhY" rel="noopener" target="_blank">Julian Florez</a> · Unsplash</p>
+          </div>
+        </li>
+        <li class="muestra" data-nivel="A1" data-ver>
+          <div class="muestra__foto">
+            <img src="https://images.unsplash.com/photo-1517701848373-805868efd0ac?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1517701848373-805868efd0ac?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1517701848373-805868efd0ac?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, (max-width: 1099px) 46vw, 25vw" width="800" height="600" loading="lazy" alt="Barista preparando un capuchino" data-i18n-alt="muestras.cafe.alt" data-foto="a1-un-cafe-por-favor">
+          </div>
+          <div class="muestra__body">
+            <div class="muestra__meta"><span class="muestra__nivel">A1</span><span class="tag" data-i18n="muestras.cafe.tag1">Adultos</span><span class="tag" data-i18n="muestras.cafe.tag2">Consignas en inglés</span><span class="tag" data-i18n="muestras.cafe.tag3">Clase de prueba</span></div>
+            <h3 data-i18n="muestras.cafe.titulo">Un café, por favor</h3>
+            <p data-i18n="muestras.cafe.desc">Pedir algo en una cafetería con un, una y «quiero…». Sirve como primera clase.</p>
+            <a class="btn btn--secondary btn--sm muestra__cta" href="muestra.html?t=a1-un-cafe-por-favor"><span data-i18n="muestras.cta">Probar</span><span class="visually-hidden">: <span data-i18n="muestras.cafe.titulo">Un café, por favor</span></span></a>
+            <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/man-in-gray-crew-neck-t-shirt-making-cappuccino-jRPxc8VGqco" rel="noopener" target="_blank">Nathan Dumlao</a> · Unsplash</p>
+          </div>
+        </li>
+        <li class="muestra" data-nivel="B1" data-ver>
+          <div class="muestra__foto">
+            <img src="https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, (max-width: 1099px) 46vw, 25vw" width="800" height="600" loading="lazy" alt="Mujer pensativa con una taza junto a la ventana" data-i18n-alt="muestras.harias.alt" data-foto="b1-que-harias-si">
+          </div>
+          <div class="muestra__body">
+            <div class="muestra__meta"><span class="muestra__nivel">B1</span><span class="tag" data-i18n="muestras.harias.tag1">Adultos</span><span class="tag" data-i18n="muestras.harias.tag2">Consignas en portugués</span></div>
+            <h3 data-i18n="muestras.harias.titulo">¿Qué harías si…?</h3>
+            <p data-i18n="muestras.harias.desc">Vecinos con dilemas para practicar el condicional y si + imperfecto de subjuntivo.</p>
+            <a class="btn btn--secondary btn--sm muestra__cta" href="muestra.html?t=b1-que-harias-si"><span data-i18n="muestras.cta">Probar</span><span class="visually-hidden">: <span data-i18n="muestras.harias.titulo">¿Qué harías si…?</span></span></a>
+            <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/woman-holding-teacup-while-standing-near-window-inside-room-during-daytime-3LbpZo8MG8A" rel="noopener" target="_blank">Daiga Ellaby</a> · Unsplash</p>
+          </div>
+        </li>
+        <li class="muestra" data-nivel="A1" data-ver>
+          <div class="muestra__foto">
+            <img src="https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, (max-width: 1099px) 46vw, 25vw" width="800" height="600" loading="lazy" alt="Monstruo de peluche azul con ojos grandes" data-i18n-alt="muestras.monstruos.alt" data-foto="a1-monstruos-gigantes">
+          </div>
+          <div class="muestra__body">
+            <div class="muestra__meta"><span class="muestra__nivel">A1</span><span class="tag" data-i18n="muestras.monstruos.tag1">Niños</span><span class="tag" data-i18n="muestras.monstruos.tag2">Consignas en inglés</span></div>
+            <h3 data-i18n="muestras.monstruos.titulo">Monstruos gigantes</h3>
+            <p data-i18n="muestras.monstruos.desc">Para niños: describir monstruos por su tamaño, sus colores y sus partes del cuerpo.</p>
+            <a class="btn btn--secondary btn--sm muestra__cta" href="muestra.html?t=a1-monstruos-gigantes"><span data-i18n="muestras.cta">Probar</span><span class="visually-hidden">: <span data-i18n="muestras.monstruos.titulo">Monstruos gigantes</span></span></a>
+            <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/blue-and-brown-plush-toy--usSqel0j5U" rel="noopener" target="_blank">Ashkan Forouzani</a> · Unsplash</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="clase pad" id="clase" aria-labelledby="h-clase">
+    <div class="wrap">
+      <h2 class="t2" id="h-clase" data-ver data-i18n="clase.titulo">Así se vive una clase con un tablero</h2>
+      <div class="momentos">
+        <article class="momento" style="--c: var(--es)" data-ver>
+          <div class="momento__head">
+            <span class="momento__num" aria-hidden="true">1</span>
+            <p class="mano" data-i18n="clase.1.mano">cinco minutos antes</p>
+          </div>
+          <h3 data-i18n="clase.1.titulo">Eliges el tablero</h3>
+          <p class="momento__desc" data-i18n="clase.1.desc">Buscas por tema, por nivel o por el idioma de tu estudiante. No hay nada que imprimir ni que armar.</p>
+          <div class="momento__ui" aria-hidden="true">
+            <div class="ui-row"><span class="ui-pill" data-i18n="clase.1.ui1">A2 · Adultos</span><span class="ui-pill">50 min</span></div>
+            <div class="ui-title">¿A cómo está la piña?</div>
+            <div class="ui-row"><span class="muted">«Me da dos libras, por favor»</span><span class="ui-pill ui-pill--cta" data-i18n="clase.1.ui2">Abrir</span></div>
+          </div>
+        </article>
+        <article class="momento" style="--c: var(--en)" data-ver>
+          <div class="momento__head">
+            <span class="momento__num" aria-hidden="true">2</span>
+            <p class="mano" data-i18n="clase.2.mano">durante la clase</p>
+          </div>
+          <h3 data-i18n="clase.2.titulo">Tu estudiante participa</h3>
+          <p class="momento__desc" data-i18n="clase.2.desc">Vota, ordena frases y destapa palabras desde su pantalla. Tú conduces y ves cada respuesta en el momento.</p>
+          <div class="momento__ui" aria-hidden="true">
+            <div class="ui-row"><span class="tag tag--live" data-i18n="clase.2.ui1">Sala en vivo</span><span class="muted" data-i18n="clase.2.ui2">Ahora</span></div>
+            <div class="ui-title">¿Qué prefieres hacer?</div>
+            <div class="ui-chips"><span class="ui-chip ui-chip--sel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Ir al mercado</span><span class="ui-chip">Pedir a domicilio</span></div>
+          </div>
+        </article>
+        <article class="momento" style="--c: var(--pt)" data-ver>
+          <div class="momento__head">
+            <span class="momento__num" aria-hidden="true">3</span>
+            <p class="mano" data-i18n="clase.3.mano">al despedirse</p>
+          </div>
+          <h3 data-i18n="clase.3.titulo">La tarea ya está escrita</h3>
+          <p class="momento__desc" data-i18n="clase.3.desc">Cada tablero cierra con una misión corta para la semana, como una nota de voz de menos de un minuto.</p>
+          <div class="momento__ui" aria-hidden="true">
+            <div class="ui-row"><span class="ui-pill" data-i18n="clase.3.ui1">Misión para la semana</span><span class="muted" data-i18n="clase.3.ui2">Nota de voz</span></div>
+            <div class="ui-title" style="font-size:14px">«Cuéntame qué compraste hoy»</div>
+            <div class="ui-audio"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg><span>0:42</span><span class="ui-audio__bar"><i></i></span><span>1:00</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="preguntas pad" id="preguntas" aria-labelledby="h-preguntas">
+    <div class="wrap">
+      <div class="preguntas__head" data-ver>
+        <p class="mano" data-i18n="faq.mano">lo que más nos preguntan</p>
+        <h2 class="t2" id="h-preguntas" data-i18n="faq.titulo">Preguntas frecuentes</h2>
+        <p data-i18n="faq.lead">Si te queda otra duda, escríbela en la solicitud de acceso y te respondemos.</p>
+      </div>
+      <div class="faq" data-ver>
+        <details>
+          <summary data-i18n="faq.1.q">¿Mi estudiante necesita una cuenta?</summary>
+          <p data-i18n="faq.1.a">No. Tú abres la sala, copias el enlace y se lo mandas por el chat de la clase. Tu estudiante lo abre en el computador o en el celular y ya está adentro.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.2.q">¿Sirve para clases de prueba?</summary>
+          <p data-i18n="faq.2.a">Sí. Hay tableros pensados para la primera clase con un estudiante nuevo: se conocen, hablan de sus metas y le muestras cómo van a trabajar. En el catálogo aparecen marcados como «Clase de prueba».</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.3.q">¿Qué niveles hay?</summary>
+          <p data-i18n="faq.3.a" data-faq-niveles>Los niveles van de A1 a C2. En español ya hay tableros de A1 a B2, para adultos y para niños; C1 y C2 llegan pronto. Los de inglés y portugués vienen en camino.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.4.q">¿En qué idioma están las consignas?</summary>
+          <p data-i18n="faq.4.a">Depende del tablero. En A1 y A2 las instrucciones van en la lengua de tu estudiante (inglés o portugués) y lo que practica, en español. Desde B1 pasan poco a poco al español. Cada tablero dice en su ficha qué idioma usa.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.5.q">¿Puedo añadir mi propio material?</summary>
+          <p data-i18n="faq.5.a">Sí. Con el botón «Añadir» pones en el tablero un video de YouTube, una imagen para describir, un cuento o una pregunta tuya, y tu estudiante lo ve enseguida en su pantalla.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.6.q">¿Cómo pido acceso?</summary>
+          <p data-i18n="faq.6.a">Entra con Google o con tu correo. La primera vez te pedimos tu nombre, el idioma que enseñas y dónde das clase. Revisamos cada solicitud a mano y, cuando la aprobamos, ya puedes abrir el catálogo completo.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
   <section class="cierre pad" aria-labelledby="h-cierre">
     <div class="wrap">
-      <p class="mano">¿tienes clase en un rato?</p>
-      <h2 id="h-cierre">Entra, elige un tablero y empieza.</h2>
-      <a class="btn btn--primary btn--pill" href="entrar.html" data-cuenta-link-largo>Entrar a mis tableros<svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <p class="mano" data-i18n="cierre.mano">¿te gustó lo que probaste?</p>
+      <h2 id="h-cierre" data-i18n="cierre.titulo">Pide tu acceso y usa todos los tableros.</h2>
+      <p class="lead" data-i18n="cierre.lead">Revisamos cada solicitud a mano. Cuando la aprobemos, entras y tienes el catálogo completo para tus clases.</p>
+      <div class="cierre__cta">
+        <a class="btn btn--primary btn--pill" href="entrar.html" data-cuenta-cierre><span data-i18n="cierre.cta">Pide tu acceso</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
     </div>
   </section>
 </main>
@@ -358,31 +527,74 @@ a.idioma-card:hover .idioma-card__chev { transform: translateX(3px); color: var(
 <footer class="pie">
   <div class="wrap">
     <span><img src="logo.svg" alt="" width="28" height="28">© 2026 Lingua's Academy</span>
-    <span>Tableros de clase para profesores de idiomas</span>
+    <span data-i18n="pie.lema">Tableros de clase para profesores de idiomas</span>
   </div>
 </footer>
 
+<script src="assets/catalogo.js" defer></script>
 <script src="assets/site.js"></script>
 <script src="assets/fb.js"></script>
 <script src="assets/auth.js"></script>
 <script>
 (() => {
   'use strict';
-  document.documentElement.classList.add('js');
 
-  /* Las secciones aparecen al bajar */
+  /* Las secciones aparecen al bajar (la clase .js ya está puesta desde el <head>) */
   const vistos = document.querySelectorAll('[data-ver]');
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visto'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
     vistos.forEach(el => io.observe(el));
   } else vistos.forEach(el => el.classList.add('visto'));
 
+  /* Cuántos tableros hay y qué niveles faltan, contados desde el catálogo.
+     Sin catálogo quedan los textos fijos de la página (respaldo). */
+  const I = window.LAi18n;
+  const NIV = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  const lista = arr => {
+    try { return new Intl.ListFormat(I ? I.lang : 'es', { style: 'long', type: 'conjunction' }).format(arr); }
+    catch (e) { return arr.length < 2 ? arr.join('') : arr.slice(0, -1).join(', ') + ' ' + (I ? I.t('comun.y') : 'y') + ' ' + arr[arr.length - 1]; }
+  };
+  const fmt = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (k in v ? v[k] : m));
+  function niveles() {
+    const C = Array.isArray(window.CATALOGO) ? window.CATALOGO : null;
+    if (!C || !I) return;
+    document.querySelectorAll('[data-cuenta]').forEach(el => {
+      const n = C.filter(t => t.idioma === el.dataset.cuenta).length;
+      if (!n) return;
+      el.querySelector('[data-cuenta-n]').textContent = n;
+      el.hidden = false;
+    });
+    document.querySelectorAll('[data-pronto-idioma]').forEach(el => {
+      const con = new Set(C.filter(t => t.idioma === el.dataset.prontoIdioma).map(t => t.nivel));
+      if (!con.size) return;
+      const faltan = NIV.filter(n => !con.has(n));
+      const txt = el.querySelector('[data-pronto-txt]');
+      txt.removeAttribute('data-i18n');
+      txt.textContent = faltan.length ? fmt(I.t('idiomas.pronto_niveles'), { niveles: lista(faltan) }) : '';
+      el.hidden = !faltan.length;
+    });
+    const faq = document.querySelector('[data-faq-niveles]');
+    const conEs = NIV.filter(n => C.some(t => t.idioma === 'es' && t.nivel === n));
+    if (faq && conEs.length) {
+      const faltan = NIV.filter(n => !conEs.includes(n));
+      const pronto = faltan.length ? fmt(I.t(faltan.length === 1 ? 'faq.3.pronto_uno' : 'faq.3.pronto_varios'), { niveles: lista(faltan) }) : '';
+      faq.removeAttribute('data-i18n');
+      faq.textContent = fmt(I.t('faq.3.plantilla'), { desde: conEs[0], hasta: conEs[conEs.length - 1], pronto });
+    }
+  }
+  addEventListener('DOMContentLoaded', niveles);
+  document.addEventListener('la:idioma', niveles);
+
   /* Video: empieza solo cuando entra en pantalla, salvo con «reducir movimiento» */
   const vid = document.querySelector('[data-video]'), vb = document.querySelector('[data-video-btn]');
-  const poner = jugando => { vb.textContent = jugando ? 'Pausar' : 'Reproducir'; vb.setAttribute('aria-label', jugando ? 'Pausar el video' : 'Reproducir el video'); };
+  const poner = jugando => {
+    vb.textContent = jugando ? vb.dataset.txtPause : vb.dataset.txtPlay;
+    vb.setAttribute('aria-label', jugando ? vb.dataset.txtPauseAria : vb.dataset.txtPlayAria);
+  };
   let pausaManual = false;
   vb.addEventListener('click', () => { if (vid.paused) { pausaManual = false; vid.play().catch(() => {}); } else { pausaManual = true; vid.pause(); } });
   vid.addEventListener('play', () => poner(true)); vid.addEventListener('pause', () => poner(false));
+  document.addEventListener('la:idioma', () => poner(!vid.paused));
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
     new IntersectionObserver(es => es.forEach(e => {
       if (e.isIntersecting) { if (!pausaManual) vid.play().catch(() => {}); } else vid.pause();
@@ -392,8 +604,18 @@ a.idioma-card:hover .idioma-card__chev { transform: translateX(3px); color: var(
   /* Con sesión de profe, «Entrar» lleva directo al catálogo */
   const revisar = () => LA.estado().then(({ perfil }) => {
     if (perfil && (perfil.estado === 'aprobado' || perfil.admin)) {
-      document.querySelectorAll('[data-cuenta-link]').forEach(a => { a.href = 'tableros.html'; a.textContent = 'Mis tableros'; });
-      document.querySelectorAll('[data-cuenta-link-largo]').forEach(a => { a.href = 'tableros.html'; });
+      const en = h => (window.LAi18n ? LAi18n.enlace(h) : h);
+      document.querySelectorAll('[data-cuenta-link]').forEach(a => {
+        a.href = en('tableros.html'); a.setAttribute('data-i18n', 'nav.mis_tableros');
+        a.textContent = window.LAi18n ? LAi18n.t('nav.mis_tableros') : 'Mis tableros';
+      });
+      /* El cierre invita a pedir acceso; con acceso ya aprobado, lleva al catálogo */
+      document.querySelectorAll('[data-cuenta-cierre]').forEach(a => {
+        a.href = en('tableros.html');
+        const sp = a.querySelector('[data-i18n]'); sp.setAttribute('data-i18n', 'cierre.cta_sesion');
+        sp.textContent = window.LAi18n ? LAi18n.t('cierre.cta_sesion') : 'Ir a mis tableros';
+      });
+      document.querySelectorAll('[data-idioma-es]').forEach(a => { a.href = en('tableros.html?idioma=es'); });
     }
   }).catch(() => {});
   ('requestIdleCallback' in window ? requestIdleCallback : setTimeout)(revisar);

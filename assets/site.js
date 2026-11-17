@@ -1,23 +1,55 @@
-/* site.js · Lingua's Academy: menú del teléfono y errores de formulario */
+/* site.js · Lingua's Academy: menú del teléfono, sección activa del menú y errores de formulario.
+   El idioma de la página (textos, selector ES · EN · PT y enlaces con ?lang=) lo lleva assets/i18n.js. */
 (() => {
   'use strict';
+  document.documentElement.classList.add('js');
 
-  /* Menú a pantalla completa en el teléfono */
+  /* Menú a pantalla completa en el teléfono.
+     Abierto: el fondo queda inerte, el foco entra a la hoja y Escape la cierra devolviendo el foco. */
   const btn = document.querySelector('.menu-btn');
   const sheet = document.getElementById('menu');
   if (btn && sheet) {
-    const poner = abierto => {
-      btn.setAttribute('aria-expanded', String(abierto));
-      btn.setAttribute('aria-label', abierto ? 'Cerrar el menú' : 'Abrir el menú');
+    sheet.hidden = false; // la oculta el CSS (visibility), así se puede animar la salida
+    const fondo = [document.querySelector('main'), document.querySelector('footer')].filter(Boolean);
+    let abierto = false;
+    /* Los textos del botón vienen de data-txt-*; i18n.js los cambia con el idioma de la página */
+    const rotular = () => {
+      const si = abierto;
+      btn.setAttribute('aria-label', si ? (btn.dataset.txtCerrarAria || 'Cerrar el menú') : (btn.dataset.txtAbrirAria || 'Abrir el menú'));
       const span = btn.querySelector('span');
-      if (span) span.textContent = abierto ? 'Cerrar' : 'Menú';
-      sheet.hidden = !abierto;
-      document.body.style.overflow = abierto ? 'hidden' : '';
+      if (span) span.textContent = si ? (btn.dataset.txtCerrar || 'Cerrar') : (btn.dataset.txtAbrir || 'Menú');
     };
-    btn.addEventListener('click', () => poner(sheet.hidden));
+    document.addEventListener('la:idioma', rotular);
+    const poner = (si, devolverFoco) => {
+      abierto = si;
+      btn.setAttribute('aria-expanded', String(si));
+      rotular();
+      sheet.toggleAttribute('data-abierto', si);
+      fondo.forEach(el => { el.inert = si; });
+      document.body.style.overflow = si ? 'hidden' : '';
+      if (si) { const primero = sheet.querySelector('a, button'); if (primero) primero.focus({ preventScroll: true }); }
+      else if (devolverFoco) btn.focus();
+    };
+    btn.addEventListener('click', () => poner(!abierto));
     sheet.addEventListener('click', e => { if (e.target.closest('a')) poner(false); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sheet.hidden) { poner(false); btn.focus(); } });
-    matchMedia('(min-width: 1024px)').addEventListener('change', e => { if (e.matches) poner(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && abierto) poner(false, true); });
+    const ancho = document.querySelector('.nav--larga') ? '(min-width: 1200px)' : '(min-width: 1024px)';
+    matchMedia(ancho).addEventListener('change', e => { if (e.matches && abierto) poner(false); });
+  }
+
+  /* Sección activa: al bajar, el menú marca con aria-current la sección que se está leyendo */
+  const enlaces = [...document.querySelectorAll('.nav__links a[href^="#"], .sheet a[href^="#"]')];
+  const secciones = [...new Set(enlaces.map(a => a.getAttribute('href')))]
+    .map(h => document.getElementById(h.slice(1))).filter(Boolean);
+  if (secciones.length && 'IntersectionObserver' in window) {
+    const marcar = id => enlaces.forEach(a => {
+      if (a.classList.contains('btn')) return;
+      if (a.getAttribute('href') === '#' + id) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) marcar(e.target.id); }),
+      { rootMargin: '-45% 0px -50% 0px' });
+    secciones.forEach(s => io.observe(s));
   }
 
   /* Ayudas para formularios: un error bajo cada campo, el foco en el primero */

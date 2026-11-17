@@ -4,12 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>Catálogo de tableros · Lingua's Academy</title>
-<meta name="description" content="Catálogo de tableros de clase de Lingua's Academy por idioma y nivel, solo para profesores.">
+<script src="assets/i18n.js"></script>
+<title data-i18n="cat.meta.titulo">Catálogo de tableros · Lingua's Academy</title>
+<meta name="description" data-i18n-content="cat.meta.desc" content="Catálogo de tableros de clase de Lingua's Academy por idioma y nivel, solo para profesores.">
 <meta name="theme-color" content="#F6F3EC">
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Caveat:wght@600&display=swap">
 <link rel="preconnect" href="https://www.gstatic.com">
 <link rel="preconnect" href="https://linguas-tableros-default-rtdb.firebaseio.com">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
@@ -27,12 +28,12 @@
 .idiomas button {
   display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 16px 20px;
   background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); text-align: left; cursor: pointer; color: var(--ink);
-  position: relative; min-height: 78px; font: inherit; transition: transform .18s var(--ease), border-color .18s, box-shadow .18s, background .18s;
+  position: relative; min-height: 78px; font: inherit; transition: transform .18s var(--ease), border-color .18s, box-shadow .18s, background-color .15s ease;
 }
 .idiomas button:hover { transform: translateY(-1px); border-color: var(--line-2); box-shadow: 0 10px 22px -18px rgba(20,33,58,.35); }
 .idiomas button[aria-selected="true"] {
   border-color: var(--c);
-  background: linear-gradient(180deg, var(--card) 0%, var(--c-soft) 180%);
+  background-color: color-mix(in srgb, var(--c-soft) 45%, var(--card));
   box-shadow: 0 0 0 1px var(--c), 0 14px 26px -20px rgba(20,33,58,.35);
 }
 .idioma__info { display: grid; gap: 3px; min-width: 0; }
@@ -50,7 +51,7 @@
 
 /* filtros */
 .filtros {
-  display: grid; grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(140px, 1fr)) auto; gap: 16px; align-items: end; margin-bottom: 16px;
+  display: grid; grid-template-columns: minmax(220px, 2fr) repeat(2, minmax(160px, 1fr)) auto; gap: 16px; align-items: end; margin-bottom: 16px;
   padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md);
   box-shadow: 0 10px 24px -22px rgba(20,33,58,.25);
 }
@@ -79,39 +80,106 @@
 @media (max-width: 1023px) { .lista { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 639px) { .lista { grid-template-columns: 1fr; gap: 14px; } .nivel__head { flex-wrap: wrap; gap: 4px 16px; } .nivel__head b { font-size: 44px; } .nivel__head .label { margin-left: 0; width: 100%; } }
 
+/* tarjeta: portada del tablero (foto + sello) y lámina de papel con borde superior del nivel */
 .t {
-  display: flex; flex-direction: column; min-height: 236px; padding: 0; overflow: hidden;
-  background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--lvl, var(--c));
-  border-radius: var(--r-md); text-decoration: none; color: var(--ink);
-  transition: transform .2s var(--ease), border-color .2s, box-shadow .2s;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative; min-width: 0; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--card); color: var(--ink);
+  border: 1.5px solid var(--line-2); border-top: 4px solid var(--lvl, var(--ink)); border-radius: var(--r-lg);
+  transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out);
 }
-.t:hover { transform: translateY(-3px); border-color: var(--line-2); border-top-color: var(--lvl, var(--c)); box-shadow: 0 20px 36px -24px rgba(20,33,58,.45); }
-.t__top {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 46px;
-  padding: 10px 20px; background: var(--lvl-bg, var(--paper-2)); border-bottom: 1px solid var(--line);
+.t__portada {
+  position: relative; aspect-ratio: 16 / 10; overflow: hidden;
+  background: var(--lvl-bg, var(--paper-2)); border-bottom: 1px solid var(--line);
 }
-.t__nivel {
-  display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px;
-  background: var(--lvl, var(--ink)); color: #fff; font: 500 12.5px/1 var(--f-mono); letter-spacing: .04em;
+.t__portada img {
+  display: block; width: 100%; height: 100%; object-fit: cover; object-position: center;
+  transition: transform 300ms var(--ease-out), opacity 200ms ease;
 }
-.t__thumb { aspect-ratio: 16 / 9; overflow: hidden; background: var(--paper-2); border-bottom: 1px solid var(--line); }
-.t__thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top left; transition: transform .35s var(--ease); }
-.t:hover .t__thumb img { transform: scale(1.03); }
-.t__body { padding: 18px 20px 8px; display: grid; gap: 6px; }
-.t h3 { font-size: 24px; margin: 0; }
-.t p { color: var(--ink-2); font-size: 16px; line-height: 1.5; }
-.t__meta { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 20px 16px; margin-top: auto; }
+.t__sello {
+  position: absolute; top: 14px; left: 14px; z-index: 1;
+  display: inline-flex; align-items: center; min-height: 30px; padding: 0 11px; border-radius: 8px;
+  background: var(--lvl, var(--ink)); color: #fff; font: 500 14px/1 var(--f-mono);
+  box-shadow: 0 0 0 2px var(--card);
+}
+.t__portada .tag--live { position: absolute; top: 14px; right: 14px; z-index: 1; box-shadow: 0 0 0 2px var(--card); }
+/* sin foto o si la foto no carga: color suave del nivel y el título grande */
+.t__respaldo {
+  position: absolute; inset: 0; display: none; align-items: flex-end; padding: 56px 20px 18px;
+  font: 400 clamp(26px, 1.2vw + 20px, 34px)/1.05 var(--f-display); font-variation-settings: 'opsz' 60;
+  letter-spacing: -.02em; color: var(--lvl-ink, var(--ink)); overflow-wrap: anywhere; text-wrap: balance;
+}
+.t__portada--sin img { display: none; }
+.t__portada--sin .t__respaldo { display: flex; }
+
+.t__body { display: grid; gap: 8px; padding: 18px 20px 6px; min-width: 0; }
+.t h3 { font: 500 25px/1.12 var(--f-display); font-variation-settings: 'opsz' 30; overflow-wrap: anywhere; }
+.t__desc { color: var(--ink-2); font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; }
+.mano { font-family: 'Caveat', cursive; font-weight: 600; line-height: 1; }
+.t__nota { font-size: 25px; line-height: 1.05; color: var(--lvl, var(--ink)); transform: rotate(-1.5deg); transform-origin: left center; margin-top: 2px; overflow-wrap: anywhere; }
+.t__meta { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 20px 4px; margin-top: auto; }
 .tag--flag { padding-left: 7px; }
 .tag__ico { width: 14px; height: 14px; flex: none; color: var(--muted); }
 .tag--prueba { background: var(--en-soft); color: var(--lvl-a2-ink, #114470); }
-.t__foot {
-  padding: 12px 20px 14px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between;
-  font: 600 14px/1 var(--f-text); color: var(--lvl-ink, var(--ink));
+.t__credito { padding: 6px 20px 0; font-size: 12.5px; line-height: 1.4; color: var(--muted); }
+.t__credito a { position: relative; z-index: 2; color: inherit; text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 2px; display: inline-block; padding: 4px 0; }
+.t__credito a:hover { color: var(--ink); text-decoration-color: currentColor; }
+
+.t__acciones { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 20px 18px; }
+.t__accion {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px;
+  border-radius: var(--r-btn); font: 600 15px/1 var(--f-text); text-decoration: none; white-space: nowrap;
+  transition: background-color 200ms var(--ease-out), border-color 200ms var(--ease-out), color 200ms var(--ease-out);
 }
-.t__cta { display: inline-flex; align-items: center; gap: 6px; }
-.t__arrow { display: inline-block; transition: transform .2s var(--ease); }
-.t:hover .t__arrow { transform: translateX(4px); }
-@media (max-width: 639px) { .t { min-height: 0; } }
+.t__accion svg { width: 18px; height: 18px; flex: none; }
+.t__accion--abrir { background: var(--lvl, var(--ink)); color: #fff; border: 1.5px solid var(--lvl, var(--ink)); }
+.t__accion--muestra { position: relative; z-index: 2; background: transparent; color: var(--lvl-ink, var(--ink)); border: 1.5px solid var(--line-2); }
+.t__accion--muestra:hover { border-color: var(--lvl, var(--ink)); background: var(--lvl-bg, var(--paper-2)); }
+/* toda la tarjeta abre el tablero; «Probar la muestra» y el crédito quedan por encima */
+.t__accion--abrir::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+.t__accion--abrir:focus-visible { outline: none; }
+.t:has(.t__accion--abrir:focus-visible) { outline: 3px solid var(--en); outline-offset: 3px; }
+.t__accion--muestra:focus-visible, .t__credito a:focus-visible { outline: 3px solid var(--en); outline-offset: 2px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .t:hover { transform: translateY(-2px); border-color: var(--lvl, var(--ink)); border-top-color: var(--lvl, var(--ink)); box-shadow: 0 16px 32px -24px rgba(20,33,58,.45); }
+  .t:hover .t__portada img { transform: scale(1.03); }
+  .t:hover .t__accion--abrir { background: var(--lvl-ink, var(--ink)); border-color: var(--lvl-ink, var(--ink)); }
+}
+.t:has(.t__accion--abrir:active) { transform: translateY(2px); box-shadow: none; transition-duration: 100ms; }
+.t__accion--muestra:active { transform: translateY(1px); transition: transform 100ms var(--ease-out); }
+@media (prefers-reduced-motion: reduce) {
+  .t, .t__portada img, .t__accion { transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease; }
+  .t:hover, .t:has(.t__accion--abrir:active), .t__accion--muestra:active { transform: none; }
+  .t:hover .t__portada img { transform: none; }
+  .t:has(.t__accion--abrir:active) { opacity: .85; }
+}
+@media (max-width: 639px) {
+  .t__body { padding: 16px 16px 4px; } .t__meta, .t__credito { padding-left: 16px; padding-right: 16px; }
+  .t__acciones { padding: 12px 16px 16px; } .t__accion { flex: 1 1 auto; }
+}
+
+/* nivel: seis botones siempre visibles; los niveles sin tableros llevan «pronto» a mano */
+.niveles { grid-column: 1 / -1; border: 0; margin: 0; padding: 0; min-width: 0; }
+.niveles legend { padding: 0; margin-bottom: 8px; font-size: 14px; font-weight: 500; }
+.niveles__fila { display: flex; flex-wrap: wrap; gap: 8px; }
+.nv { position: relative; display: inline-flex; align-items: baseline; gap: 6px; min-height: 44px; padding: 10px 16px; cursor: pointer;
+  border: 1.5px solid var(--line-2); border-radius: var(--r-sm); background: var(--card); color: var(--ink);
+  transition: border-color 150ms ease, background-color 150ms ease; }
+.nv input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.nv__n { font: 500 15px/1.4 var(--f-mono); }
+.nv__pronto { font-size: 20px; color: var(--lvl-ink, var(--muted)); transform: rotate(-4deg); }
+.nv:hover { border-color: var(--lvl, var(--ink)); }
+.nv:has(input:checked) { border-color: var(--lvl, var(--ink)); background: var(--lvl-bg, var(--paper-2)); box-shadow: inset 0 0 0 1px var(--lvl, var(--ink)); }
+.nv:has(input:focus-visible) { outline: 3px solid var(--en); outline-offset: 2px; }
+@media (max-width: 639px) { .nv { padding: 10px 12px; } }
+
+/* nivel todavía sin tableros */
+.pronto { display: grid; gap: 10px; justify-items: start; max-width: 62ch; padding: 22px 24px;
+  background: var(--card); border: 1.5px dashed var(--line-2); border-top: 4px solid var(--lvl, var(--ink)); border-radius: var(--r-lg); }
+.pronto .mano { font-size: 30px; color: var(--lvl, var(--ink)); transform: rotate(-2deg); }
+.pronto p { color: var(--ink-2); }
+.pronto a { font-weight: 600; color: var(--lvl-ink, var(--ink)); min-height: 44px; display: inline-flex; align-items: center; }
 
 .vacio { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: center; }
 .vacio .photo { grid-column: 1 / span 6; aspect-ratio: 3 / 2; }
@@ -125,79 +193,80 @@
 <body>
 <header class="nav">
   <div class="wrap">
-    <a class="skip-link" href="#top">Saltar al contenido</a>
-    <a class="brand" href="./" aria-label="Lingua's Academy, inicio"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
-    <nav aria-label="Plataforma">
+    <a class="skip-link" href="#top" data-i18n="nav.saltar">Saltar al contenido</a>
+    <a class="brand" href="./" data-i18n-aria="nav.marca" aria-label="Lingua's Academy, inicio"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <nav aria-label="Plataforma" data-i18n-aria="nav.plataforma">
       <ul class="nav__links">
-        <li><a href="tableros.html" aria-current="page">Catálogo</a></li>
-        <li data-solo-admin hidden><a href="admin.html">Solicitudes</a></li>
+        <li><a href="tableros.html" aria-current="page" data-i18n="nav.catalogo">Catálogo</a></li>
+        <li data-solo-admin hidden><a href="admin.html" data-i18n="nav.solicitudes">Solicitudes</a></li>
       </ul>
     </nav>
     <div class="nav__actions">
+      <div class="nav__idioma" data-selector-idioma></div>
       <span class="nav__user" data-nombre></span>
-      <button class="btn btn--secondary btn--sm" type="button" data-salir>Salir</button>
-      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú"><span>Menú</span></button>
+      <button class="btn btn--secondary btn--sm" type="button" data-salir data-i18n="nav.salir">Salir</button>
+      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.abrirMenu" data-txt-abrir="Menú" data-txt-cerrar="Cerrar" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir="nav.menu" data-i18n-txt-cerrar="nav.cerrar" data-i18n-txt-abrir-aria="nav.abrirMenu" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><span data-i18n="nav.menu">Menú</span></button>
     </div>
   </div>
 </header>
 <div class="sheet" id="menu" hidden>
-  <a href="tableros.html">Catálogo</a>
-  <a href="admin.html" data-solo-admin hidden>Solicitudes</a>
-  <a href="./">Inicio</a>
-  <button class="btn btn--secondary" type="button" data-salir>Salir</button>
+  <a href="tableros.html" data-i18n="nav.catalogo">Catálogo</a>
+  <a href="admin.html" data-solo-admin hidden data-i18n="nav.solicitudes">Solicitudes</a>
+  <a href="./" data-i18n="nav.inicio">Inicio</a>
+  <button class="btn btn--secondary" type="button" data-salir data-i18n="nav.salir">Salir</button>
 </div>
 
 <main id="top" class="app">
   <div class="wrap">
-    <p class="cargando" data-cargando role="status">Comprobando tu acceso…</p>
+    <p class="cargando" data-cargando role="status" data-i18n="cat.comprobando">Comprobando tu acceso…</p>
 
     <div data-contenido hidden>
       <div class="app__head">
         <div>
-          <h1>Catálogo de tableros</h1>
+          <h1 data-i18n="cat.titulo">Catálogo de tableros</h1>
           <p class="lead" data-saludo>Elige el idioma que enseñas y filtra por nivel.</p>
         </div>
       </div>
 
-      <div class="idiomas" role="tablist" aria-label="Idioma que se enseña">
+      <div class="idiomas" role="tablist" aria-label="Idioma que se enseña" data-i18n-aria="cat.idiomaTabs">
         <button type="button" role="tab" id="i-es" data-lang="es" data-idioma="es" aria-selected="true" aria-controls="resultados">
           <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#AA151B"></rect><rect y="6" width="32" height="12" fill="#F1BF00"></rect></svg>
-          <span class="idioma__info"><span class="nombre">Español</span><span class="idioma__sub"><span class="idioma__rango">A1–B2</span> · <span class="cuenta" data-cuenta-idioma="es"></span></span></span>
+          <span class="idioma__info"><span class="nombre" data-i18n="cat.tab.es">Español</span><span class="idioma__sub"><span class="idioma__rango" data-rango-idioma="es">A1–C2</span> · <span class="cuenta" data-cuenta-idioma="es"></span></span></span>
           <span class="idioma__chev" aria-hidden="true">›</span>
         </button>
         <button type="button" role="tab" id="i-en" data-lang="en" data-idioma="en" aria-selected="false" aria-controls="resultados" tabindex="-1">
           <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#012169"></rect><path d="M0 0L32 24M32 0L0 24" stroke="#FFF" stroke-width="4.5"></path><path d="M0 0L32 24M32 0L0 24" stroke="#C8102E" stroke-width="2"></path><path d="M16 0v24M0 12h32" stroke="#FFF" stroke-width="7"></path><path d="M16 0v24M0 12h32" stroke="#C8102E" stroke-width="4"></path></svg>
-          <span class="idioma__info"><span class="nombre">Inglés</span><span class="idioma__sub"><span class="idioma__rango">A1–B2</span> · <span class="cuenta" data-cuenta-idioma="en"></span></span></span>
+          <span class="idioma__info"><span class="nombre" data-i18n="cat.tab.en">Inglés</span><span class="idioma__sub"><span class="idioma__rango" data-rango-idioma="en">A1–C2</span> · <span class="cuenta" data-cuenta-idioma="en"></span></span></span>
           <span class="idioma__chev" aria-hidden="true">›</span>
         </button>
         <button type="button" role="tab" id="i-pt" data-lang="pt" data-idioma="pt" aria-selected="false" aria-controls="resultados" tabindex="-1">
           <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#009B3A"></rect><polygon points="16,3 29,12 16,21 3,12" fill="#FEDF00"></polygon><circle cx="16" cy="12" r="4.5" fill="#002776"></circle></svg>
-          <span class="idioma__info"><span class="nombre">Portugués</span><span class="idioma__sub"><span class="idioma__rango">A1–B2</span> · <span class="cuenta" data-cuenta-idioma="pt"></span></span></span>
+          <span class="idioma__info"><span class="nombre" data-i18n="cat.tab.pt">Portugués</span><span class="idioma__sub"><span class="idioma__rango" data-rango-idioma="pt">A1–C2</span> · <span class="cuenta" data-cuenta-idioma="pt"></span></span></span>
           <span class="idioma__chev" aria-hidden="true">›</span>
         </button>
       </div>
 
       <section id="resultados" role="tabpanel" aria-labelledby="i-es">
-        <form class="filtros" data-filtros role="search" onsubmit="return false">
+        <form class="filtros" data-filtros role="search" aria-label="Filtros" data-i18n-aria="cat.f.aria" onsubmit="return false">
           <div class="field buscar">
-            <label for="b-texto">Buscar por tema o gramática</label>
-            <input id="b-texto" name="texto" type="search" autocomplete="off" placeholder="Ej. restaurante, pasado, familia, subjuntivo…">
+            <label for="b-texto" data-i18n="cat.f.buscar">Buscar por tema o gramática</label>
+            <input id="b-texto" name="texto" type="search" autocomplete="off" data-i18n-placeholder="cat.f.buscarEj" placeholder="Ej. restaurante, pasado, familia, subjuntivo…">
           </div>
           <div class="field">
-            <label for="b-nivel">Nivel</label>
-            <select id="b-nivel" name="nivel"><option value="">Todos</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select>
+            <label for="b-consignas" data-i18n="cat.f.consignas">Consignas en</label>
+            <select id="b-consignas" name="consignas"><option value="" data-i18n="cat.f.cualquiera">Cualquier idioma</option><option value="en" data-i18n="cat.f.ingles">Inglés</option><option value="pt" data-i18n="cat.f.portugues">Portugués</option><option value="es" data-i18n="cat.f.espanol">Español</option></select>
           </div>
           <div class="field">
-            <label for="b-consignas">Consignas en</label>
-            <select id="b-consignas" name="consignas"><option value="">Cualquier idioma</option><option value="en">Inglés</option><option value="pt">Portugués</option><option value="es">Español</option></select>
+            <label for="b-publico" data-i18n="cat.f.para">Para</label>
+            <select id="b-publico" name="publico"><option value="" data-i18n="cat.f.todos">Todos</option><option value="ninos" data-i18n="cat.ninos">Niños</option><option value="adultos" data-i18n="cat.adultos">Adultos</option><option value="prueba" data-i18n="cat.clasePrueba">Clase de prueba</option></select>
           </div>
-          <div class="field">
-            <label for="b-publico">Para</label>
-            <select id="b-publico" name="publico"><option value="">Todos</option><option value="ninos">Niños</option><option value="adultos">Adultos</option><option value="prueba">Clase de prueba</option></select>
-          </div>
-          <label class="chk"><input type="checkbox" name="vivo"> Solo en vivo</label>
+          <label class="chk"><input type="checkbox" name="vivo"> <span data-i18n="cat.f.soloVivo">Solo en vivo</span></label>
+          <fieldset class="niveles">
+            <legend data-i18n="cat.f.nivel">Nivel</legend>
+            <div class="niveles__fila"><label class="nv"><input type="radio" name="nivel" value="" checked><span class="nv__n" data-i18n="cat.f.todos">Todos</span></label><label class="nv" data-nivel="A1"><input type="radio" name="nivel" value="A1"><span class="nv__n">A1</span><span class="mano nv__pronto" data-pronto="A1" data-i18n="cat.pronto" hidden>pronto</span></label><label class="nv" data-nivel="A2"><input type="radio" name="nivel" value="A2"><span class="nv__n">A2</span><span class="mano nv__pronto" data-pronto="A2" data-i18n="cat.pronto" hidden>pronto</span></label><label class="nv" data-nivel="B1"><input type="radio" name="nivel" value="B1"><span class="nv__n">B1</span><span class="mano nv__pronto" data-pronto="B1" data-i18n="cat.pronto" hidden>pronto</span></label><label class="nv" data-nivel="B2"><input type="radio" name="nivel" value="B2"><span class="nv__n">B2</span><span class="mano nv__pronto" data-pronto="B2" data-i18n="cat.pronto" hidden>pronto</span></label><label class="nv" data-nivel="C1"><input type="radio" name="nivel" value="C1"><span class="nv__n">C1</span><span class="mano nv__pronto" data-pronto="C1" data-i18n="cat.pronto" hidden>pronto</span></label><label class="nv" data-nivel="C2"><input type="radio" name="nivel" value="C2"><span class="nv__n">C2</span><span class="mano nv__pronto" data-pronto="C2" data-i18n="cat.pronto" hidden>pronto</span></label></div>
+          </fieldset>
         </form>
-        <div class="resumen"><span role="status" data-resumen></span><button class="plain-btn link" type="button" data-limpiar hidden style="background-color:transparent;border:0;padding:0;font:inherit;cursor:pointer;min-height:44px">Quitar los filtros</button></div>
+        <div class="resumen"><span role="status" data-resumen></span><button class="plain-btn link" type="button" data-limpiar hidden data-i18n="cat.f.quitar" style="background-color:transparent;border:0;padding:0;font:inherit;cursor:pointer;min-height:44px">Quitar los filtros</button></div>
 
         <div data-lista></div>
       </section>
@@ -211,7 +280,7 @@
     <div>
       <h2></h2>
       <p class="lead"></p>
-      <div class="btn-row"><button class="btn btn--secondary" type="button" data-a-espanol>Ver los tableros de español</button></div>
+      <div class="btn-row"><button class="btn btn--secondary" type="button" data-a-espanol data-i18n="cat.vacio.boton0">Ver los tableros de español</button></div>
     </div>
   </div>
 </template>
@@ -224,6 +293,13 @@
 (() => {
   'use strict';
   const C = window.CATALOGO || [];
+  /* Textos de interfaz: window.I18N_UI[lang][clave], con respaldo en español. lang = <html lang>. */
+  const lang = () => (document.documentElement.lang || 'es').slice(0, 2).toLowerCase();
+  const tr = (clave, es) => {
+    const v = window.I18N_UI && window.I18N_UI[lang()] && window.I18N_UI[lang()][clave];
+    return v == null ? es : v;
+  };
+  const fmt = (s, vars) => String(s).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
   const NIVELES = {
     A1: ['Acceso', 'Presentarse, la rutina, los gustos, comprar.'],
     A2: ['Plataforma', 'El pasado y los planes, viajes, comparar.'],
@@ -232,24 +308,36 @@
     C1: ['Dominio operativo', 'Registro, ironía y atenuación.'],
     C2: ['Maestría', 'Precisión y estilo en cualquier contexto.']
   };
-  const IDIOMA = { es: 'español', en: 'inglés', pt: 'portugués' };
+  const nivelNombre = n => tr('cat.nivel.' + n + '.nombre', NIVELES[n][0]);
+  const nivelDesc = n => tr('cat.nivel.' + n + '.desc', NIVELES[n][1]);
+  const IDIOMA_ES = { es: 'español', en: 'inglés', pt: 'portugués' };
+  const idiomaNombre = i => tr('cat.idioma.' + i, IDIOMA_ES[i]);
   const VACIO = {
-    es: { img: 'assets/img/londres', alt: 'Tableros en preparación' },
-    en: { img: 'assets/img/londres', alt: 'El río Támesis atraviesa Londres, visto desde el aire' },
-    pt: { img: 'assets/img/lisboa', alt: 'Un tranvía amarillo sube por una calle de Lisboa' }
+    es: { img: 'assets/img/londres', alt: ['cat.vacio.alt.es', 'Tableros en preparación'] },
+    en: { img: 'assets/img/londres', alt: ['cat.vacio.alt.en', 'El río Támesis atraviesa Londres, visto desde el aire'] },
+    pt: { img: 'assets/img/lisboa', alt: ['cat.vacio.alt.pt', 'Un tranvía amarillo sube por una calle de Lisboa'] }
   };
   const $ = s => document.querySelector(s);
-  const sinTildes = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const sinTildes = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const nTableros = n => n === 1 ? tr('cat.unTablero', '1 tablero') : fmt(tr('cat.nTableros', '{n} tableros'), { n });
 
   /* ---------- acceso ---------- */
   document.querySelectorAll('[data-salir]').forEach(b => b.addEventListener('click', async () => { await LA.salir().catch(() => {}); location.replace('./'); }));
-  const aEntrar = () => location.replace('entrar.html?volver=' + encodeURIComponent('tableros.html' + location.search));
+  const enlace = h => (window.LAi18n ? LAi18n.enlace(h) : h);
+  const aEntrar = () => { const u = enlace('entrar.html'); location.replace(u + (u.includes('?') ? '&' : '?') + 'volver=' + encodeURIComponent('tableros.html' + location.search)); };
 
-  let mostrado = false;
+  let mostrado = false, nombrePila = '';
+  function saludar() {
+    const s = $('[data-saludo]');
+    s.textContent = nombrePila
+      ? fmt(tr('cat.saludoNombre', 'Hola, {nombre}. Elige el idioma que enseñas y filtra por nivel.'), { nombre: nombrePila })
+      : tr('cat.saludo', 'Elige el idioma que enseñas y filtra por nivel.');
+  }
   function mostrar(perfil, usuario) {
     const nombre = (perfil.nombre || (usuario && (usuario.displayName || usuario.email)) || perfil.correo || '').trim();
     $('[data-nombre]').textContent = nombre;
-    if (nombre) $('[data-saludo]').textContent = 'Hola, ' + nombre.split(' ')[0] + '. Elige el idioma que enseñas y filtra por nivel.';
+    nombrePila = nombre ? nombre.split(' ')[0] : '';
+    saludar();
     document.querySelectorAll('[data-solo-admin]').forEach(el => { el.hidden = !perfil.admin; });
     if (mostrado) return;
     mostrado = true;
@@ -271,8 +359,11 @@
       console.warn(err);
       if (mostrado) return;
       const c = $('[data-cargando]');
-      c.innerHTML = 'La conexión está lenta y no se pudo comprobar tu sesión. <button class="btn btn--secondary btn--sm" type="button">Reintentar</button>';
-      c.querySelector('button').addEventListener('click', () => { c.textContent = 'Comprobando tu acceso…'; comprobar(); });
+      c.textContent = tr('cat.lento', 'La conexión está lenta y no se pudo comprobar tu sesión.') + ' ';
+      const b = document.createElement('button');
+      b.className = 'btn btn--secondary btn--sm'; b.type = 'button'; b.textContent = tr('cat.reintentar', 'Reintentar');
+      c.appendChild(b);
+      b.addEventListener('click', () => { c.textContent = tr('cat.comprobando', 'Comprobando tu acceso…'); comprobar(); });
     });
   }
   comprobar();
@@ -292,10 +383,22 @@
   ['nivel', 'consignas', 'publico', 'texto'].forEach(k => { if (url.get(k)) form.elements[k].value = url.get(k); });
   if (url.get('vivo') === '1') form.elements.vivo.checked = true;
 
-  ['es', 'en', 'pt'].forEach(i => {
-    const n = C.filter(t => t.idioma === i).length;
-    $('[data-cuenta-idioma="' + i + '"]').textContent = n ? (n === 1 ? '1 tablero' : n + ' tableros') : 'En preparación';
-  });
+  /* Rango de cada idioma: siempre A1–C2; los niveles que aún no tienen tableros se marcan «pronto» */
+  const NIV = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  const listaNiveles = arr => {
+    try { return new Intl.ListFormat(lang(), { style: 'long', type: 'conjunction' }).format(arr); }
+    catch (e) { return arr.join(', '); }
+  };
+  function cuentas() {
+    ['es', 'en', 'pt'].forEach(i => {
+      const deI = C.filter(t => t.idioma === i);
+      $('[data-cuenta-idioma="' + i + '"]').textContent = deI.length ? nTableros(deI.length) : tr('cat.enPreparacion', 'En preparación');
+      const faltan = deI.length ? NIV.filter(n => !deI.some(t => t.nivel === n)) : [];
+      $('[data-rango-idioma="' + i + '"]').textContent = tr('cat.rango', 'A1–C2') +
+        (faltan.length ? ' (' + fmt(tr('cat.rangoPronto', '{niveles}, pronto'), { niveles: listaNiveles(faltan) }) + ')' : '');
+    });
+  }
+  cuentas();
 
   const tabs = [...document.querySelectorAll('.idiomas [role="tab"]')];
   tabs.forEach((t, n) => {
@@ -309,23 +412,22 @@
   form.addEventListener('input', () => pintar());
   $('[data-limpiar]').addEventListener('click', () => { form.reset(); pintar(); form.elements.texto.focus(); });
 
+  /* Si otra parte de la web cambia <html lang>, se repintan los textos generados aquí */
+  new MutationObserver(() => { cuentas(); saludar(); if (mostrado) pintar(); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+
   function guardarUrl(f) {
     const p = new URLSearchParams();
     if (idioma !== 'es') p.set('idioma', idioma);
+    const ql = new URLSearchParams(location.search).get('lang');
     for (const k of ['nivel', 'consignas', 'publico', 'texto']) if (f[k]) p.set(k, f[k]);
     if (f.vivo) p.set('vivo', '1');
+    if (ql) p.set('lang', ql);
     const qs = p.toString() ? '?' + p : '';
     history.replaceState(null, '', location.pathname + qs);
     try { sessionStorage.setItem('la-catalogo', 'tableros.html' + qs); } catch (e) {}
   }
 
-  const THUMBS = {
-    'a1-monstruos-gigantes.html': 'assets/tableros/a1-monstruos-gigantes-960.jpg',
-    'a2-me-lo-llevo.html': 'assets/tableros/a2-me-lo-llevo-960.jpg',
-    'a2-a-como-esta-la-pina.html': 'assets/tableros/a2-a-como-esta-la-pina-960.jpg',
-    'b1-que-harias-si.html': 'assets/tableros/b1-que-harias-si-960.jpg',
-    'b2-radio-chisme.html': 'assets/tableros/b2-radio-chisme-960.jpg'
-  };
   const FLAGS = {
     es: '<svg class="flag flag--sm" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#AA151B"></rect><rect y="6" width="32" height="12" fill="#F1BF00"></rect></svg>',
     en: '<svg class="flag flag--sm" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#012169"></rect><path d="M0 0L32 24M32 0L0 24" stroke="#FFF" stroke-width="4.5"></path><path d="M0 0L32 24M32 0L0 24" stroke="#C8102E" stroke-width="2"></path><path d="M16 0v24M0 12h32" stroke="#FFF" stroke-width="7"></path><path d="M16 0v24M0 12h32" stroke="#C8102E" stroke-width="4"></path></svg>',
@@ -335,42 +437,107 @@
     ninos: '<svg class="tag__ico" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.3l-3.8 2 .7-4.3-3.1-3 4.3-.6z"></path></svg>',
     adultos: '<svg class="tag__ico" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5" r="3"></circle><path d="M2.5 14c.6-2.6 2.8-4 5.5-4s4.9 1.4 5.5 4"></path></svg>'
   };
+  /* Lucide (ISC): arrow-right y play */
+  const ICO_ABRIR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+  const ICO_MUESTRA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
 
+  const notaDe = t => (lang() === 'en' && t.notaEn) || (lang() === 'pt' && t.notaPt) || t.nota || '';
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const sinFoto = portada => portada.classList.add('t__portada--sin');
+
+  /* estado amable de un nivel que todavía no tiene tableros */
+  function pronto(n) {
+    const box = el('div', 'pronto');
+    box.appendChild(el('p', 'mano', tr('cat.pronto', 'pronto')));
+    box.appendChild(el('p', null, fmt(tr('cat.pronto.texto', 'Estamos preparando los tableros de {nivel}. ¿Quieres que te avisemos?'), { nivel: n })));
+    const a = el('a', 'link', tr('cat.pronto.avisar', 'Avísame cuando estén listos'));
+    a.href = enlace('entrar.html');
+    box.appendChild(a);
+    return box;
+  }
+
+  let nTarjeta = 0;
   function tarjeta(t) {
-    const a = document.createElement('a');
-    a.className = 't'; a.href = t.archivo; a.dataset.lang = t.idioma; a.dataset.nivel = t.nivel;
-    const thumb = THUMBS[t.archivo] ? '<div class="t__thumb"><img src="' + THUMBS[t.archivo] + '" alt="" width="960" height="600" loading="lazy"></div>' : '';
-    a.innerHTML =
-      '<div class="t__top"><span class="t__nivel"></span></div>' +
-      thumb +
-      '<div class="t__body"><h3></h3><p></p></div>' +
-      '<div class="t__meta"></div>' +
-      '<div class="t__foot"><span class="t__cta">Abrir tablero <span class="t__arrow" aria-hidden="true">→</span></span></div>';
-    a.querySelector('.t__nivel').textContent = t.nivel;
-    if (t.vivo) a.querySelector('.t__top').insertAdjacentHTML('beforeend', '<span class="tag tag--live">En vivo</span>');
-    a.querySelector('h3').textContent = t.titulo;
-    a.querySelector('p').textContent = t.desc;
-    const m = a.querySelector('.t__meta');
-    const cTag = document.createElement('span');
-    cTag.className = 'tag tag--flag';
-    cTag.innerHTML = (FLAGS[t.consignas] || '') + '<span></span>';
-    cTag.querySelector('span').textContent = 'Consignas en ' + IDIOMA[t.consignas];
-    m.appendChild(cTag);
+    const id = 't-' + t.archivo.replace(/\.html$/, '');
+    const art = el('article', 't');
+    art.dataset.lang = t.idioma; art.dataset.nivel = t.nivel;
+    art.setAttribute('aria-labelledby', id);
 
-    const pKey = t.publico === 'ninos' ? 'ninos' : 'adultos';
-    const pTag = document.createElement('span');
-    pTag.className = 'tag tag--ico';
-    pTag.innerHTML = ICON_PUBLICO[pKey] + '<span></span>';
-    pTag.querySelector('span').textContent = pKey === 'ninos' ? 'Niños' : 'Adultos';
-    m.appendChild(pTag);
-
-    if (t.prueba) {
-      const prTag = document.createElement('span');
-      prTag.className = 'tag tag--prueba';
-      prTag.textContent = 'Clase de prueba';
-      m.appendChild(prTag);
+    /* portada */
+    const portada = el('div', 't__portada');
+    if (t.foto) {
+      const img = new Image();
+      img.addEventListener('error', () => sinFoto(portada), { once: true });
+      const base = t.foto.split('?')[0];
+      const q = w => base + '?auto=format&fit=crop&w=' + w + '&q=70';
+      img.src = q(800);
+      img.srcset = q(480) + ' 480w, ' + q(800) + ' 800w';
+      img.sizes = '(max-width: 639px) calc(100vw - 40px), (max-width: 1023px) 50vw, 400px';
+      img.width = 800; img.height = 500;
+      img.alt = t.fotoAlt || '';
+      img.decoding = 'async';
+      if (nTarjeta >= 3) img.loading = 'lazy';
+      portada.appendChild(img);
+    } else {
+      sinFoto(portada);
     }
-    return a;
+    nTarjeta++;
+    const resp = el('span', 't__respaldo', t.titulo); resp.setAttribute('aria-hidden', 'true');
+    portada.appendChild(resp);
+    const sello = el('span', 't__sello');
+    sello.innerHTML = '<span class="visually-hidden"></span>';
+    sello.firstChild.textContent = tr('cat.nivel', 'Nivel') + ' ';
+    sello.append(t.nivel);
+    portada.appendChild(sello);
+    if (t.vivo) portada.appendChild(el('span', 'tag tag--live', tr('cat.enVivo', 'En vivo')));
+    art.appendChild(portada);
+
+    /* texto */
+    const body = el('div', 't__body');
+    const h = el('h3', null, t.titulo); h.id = id;
+    body.append(h, el('p', 't__desc', t.desc));
+    const nota = notaDe(t);
+    if (nota) body.appendChild(el('p', 'mano t__nota', nota));
+    art.appendChild(body);
+
+    /* etiquetas */
+    const m = el('div', 't__meta');
+    const cTag = el('span', 'tag tag--flag');
+    cTag.innerHTML = (FLAGS[t.consignas] || '') + '<span></span>';
+    cTag.querySelector('span').textContent = fmt(tr('cat.consignasEn', 'Consignas en {idioma}'), { idioma: idiomaNombre(t.consignas) });
+    m.appendChild(cTag);
+    const pKey = t.publico === 'ninos' ? 'ninos' : 'adultos';
+    const pTag = el('span', 'tag tag--ico');
+    pTag.innerHTML = ICON_PUBLICO[pKey] + '<span></span>';
+    pTag.querySelector('span').textContent = pKey === 'ninos' ? tr('cat.ninos', 'Niños') : tr('cat.adultos', 'Adultos');
+    m.appendChild(pTag);
+    if (t.prueba) m.appendChild(el('span', 'tag tag--prueba', tr('cat.clasePrueba', 'Clase de prueba')));
+    art.appendChild(m);
+
+    /* crédito de la foto */
+    if (t.foto && t.fotoAutor) {
+      const cr = el('p', 't__credito');
+      const a = el('a', null, fmt(tr('cat.foto', 'Foto: {autor} · Unsplash'), { autor: t.fotoAutor }));
+      a.href = t.fotoPagina || 'https://unsplash.com/'; a.target = '_blank'; a.rel = 'noopener';
+      cr.appendChild(a);
+      art.appendChild(cr);
+    }
+
+    /* acciones */
+    const acc = el('div', 't__acciones');
+    const abrir = el('a', 't__accion t__accion--abrir');
+    abrir.href = t.archivo;
+    abrir.innerHTML = '<span></span><span class="visually-hidden"></span>' + ICO_ABRIR;
+    abrir.children[0].textContent = tr('cat.abrir', 'Abrir');
+    abrir.children[1].textContent = ': ' + t.titulo;
+    const muestra = el('a', 't__accion t__accion--muestra');
+    muestra.href = enlace('muestra.html?t=' + encodeURIComponent(t.archivo.replace(/\.html$/, '')));
+    muestra.innerHTML = ICO_MUESTRA + '<span></span><span class="visually-hidden"></span>';
+    muestra.children[1].textContent = tr('cat.probarMuestra', 'Probar la muestra');
+    muestra.children[2].textContent = ': ' + t.titulo;
+    acc.append(abrir, muestra);
+    art.appendChild(acc);
+    return art;
   }
 
   function pintar() {
@@ -381,21 +548,27 @@
     guardarUrl(f);
 
     const delIdioma = C.filter(t => t.idioma === idioma);
+    document.querySelectorAll('[data-pronto]').forEach(p => {
+      p.hidden = delIdioma.some(t => t.nivel === p.dataset.pronto);
+      p.textContent = tr('cat.pronto', 'pronto');
+    });
     const lista = $('[data-lista]');
     lista.textContent = '';
+    nTarjeta = 0;
     form.hidden = !delIdioma.length;
 
     if (!delIdioma.length) {
       const v = document.getElementById('tpl-vacio').content.cloneNode(true);
       const img = v.querySelector('img'), cfg = VACIO[idioma];
-      img.src = cfg.img + '-1100.jpg'; img.srcset = cfg.img + '-600.jpg 600w, ' + cfg.img + '-1100.jpg 1100w'; img.sizes = '(max-width: 1023px) 100vw, 48vw'; img.alt = cfg.alt;
-      v.querySelector('h2').textContent = 'Tableros de ' + IDIOMA[idioma] + ' en preparación';
-      v.querySelector('.lead').textContent = 'Aparecerán aquí, ordenados por nivel, en cuanto estén listos. Mientras tanto, ' + C.filter(t => t.idioma === 'es' && t.consignas === idioma).length + ' tableros de español tienen las consignas en ' + IDIOMA[idioma] + '.';
+      img.src = cfg.img + '-1100.jpg'; img.srcset = cfg.img + '-600.jpg 600w, ' + cfg.img + '-1100.jpg 1100w'; img.sizes = '(max-width: 1023px) 100vw, 48vw'; img.alt = tr(cfg.alt[0], cfg.alt[1]);
+      v.querySelector('h2').textContent = fmt(tr('cat.vacio.titulo', 'Tableros de {idioma} en preparación'), { idioma: idiomaNombre(idioma) });
+      v.querySelector('.lead').textContent = fmt(tr('cat.vacio.texto', 'Aparecerán aquí, ordenados por nivel, en cuanto estén listos. Mientras tanto, {n} tableros de español tienen las consignas en {idioma}.'),
+        { n: C.filter(t => t.idioma === 'es' && t.consignas === idioma).length, idioma: idiomaNombre(idioma) });
       const ir = v.querySelector('[data-a-espanol]');
-      ir.textContent = 'Ver los de español con consignas en ' + IDIOMA[idioma];
+      ir.textContent = fmt(tr('cat.vacio.boton', 'Ver los de español con consignas en {idioma}'), { idioma: idiomaNombre(idioma) });
       ir.addEventListener('click', () => { const antes = idioma; idioma = 'es'; form.reset(); form.elements.consignas.value = antes; pintar(); $('#i-es').focus(); });
       lista.appendChild(v);
-      $('[data-resumen]').textContent = 'Todavía no hay tableros de ' + IDIOMA[idioma] + '.';
+      $('[data-resumen]').textContent = fmt(tr('cat.vacio.resumen', 'Todavía no hay tableros de {idioma}.'), { idioma: idiomaNombre(idioma) });
       $('[data-limpiar]').hidden = true;
       return;
     }
@@ -406,27 +579,38 @@
       (!f.consignas || t.consignas === f.consignas) &&
       (!f.publico || (f.publico === 'prueba' ? t.prueba : t.publico === f.publico)) &&
       (!f.vivo || t.vivo) &&
-      (!txt || sinTildes(t.titulo + ' ' + t.desc).includes(txt))
+      (!txt || sinTildes(t.titulo + ' ' + t.desc + ' ' + notaDe(t)).includes(txt))
     );
     const filtrando = !!(f.nivel || f.consignas || f.publico || f.vivo || txt);
     $('[data-limpiar]').hidden = !filtrando;
-    $('[data-resumen]').textContent = hay.length === 1 ? '1 tablero' : hay.length + ' tableros' + (filtrando ? ' con estos filtros' : '');
+    $('[data-resumen]').textContent = hay.length === 1 ? nTableros(1)
+      : filtrando ? fmt(tr('cat.nConFiltros', '{n} tableros con estos filtros'), { n: hay.length }) : nTableros(hay.length);
 
-    if (!hay.length) {
-      const p = document.createElement('p'); p.className = 'lead';
-      p.textContent = 'Ningún tablero coincide con estos filtros. Prueba con otro nivel o quita la búsqueda.';
-      lista.appendChild(p); return;
+    const soloOtros = !!(f.consignas || f.publico || f.vivo || txt);
+    const nivelVacio = f.nivel && !delIdioma.some(t => t.nivel === f.nivel);
+    if (nivelVacio) $('[data-resumen]').textContent = fmt(tr('cat.pronto.resumen', 'Los tableros de {nivel} llegan pronto.'), { nivel: f.nivel });
+    if (!hay.length && !nivelVacio) {
+      lista.appendChild(el('p', 'lead', tr('cat.sinResultados', 'Ningún tablero coincide con estos filtros. Prueba con otro nivel o quita la búsqueda.')));
+      return;
     }
     for (const n of Object.keys(NIVELES)) {
       const deN = hay.filter(t => t.nivel === n);
-      if (!deN.length) continue;
+      const vacioNivel = !delIdioma.some(t => t.nivel === n);
+      /* los niveles todavía sin tableros se ven siempre, salvo que se busque o se elija otro nivel */
+      const verPronto = vacioNivel && (f.nivel === n || (!f.nivel && !soloOtros));
+      if (!deN.length && !verPronto) continue;
       const s = document.createElement('section'); s.className = 'nivel'; s.dataset.nivel = n; s.setAttribute('aria-labelledby', 'n-' + n);
       s.innerHTML = '<header class="nivel__head"><b aria-hidden="true">' + n + '</b><div><h2 id="n-' + n + '"></h2><p></p></div><span class="label"></span></header><div class="lista"></div>';
       s.querySelector('h2').innerHTML = '<span class="visually-hidden">' + n + ', </span>';
-      s.querySelector('h2').append(NIVELES[n][0]);
-      s.querySelector('p').textContent = NIVELES[n][1];
-      s.querySelector('.label').textContent = deN.length === 1 ? '1 tablero' : deN.length + ' tableros';
-      const l = s.querySelector('.lista'); deN.forEach(t => l.appendChild(tarjeta(t)));
+      s.querySelector('h2').append(nivelNombre(n));
+      s.querySelector('p').textContent = nivelDesc(n);
+      if (vacioNivel) {
+        s.querySelector('.label').textContent = tr('cat.pronto', 'pronto');
+        s.querySelector('.lista').replaceWith(pronto(n));
+      } else {
+        s.querySelector('.label').textContent = nTableros(deN.length);
+        const l = s.querySelector('.lista'); deN.forEach(t => l.appendChild(tarjeta(t)));
+      }
       lista.appendChild(s);
     }
   }
