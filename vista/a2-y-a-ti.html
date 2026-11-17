@@ -1,0 +1,1101 @@
+<!doctype html><html><head>
+<script>/* Vista previa: sin sala en vivo. El tablero funciona solo en esta pantalla. */window.claude={use:async function(){return null}};window.LA_VISTA_PREVIA=true;</script>
+<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="robots" content="noindex, nofollow">
+<title>Vista previa · ¿Y a ti?</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Barlow+Condensed:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Lámina de aula: barra de visor arriba, mapa de ruta a la izquierda y una sola lámina con pestañas y páginas.
+   Identidad: taquilla. Entradas de concierto, de partido y de cine: lo que está en español va en entradas con muescas,
+   y cada palabra abre una ventana que es una entrada con su resguardo. Aspecto único y claro a propósito: se comparte por videollamada. */
+:root{
+  --tinta:#1D1B33; --noche:#221F4A; --noche2:#15133A;
+  --fondo:#E9ECF5; --lamina:#F4F5FB; --papel:#FFFFFF; --linea:#C9CEE0;
+  --rojo:#D4263E; --ambar:#9C6400; --mostaza:#F5B82E; --mostaza2:#FFF1C7;
+  --cobalto:#2B46C8; --cobalto2:#E4E9FC; --ciruela:#8C2A78; --teal:#0F7F74;
+  --ayuda:#555A75; --ok:#177E48; --mal:#C3271F; --okf:#DDF3E5; --malf:#FBE2DF;
+  --display:'Barlow Condensed','Arial Narrow','Helvetica Neue',Arial,sans-serif;
+  --texto:'Albert Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'Space Mono',ui-monospace,Menlo,Consolas,monospace;
+  --ease-out:cubic-bezier(.23,1,.32,1); --ease-io:cubic-bezier(.77,0,.175,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+body{margin:0;background:var(--fondo);color:var(--tinta);font:500 19px/1.45 var(--texto);overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .12s var(--ease-out)}
+button:active:not(:disabled){transform:scale(.97)}
+a{touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--mostaza);outline-offset:2px}
+.es{color:var(--tinta);font-weight:700}
+.en{color:var(--ayuda);font-size:.9em;font-weight:500}
+b.f,.f{color:var(--rojo);font-weight:800}
+.ic{flex:none;vertical-align:-3px}
+.nv{display:inline-flex;gap:1px;align-items:center}
+
+#app{height:100%;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+
+/* ---- barra del visor: angosta (40 px), flotante y redondeada ---- */
+#top{grid-column:1/-1;height:40px;margin:5px 8px 0;border-radius:14px;overflow:hidden;display:flex;align-items:center;gap:8px;background:var(--noche);color:#fff;padding-right:8px}
+#top button{color:#fff}
+.tmenu{height:40px;width:264px;flex:none;display:flex;align-items:center;gap:8px;padding:0 12px!important;background:var(--cobalto);font:700 17px/1 var(--display);letter-spacing:.03em}
+.plegado .tmenu{width:48px;justify-content:center;padding:0!important}
+.plegado .tmenu span{display:none}
+.tmenu svg{display:block;flex:none;width:24px;height:24px}
+.tnav{display:flex;align-items:center;gap:2px;margin-left:2px}
+.tnav button{height:32px;display:flex;align-items:center;gap:6px;padding:0 9px;border-radius:9px;font:700 17px/1 var(--display);letter-spacing:.02em}
+.tnav i{width:24px;height:24px;font-size:11px;border-radius:6px;background:#ffffff26;display:grid;place-items:center;font-style:normal;line-height:1}
+.tnav button:disabled{opacity:.4;cursor:default}
+.tprog{flex:1;min-width:0;display:flex;justify-content:center;align-items:center;gap:2px;overflow:hidden}
+.tprog svg{flex:none}
+.crono{font:700 14px/1 var(--mono);height:30px;padding:0 10px!important;border-radius:8px;background:#ffffff1a;min-width:66px;font-variant-numeric:tabular-nums}
+.crono.va{background:var(--teal)}
+.crono.pasado{background:var(--rojo)}
+.guard{font:400 10.5px var(--mono);letter-spacing:.06em;opacity:.8;white-space:nowrap}
+.guard.ok{color:#9BE8BF;opacity:1}
+.tedit{height:30px;padding:0 12px!important;border-radius:8px;background:var(--mostaza);color:var(--tinta)!important;font:700 17px/1 var(--display)}
+.editando .tedit{background:#fff}
+
+/* ---- mapa lateral: al ocultarlo desaparece por completo; vuelve con el botón del logo o la tecla S ---- */
+#lado{grid-column:1;grid-row:2;margin-top:6px;border-radius:0 14px 0 0;background:var(--noche);color:#fff;width:272px;overflow-y:auto;display:flex;flex-direction:column;overscroll-behavior:contain}
+.plegado #lado{display:none}
+.ficha{padding:14px 16px 10px;border-bottom:2px dashed #ffffff33;font-size:15px;line-height:1.4}
+.ficha b{display:block;font:800 28px/1 var(--display);letter-spacing:.02em}
+.ficha span{display:block;color:#BFC3E6}
+.indice{position:relative;padding:10px 0;flex:1}
+.indice::before{content:"";position:absolute;left:29px;top:26px;bottom:26px;border-left:3px dotted var(--mostaza);opacity:.6}
+.it{position:relative;display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:5px 12px;color:#fff}
+.it .pt2{flex:none;width:36px;height:36px;border-radius:8px;display:grid;place-items:center;line-height:1;background:var(--noche2);border:3px solid var(--mcol);font:700 15px/1 var(--mono)}
+.it .tx{min-width:0;font:600 16px/1.15 var(--texto)}
+.it .tx small{display:block;font:400 10px var(--mono);letter-spacing:.08em;color:#AEB3DA}
+.it.on{background:#ffffff1c}
+.it.on .pt2{background:var(--mcol);color:#fff}
+.it.ok .pt2{background:var(--ok);border-color:var(--ok)}
+.vaciar{margin:8px 12px 14px;padding:8px 10px!important;border:1px solid #ffffff55!important;border-radius:8px;font:400 12px var(--mono);letter-spacing:.05em;color:#fff}
+.vaciar.arma{background:var(--rojo);border-color:var(--rojo)!important}
+
+/* ---- lámina ---- */
+#escena{grid-column:2;grid-row:2;overflow:auto;padding:8px 14px 12px;overscroll-behavior:contain}
+.lamina{--mcol:var(--cobalto);max-width:1160px;min-height:100%;margin:0 auto;display:flex;flex-direction:column;background:var(--lamina);border-radius:16px;overflow:hidden;box-shadow:0 6px 22px #221f4a1f}
+/* cabecera: una entrada con su resguardo */
+.cab{display:flex;align-items:stretch;margin:10px 12px 0;min-height:56px;border-radius:10px;overflow:hidden;background:var(--noche);color:#fff;flex:none}
+.cab .icono{flex:none;width:64px;background:var(--mcol);display:grid;place-items:center;border-right:3px dashed #ffffffb0}
+.cab h1{margin:0;flex:1;min-width:0;align-self:center;padding:6px 16px;font:800 clamp(25px,3.1vw,36px)/1 var(--display);letter-spacing:.05em;text-transform:uppercase;text-wrap:balance}
+.cab .serie{flex:none;align-self:center;padding:0 16px;font:400 11px/1.45 var(--mono);letter-spacing:.1em;text-align:right;opacity:.85}
+.tagrow{display:flex;align-items:flex-end;flex-wrap:wrap;gap:6px 14px;padding:10px 14px 0}
+.tag{display:flex;align-items:center;background:var(--mcol);color:#fff;font:700 13px/1 var(--mono);letter-spacing:.1em;padding:9px 12px 8px;border-radius:6px}
+.tag i{font-style:normal;background:#fff;color:var(--mcol);border-radius:4px;padding:2px 6px;margin:-2px 0 -2px 8px}
+.sub{font:700 25px/1.1 var(--display);letter-spacing:.01em;padding-bottom:3px;min-width:0}
+.min{font:400 12px var(--mono);letter-spacing:.08em;color:var(--ayuda);padding-bottom:6px}
+.tabs{margin-left:auto;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;align-self:flex-end;padding-bottom:1px;min-width:0}
+.tabs button{min-width:44px;height:40px;padding:0 10px;border-radius:8px;background:#fff;color:var(--ayuda);border:2.5px solid var(--linea);font:700 15px/1 var(--mono);display:grid;place-items:center}
+.tabs button[aria-selected="true"]{background:var(--mcol);border-color:var(--mcol);color:#fff}
+.tabs button.extra{border-style:dashed;border-color:var(--teal);color:var(--teal)}
+.tabs button.extra[aria-selected="true"]{background:var(--teal);border-style:solid;color:#fff}
+.instr{display:flex;align-items:flex-start;gap:8px;padding:8px 16px;font:italic 500 18px/1.3 var(--texto)}
+.instr svg{flex:none;margin-top:1px}
+.panel{position:relative;flex:1;margin:0 12px;background:var(--papel);border-radius:14px;padding:18px clamp(14px,2.6vw,30px);min-height:300px;min-width:0}
+.pie{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px 12px}
+.hecha{margin-left:auto;height:44px;padding:0 18px!important;border-radius:10px;background:var(--tinta);color:#fff!important;font:700 20px/1 var(--display);letter-spacing:.03em;display:flex;align-items:center;gap:8px}
+.hecha.si{background:var(--ok)}
+.editbar{display:none;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px}
+.editando .editbar{display:flex}
+.editbar b{font:400 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ayuda)}
+.chipadd{height:38px;padding:0 14px!important;border-radius:10px;border:2px dashed var(--teal)!important;color:var(--teal)!important;font:600 15px var(--texto);background:#fff!important}
+
+/* ---- piezas comunes ---- */
+.btn{min-height:48px;padding:0 22px;border-radius:10px;background:var(--cobalto);color:#fff;font:700 21px/1.1 var(--display);letter-spacing:.03em}
+.btn.sol{background:var(--mostaza);color:var(--tinta)}
+.btn.osc{background:var(--tinta)}
+.btn:disabled{opacity:.35;cursor:default}
+.mini:disabled{opacity:.4;cursor:default}
+.mini{min-height:40px;padding:0 14px;border-radius:9px;border:2px solid var(--linea);font:600 15px/1.1 var(--texto);color:var(--ayuda);background:#fff}
+.fila{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+.hueco{flex:1}
+.fb{min-height:36px;margin-top:12px;padding:7px 14px;border-radius:10px;font-weight:600;font-size:18px;line-height:1.3}
+.fb:empty{padding:0}
+.fb.ok{background:var(--okf);color:#0D5730}
+.fb.mal{background:var(--malf);color:#8A1C16}
+.fb.inf{background:var(--cobalto2);color:#1F3396}
+.fb b{font-weight:800}
+.pts{font:700 14px/1 var(--mono);display:inline-flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
+h2.t{overflow-wrap:anywhere;margin:0 0 4px;font:800 clamp(27px,3.3vw,38px)/1.05 var(--display);letter-spacing:.005em;text-wrap:balance}
+p.lead{margin:0 0 14px;max-width:64ch}
+.etq{font:400 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ayuda);margin:0 0 6px}
+.rev{display:inline-block;font:700 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:5px;padding:4px 7px;vertical-align:2px;margin-right:6px}
+/* entrada: la forma de lo que está en español */
+.tq{--c:var(--cobalto);display:inline-block;padding:10px 24px;color:#fff;font:700 clamp(24px,2.9vw,32px)/1.15 var(--display);letter-spacing:.01em;text-wrap:balance;
+  background:radial-gradient(circle at 0 50%,#0000 7px,var(--c) 7.6px) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,#0000 7px,var(--c) 7.6px) right/51% 100% no-repeat;border-radius:8px}
+.tq b.f,.tq .f{color:var(--mostaza)}
+.tq.clara{--c:var(--mostaza2);color:var(--tinta)}
+.tq.clara .f{color:var(--rojo)}
+.rutas{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.ruta{padding:6px 14px;border-radius:8px;background:var(--mostaza2);border:2px dashed #D9A31F;font:700 21px/1.2 var(--display);overflow-wrap:anywhere}
+.ayuda{margin-top:10px}
+.ayuda>.mini{border-style:dashed;border-color:var(--cobalto);color:var(--cobalto)}
+.ayuda .rutas{display:none}
+.ayuda.abierta .rutas{display:flex}
+@keyframes tiembla{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.tiembla{animation:tiembla .22s 2}
+@keyframes aparece{from{opacity:0}to{opacity:1}}
+.entra{animation:aparece .2s var(--ease-out)}
+.cont2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;align-items:start}
+.ej{padding:9px 14px;border-radius:10px;background:var(--lamina);border-left:5px solid var(--cobalto)}
+.ej .es{display:block;font:700 clamp(21px,2.4vw,26px)/1.2 var(--display)}
+.ej .en{display:block}
+.ops{display:flex;flex-wrap:wrap;gap:10px}
+.ops.col{flex-direction:column}
+.op{min-height:54px;padding:6px 22px;border-radius:10px;border:2.5px solid var(--linea);background:#fff;font:700 25px/1.1 var(--display);text-align:left}
+.op.en-op{font:600 18px/1.25 var(--texto);padding:8px 16px}
+.op.ok{border-color:var(--ok);background:var(--okf)}
+.op.mal{border-color:var(--mal);background:var(--malf)}
+
+/* ---- introducción: de memoria ---- */
+.tapas{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.tapa{display:grid;align-content:start;gap:4px;width:100%;text-align:left;border-radius:12px;border:2.5px solid var(--linea);padding:12px 14px;min-height:150px;background:#fff}
+.tapa .n{font:700 13px var(--mono);color:var(--rojo)}
+.tapa .que{font:600 19px/1.25 var(--texto)}
+.tapa i{font:400 11px var(--mono);font-style:normal;letter-spacing:.08em;color:var(--ayuda);margin-top:6px}
+.tapa .res{display:none;margin-top:6px;font:700 25px/1.15 var(--display);color:var(--cobalto)}
+.tapa.vista{border-color:var(--cobalto);background:var(--cobalto2)}
+.tapa.vista .res{display:block}
+.tapa.vista i{display:none}
+/* introducción: las palabras que abren una ventana */
+.claves{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.clave{display:grid;justify-items:center;gap:6px;padding:14px 8px 10px;border-radius:12px;border:2.5px solid var(--linea);background:#fff;text-align:center}
+.clave b{font:700 clamp(24px,2.6vw,29px)/1.05 var(--display)}
+.clave i{font:400 10.5px var(--mono);font-style:normal;letter-spacing:.08em;color:var(--ayuda)}
+.clave.vista{border-color:var(--ok);background:var(--okf)}
+.clave.vista i{color:#0D5730}
+
+/* ---- objetivos: el volumen ---- */
+.metas{display:grid;gap:10px}
+.meta{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 18px;align-items:center;border:2.5px solid var(--linea);border-radius:12px;padding:12px 16px}
+.meta .q{font:600 19px/1.25 var(--texto)}
+.meta .ejm{grid-column:1;font:700 clamp(22px,2.5vw,27px)/1.15 var(--display);color:var(--cobalto)}
+.meta .ejm small{display:block;font:500 15.5px/1.3 var(--texto);color:var(--ayuda)}
+.vol{grid-row:1/3;grid-column:2;display:grid;grid-template-columns:repeat(3,34px);align-items:end;gap:6px;justify-items:stretch}
+.barra{position:relative;border-radius:6px;background:#DDE1EE;border:2.5px solid var(--linea)}
+.barra.b0{height:24px}.barra.b1{height:40px}.barra.b2{height:56px}
+.barra[aria-pressed="true"]{background:var(--mostaza);border-color:var(--tinta)}
+.barra.fue::after{content:"";position:absolute;left:-7px;right:-7px;top:-9px;border-top:3px dotted var(--ciruela)}
+.vl{grid-column:1/-1;min-height:17px;text-align:center;font:400 11px var(--mono);letter-spacing:.06em;color:var(--ayuda);text-transform:uppercase}
+.reto{margin-top:14px;padding:12px 16px;border-radius:10px;background:var(--mostaza2);border:2px dashed #D9A31F}
+.aprendi{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:5px}
+.aprendi li{padding-left:30px;position:relative}
+.aprendi li::before{content:"";position:absolute;left:2px;top:.42em;width:18px;height:12px;border-radius:3px;background:var(--ciruela)}
+
+/* ---- muestra: la conversación en la barra ---- */
+.dialogo{display:grid;gap:10px;max-width:860px}
+.linea-d{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start}
+.linea-d.tu{grid-template-columns:minmax(0,1fr) auto}
+.linea-d.tu .quien{order:2}
+.linea-d.tu .globo{justify-self:end;background:var(--mostaza2);border-color:#D9A31F}
+.quien{width:52px;text-align:center;font:400 10px/1.2 var(--mono);letter-spacing:.06em;color:var(--ayuda)}
+.quien svg{display:block;margin:0 auto 2px}
+.quien .yo{width:44px;height:44px;margin:0 auto 2px;border-radius:10px;background:var(--mostaza);display:grid;place-items:center;font:800 24px/1 var(--display);color:var(--tinta)}
+.globo{justify-self:start;max-width:94%;border:2.5px solid var(--cobalto);border-radius:14px;padding:8px 14px;background:var(--cobalto2)}
+.globo .es{display:block;font:700 clamp(23px,2.7vw,29px)/1.3 var(--display)}
+.globo .en{display:block;margin-top:1px}
+.blq{font:inherit;color:#fff;background:var(--cobalto);border-radius:7px;padding:0 9px 1px;margin:0 1px;box-shadow:0 3px 0 #1B2E8F}
+.blq.vista{background:var(--ok);box-shadow:0 3px 0 #0D5730}
+.pasapag{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+.flecha{width:48px;height:48px;border-radius:10px;background:var(--tinta)!important;color:#fff!important;font:700 22px/1 var(--mono);display:grid;place-items:center}
+.flecha:disabled{opacity:.25;cursor:default}
+.npag{font:400 13px var(--mono);color:var(--ayuda);font-variant-numeric:tabular-nums}
+
+/* ---- muestra: la mesa de mezclas ---- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:4px 14px 4px 8px;border-radius:10px;border:2.5px solid var(--linea);background:#fff;font:600 17px/1.15 var(--texto)}
+.chip .nv{padding-left:6px}
+.chip[aria-pressed="true"]{border-color:var(--tinta);background:var(--mostaza2)}
+.sal{display:grid;gap:10px;justify-items:start;align-content:start;position:sticky;top:0}
+.sal .tq{font-size:clamp(29px,3.5vw,42px)}
+.regla{display:grid;gap:6px;width:100%}
+.regla div{padding:7px 12px;border-radius:8px;border:2px solid var(--linea);font-size:17px;color:var(--ayuda)}
+.regla div b{font:700 21px var(--display);color:var(--tinta)}
+.regla div.on{border-color:var(--cobalto);background:var(--cobalto2);color:var(--tinta)}
+
+/* ---- ¿quién lo dijo? ---- */
+.perfiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.pf{border-radius:12px;border:2.5px solid var(--linea);overflow:hidden;background:#fff}
+.pf .cinta{display:flex;align-items:center;gap:10px;padding:6px 12px;background:var(--noche);color:#fff;font:800 24px/1 var(--display);letter-spacing:.03em;border-bottom:3px dashed #ffffff90}
+.pf ul{margin:0;padding:8px 12px;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:6px}
+.pf li{display:flex;align-items:center;gap:6px}
+.dijo{margin:4px 0 14px}
+.botq{display:flex;flex-wrap:wrap;gap:10px}
+.botq .op{display:flex;align-items:center;gap:10px}
+
+/* ---- la tragamonedas ---- */
+.traga{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:center}
+.maq{display:grid;grid-template-columns:1fr 1.25fr;gap:10px;padding:12px;border-radius:16px;background:var(--noche)}
+.maq.tres{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1.1fr);gap:8px}
+.maq.tres .rueda{padding:10px 4px}
+.maq.tres .rueda small{font-size:15px}
+.rueda{min-height:170px;border-radius:10px;background:#fff;display:grid;place-items:center;align-content:center;gap:8px;text-align:center;padding:10px 6px;overflow:hidden}
+.rueda .gran{display:grid;place-items:center;min-height:84px}
+.rueda small{font:600 16px/1.2 var(--texto);color:var(--ayuda)}
+@keyframes cae{from{transform:translateY(-22px);opacity:.3}to{transform:none;opacity:1}}
+.rueda.gira>*{animation:cae .09s linear}
+.trc{display:grid;gap:10px;justify-items:start}
+.sale{min-height:92px;display:grid;gap:4px;align-content:start}
+
+/* ---- contraste: caza del error ---- */
+.intr{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.intr button{min-height:58px;padding:6px 16px;border-radius:10px;border:2.5px solid var(--linea);background:#fff;font:700 clamp(25px,3.2vw,34px)/1.1 var(--display)}
+.intr button.ok{border-color:var(--ok);background:var(--okf);text-decoration:line-through;text-decoration-thickness:3px}
+.intr button.mal{border-color:var(--mal);background:var(--malf)}
+.arreglo{margin-top:12px}
+
+/* ---- imagen para hablar: puntos en la escena ---- */
+.imgdesc{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(0,1fr);gap:16px;align-items:start}
+.marco{position:relative;border-radius:12px;overflow:hidden;background:var(--lamina);border:2.5px solid var(--linea)}
+.marco svg,.marco img{display:block;width:100%;height:auto;max-height:60vh;object-fit:contain}
+.marco text{font-family:var(--display);font-weight:800}
+.punto{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--mostaza);border:3px solid var(--tinta);font:700 17px/1 var(--mono);display:grid;place-items:center;box-shadow:0 0 0 4px #ffffffc0}
+.punto.fijo{position:static;margin:0}
+.punto.ya{background:var(--ok);color:#fff}
+.punto.on{background:var(--tinta);color:#fff}
+.nums{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.qbox{min-height:190px;border-radius:12px;border:2.5px solid var(--cobalto);padding:14px 16px;background:#fff}
+.qbox.vacio{border-style:dashed;border-color:var(--linea);display:grid;place-items:center;text-align:center;color:var(--ayuda)}
+.qbox .q{font:700 clamp(25px,2.8vw,31px)/1.15 var(--display);margin:4px 0 2px;text-wrap:balance}
+.dado{width:84px;height:84px;border-radius:16px;background:var(--rojo)!important;color:#fff!important;font:700 44px/1 var(--mono);display:grid;place-items:center;box-shadow:inset 0 -7px 0 #0000002e}
+@keyframes rueda{to{transform:rotate(360deg)}}
+.dado.gira{animation:rueda .45s var(--ease-out)}
+.preg{font:700 clamp(25px,3vw,31px)/1.15 var(--display);margin-top:6px}
+.orden{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+/* ---- lectura: un perfil en el teléfono ---- */
+.movil{position:relative;max-width:760px;margin:0 auto;border-radius:22px;background:#fff;border:3px solid var(--tinta);padding:0 0 62px;overflow:hidden}
+.movil .barra-m{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--teal);color:#fff;min-width:0}
+.movil .barra-m b{display:block;font:800 26px/1 var(--display);letter-spacing:.02em;overflow-wrap:anywhere}
+.movil .barra-m small{display:block;font:400 11px var(--mono);letter-spacing:.08em;overflow-wrap:anywhere}
+.movil .barra-m>div{min-width:0}
+.movil .hoja{padding:18px clamp(16px,3vw,32px) 6px;min-height:230px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.movil .tit{font:800 clamp(30px,3.8vw,42px)/1.05 var(--display);margin:0;overflow-wrap:anywhere}
+.movil .aut{font:400 13px var(--mono);letter-spacing:.04em;color:var(--ayuda);margin:8px 0 0;overflow-wrap:anywhere}
+.movil .txt{min-width:0}
+.movil .txt p{margin:0 0 .5em;font:500 var(--fs,25px)/1.5 var(--texto);overflow-wrap:anywhere}
+.movil .nav{position:absolute;left:0;right:0;bottom:10px;display:flex;align-items:center;justify-content:center;gap:16px}
+.movil .nav span{min-width:54px;text-align:center}
+.movil.libro{border-width:2.5px;border-color:var(--linea);border-radius:12px}
+.movil.libro .barra-m{background:var(--cobalto2);color:var(--tinta)}
+.leer{font:500 23px/1.75 var(--texto);max-width:66ch;margin:0}
+.leer button{font:inherit;font-weight:700;border-bottom:4px solid var(--mostaza);padding:0 2px;border-radius:4px 4px 0 0}
+.leer button.fr{border-bottom-color:var(--teal)}
+.leer button.listo{background:var(--okf);border-bottom-color:var(--ok)}
+.rasgas{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.rasga{display:grid;border-radius:12px;background:#fff;border:2.5px solid var(--linea);overflow:hidden}
+.rasga .tal{display:grid;justify-items:center;gap:2px;width:100%;padding:12px;background:var(--cobalto);color:#fff;border-bottom:3px dashed #ffffffb0;transform-origin:left bottom;transition:transform .22s var(--ease-out),background-color .2s ease}
+.rasga .tal small{font:400 11px var(--mono);letter-spacing:.1em}
+.rasga .tal b{font:800 46px/1 var(--display)}
+.rasga .cu{padding:12px 14px 14px;visibility:hidden;min-height:128px}
+.rasga .cu .q{font:700 25px/1.15 var(--display);text-wrap:balance}
+.rasga.rota .tal{transform:rotate(-2.5deg) translateY(-3px);background:var(--tinta)}
+.rasga.rota .cu{visibility:visible}
+.rasga.rota{border-color:var(--cobalto)}
+
+/* ---- juego: tres en raya ---- */
+.marcador{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:stretch}
+.jug{flex:1;min-width:130px;border-radius:10px;border:2.5px solid var(--linea);padding:4px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;font:800 25px/1.1 var(--display);letter-spacing:.02em}
+.jug small{display:block;font:400 10.5px var(--mono);letter-spacing:.08em;color:var(--ayuda)}
+.jug b{font:800 42px/1 var(--display);font-variant-numeric:tabular-nums}
+.jug.D.turno{border-color:#D9A31F;background:var(--mostaza2)}
+.jug.P.turno{border-color:var(--cobalto);background:var(--cobalto2)}
+.raya{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:660px}
+.cas{position:relative;display:grid;justify-items:center;align-content:center;gap:2px;min-height:98px;padding:6px 6px;border-radius:10px;border:2.5px solid var(--linea);background:#fff;text-align:center}
+.cas .es2{font:700 clamp(19px,2vw,23px)/1.1 var(--display);text-wrap:balance}
+.cas .en{font-size:13.5px;line-height:1.15}
+.cas .sello{position:absolute;right:6px;top:6px;font:700 10.5px var(--mono);letter-spacing:.06em;padding:3px 6px;border-radius:5px;color:#fff}
+.cas.D{background:var(--mostaza2);border-color:#D9A31F;cursor:default}
+.cas.D .sello{background:var(--ambar)}
+.cas.P{background:var(--cobalto2);border-color:var(--cobalto);cursor:default}
+.cas.P .sello{background:var(--cobalto)}
+.cas.linea{box-shadow:inset 0 0 0 4px var(--ok)}
+.cas:disabled{cursor:default}
+.rayac{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)}
+.final{padding:12px 16px;border-radius:10px;background:var(--mostaza2);border:2px dashed #D9A31F}
+.final .gana{font:800 30px/1.1 var(--display)}
+
+/* ---- tarea final: mi entrada ---- */
+.compo{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+.gfila{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:8px;padding:5px 0;border-bottom:2px dotted var(--linea)}
+.gfila .nm{font:700 22px/1.1 var(--display)}
+.gfila .nm small{display:block;font:500 14px/1.2 var(--texto);color:var(--ayuda)}
+.g4{display:flex;gap:4px}
+.g4 button{min-width:46px;height:42px;padding:0 6px;border-radius:8px;border:2.5px solid var(--linea);background:#fff;display:grid;place-items:center}
+.g4 button[aria-pressed="true"]{border-color:var(--tinta);background:var(--mostaza)}
+.entrada{border-radius:12px;background:var(--noche);color:#fff;overflow:hidden}
+.entrada .cinta{display:flex;justify-content:space-between;gap:8px;padding:10px 16px;font:400 11px var(--mono);letter-spacing:.1em;border-bottom:3px dashed #ffffff80}
+.entrada h3{margin:10px 16px 2px;font:800 34px/1 var(--display);letter-spacing:.03em}
+.entrada ol{margin:8px 16px 14px;padding:0;list-style:none;display:grid;gap:6px}
+.entrada li{font:700 clamp(21px,2.2vw,25px)/1.2 var(--display)}
+.entrada li .f{color:var(--mostaza)}
+.entrada .nv path[stroke]{stroke:#fff}
+.entrada .vac{margin:10px 16px 16px;color:#BFC3E6;font-size:17px}
+
+/* ---- resumen: ráfaga ---- */
+.flash{min-height:230px;display:grid;gap:10px;align-content:start;justify-items:start}
+.fen{font:700 clamp(30px,4vw,44px)/1.1 var(--display);text-wrap:balance}
+.fres{min-height:64px}
+.falt{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.falt li{padding:6px 12px;border-radius:8px;background:var(--lamina);font:700 22px var(--display)}
+.falt li small{display:block;font:500 15px var(--texto);color:var(--ayuda)}
+
+/* ---- tarea: la misión ---- */
+.mision{border-radius:12px;border:2.5px solid var(--teal);overflow:hidden;max-width:820px}
+.mision .cinta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 16px;background:var(--teal);color:#fff;font:400 12px var(--mono);letter-spacing:.1em;border-bottom:3px dashed #ffffffb0}
+.mision .cu{padding:14px 16px}
+.lista{display:grid;gap:8px;margin-top:10px}
+.item{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;align-items:center;width:100%;text-align:left;padding:8px 12px;border-radius:10px;border:2.5px solid var(--linea);background:#fff}
+.item .caja{width:32px;height:32px;border-radius:7px;border:2.5px solid var(--tinta);display:grid;place-items:center;font:700 18px/1 var(--mono);color:#fff}
+.item .tx b{display:block;font-weight:600}
+.item .tx span{display:block;font:700 21px/1.2 var(--display);color:var(--cobalto)}
+.item[aria-pressed="true"]{border-color:var(--ok);background:var(--okf)}
+.item[aria-pressed="true"] .caja{background:var(--ok);border-color:var(--ok)}
+
+/* ---- bloques añadidos por el profesor ---- */
+.video{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:center}
+.poster{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:12px;background:linear-gradient(135deg,#15133A,#2B46C8);display:grid;place-items:center;color:#fff;text-decoration:none;overflow:hidden}
+.poster::before{content:"";width:88px;height:88px;border-radius:50%;background:var(--rojo);box-shadow:0 0 0 10px #ffffff2e}
+.poster::after{content:"";position:absolute;border:20px solid transparent;border-left:32px solid #fff;border-right:0;margin-left:8px}
+.poster em{position:absolute;left:12px;bottom:10px;font:400 13px var(--mono);font-style:normal;background:#000000a0;padding:2px 8px;border-radius:6px}
+.video .tiempos{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.video .tiempos span{font:400 15px var(--mono);padding:4px 10px;border-radius:8px;background:var(--lamina)}
+.video a.btn{display:inline-flex;align-items:center;text-decoration:none}
+.video h2,.pregx{overflow-wrap:anywhere}
+.vacio2{border:2.5px dashed var(--linea);border-radius:12px;padding:26px;text-align:center;color:var(--ayuda)}
+.herr{display:none;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.editando .herr{display:flex}
+.cajas{display:grid;gap:10px}
+.caja2{border-radius:10px;border:2.5px solid var(--linea);overflow:hidden}
+.caja2>button{width:100%;text-align:left;padding:12px 16px;font:700 22px var(--display);display:flex;gap:10px;align-items:center}
+.caja2>button i{font-style:normal;width:32px;height:32px;border-radius:7px;background:var(--mostaza);display:grid;place-items:center;flex:none;font:700 15px/1 var(--mono)}
+.caja2 .den{display:none;padding:0 16px 14px}
+.caja2.abierta .den{display:block}
+.caja2.abierta{border-color:var(--cobalto)}
+.dicho-x{margin:6px 0 0;font:700 26px/1.3 var(--display);overflow-wrap:anywhere}
+
+/* ---- ventana: una entrada con su resguardo ---- */
+#velo{position:fixed;inset:0;background:#15133Aeb;display:grid;place-items:center;padding:16px;z-index:20}
+.popup{position:relative;background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:92%;overflow:auto;padding:24px 24px 20px;box-shadow:0 20px 60px #0006;overscroll-behavior:contain;animation:sale .18s var(--ease-out)}
+@keyframes sale{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.popup .x{position:absolute;right:10px;top:10px;width:40px;height:40px;border-radius:9px;background:var(--tinta);color:#fff;font:700 16px/1 var(--mono);display:grid;place-items:center;z-index:2}
+.popup h3{margin:0 44px 10px 0;font:800 30px/1.05 var(--display)}
+.popup label{display:block;font:600 15px var(--texto);margin:10px 0 3px}
+.popup label small{font-weight:500;color:var(--ayuda)}
+.popup input[type=text],.popup textarea,.popup select{width:100%;font:500 17px var(--texto);padding:9px 12px;border:2px solid var(--linea);border-radius:10px;background:#fff;color:var(--tinta)}
+.popup input[type=file]{max-width:100%;font-size:16px}
+.popup textarea{min-height:120px;resize:vertical}
+.popup .dos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.popup .err{color:var(--mal);font-weight:700;font-size:15px;min-height:20px;margin-top:6px}
+.popup.vt{padding:0;overflow:visible;display:flex;flex-direction:column;max-width:600px}
+.popup.vt .x{background:#ffffff30}
+.vt-cab{position:relative;flex:none;display:flex;gap:14px;align-items:center;padding:14px 60px 14px 20px;background:var(--c);color:#fff;border-radius:14px 14px 0 0;border-bottom:3px dashed #ffffffc0}
+.vt-cab::before,.vt-cab::after{content:"";position:absolute;bottom:-12px;width:22px;height:22px;border-radius:50%;background:#16143B;z-index:1}
+.vt-cab::before{left:-11px}.vt-cab::after{right:-11px}
+.vt-cab small{display:block;font:400 11px var(--mono);letter-spacing:.1em;opacity:.9}
+.vt-cab b{display:block;font:800 clamp(32px,5vw,44px)/1.02 var(--display);letter-spacing:.01em;overflow-wrap:anywhere}
+.vt-cab>div{min-width:0}
+.vt-cu{padding:16px 22px 22px;overflow:auto;display:grid;gap:10px;overscroll-behavior:contain}
+.vt-en{margin:0;font:700 24px/1.2 var(--texto)}
+.vt-como{margin:0;font-size:18px}
+.vt-nota{margin:0;padding:8px 12px;border-radius:8px;background:var(--mostaza2);font-size:17px}
+
+@media (hover:hover) and (pointer:fine){
+  .tnav button:hover:not(:disabled){background:#ffffff1f}
+  .it:hover{background:#ffffff12}
+  .chipadd:hover{background:var(--cobalto2)!important}
+  .mini:hover{border-color:var(--cobalto)}
+  .op:hover,.chip:hover,.clave:hover,.tapa:hover,.intr button:hover,.item:hover,button.cas:hover:not(:disabled),.g4 button:hover{border-color:var(--cobalto)}
+  .blq:hover{background:#1F3396}
+}
+@media (max-width:900px){
+  body{font-size:18px}
+  #app:not(.plegado) #lado{position:fixed;margin-top:0;top:calc(51px + env(safe-area-inset-top,0px));bottom:0;left:0;z-index:15;width:min(272px,86vw);box-shadow:8px 0 30px #0006}
+  .tmenu{width:48px;justify-content:center;padding:0!important}.tmenu span{display:none}
+  .tnav span,.guard,.tedit span{display:none}
+  .tprog{display:none}
+  #top{gap:3px;margin:5px 6px 0}
+  .crono{margin-left:auto}
+  .cont2,.rayac,.imgdesc,.video,.compo,.traga{grid-template-columns:minmax(0,1fr)}
+  .cab .serie{display:none}
+  .cab{margin:8px 8px 0}
+  .cab .icono{width:52px}
+  #escena{padding:8px}
+  .panel{margin:0 8px;padding:14px 12px}
+  .meta{grid-template-columns:1fr}
+  .vol{grid-row:auto;grid-column:1;justify-self:start}
+  .perfiles{grid-template-columns:1fr}
+  .tabs{margin-left:0}
+  .sal{position:static}
+  .cas{min-height:104px;padding:6px 3px}
+  .cas .en{display:none}
+  .cas svg{width:34px;height:34px}
+  .gfila{grid-template-columns:36px minmax(0,1fr)}
+  .gfila>svg{width:34px;height:34px}
+  .g4{grid-column:1/-1}
+  .g4 button{flex:1}
+  .punto{width:38px;height:38px;margin:-19px 0 0 -19px;font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}
+  button,.rasga .tal{transition:none!important}
+  .rasga.rota .tal{transform:none}
+}
+</style>
+
+<div id="app">
+  <header id="top">
+    <button id="bMenu" class="tmenu" title="Mostrar u ocultar el menú (tecla S)" aria-label="Mostrar u ocultar el menú">
+      <svg width="30" height="30" viewBox="0 0 732 732" aria-hidden="true" focusable="false"><circle cx="366" cy="366" r="338" fill="#F8F8F8"/><circle cx="366" cy="366" r="338" fill="none" stroke="#6FC0AB" stroke-width="40"/><g transform="translate(338 382) scale(1.1) translate(-366 -380)"><path d="M186 452 C158 404, 154 350, 178 302 C212 236, 286 190, 368 184 C408 181, 446 189, 472 199" fill="none" stroke="#1A6FAF" stroke-width="30" stroke-linecap="round"/><path d="M470 212 C420 194, 366 188, 322 196 C238 212, 176 268, 165 348 C158 402, 176 454, 212 488 C221 497, 223 506, 217 519 C207 543, 192 562, 185 572 C178 581, 184 590, 194 585 C233 570, 269 558, 303 556 L470 556 Z" fill="#14C49B"/><path d="M462 206 L628 322 L462 438 Z" fill="#F52323" stroke="#F52323" stroke-width="10" stroke-linejoin="round"/><circle cx="398" cy="282" r="25" fill="#111"/><circle cx="406" cy="274" r="7" fill="#fff"/></g></svg>
+      <span id="lMenu">Ocultar el menú</span>
+    </button>
+    <nav class="tnav" aria-label="Navegación">
+      <button id="bAnt" title="Anterior (←)"><i>◀</i><span>Anterior</span></button>
+      <button id="bInicio" title="Ir al inicio" aria-label="Ir al inicio"><i>⌂</i></button>
+      <button id="bSig" title="Siguiente (→)"><span>Siguiente</span><i>▶</i></button>
+    </nav>
+    <div class="tprog" id="prog" title="Secciones hechas"></div>
+    <button id="crono" class="crono" title="Cronómetro: clic para iniciar o pausar">4:00</button>
+    <span id="guard" class="guard">CONECTANDO…</span>
+    <button id="bEditar" class="tedit" title="Añadir video, imagen o cuento">＋ <span>Añadir</span></button>
+  </header>
+  <aside id="lado" aria-label="Mapa de la clase">
+    <div class="ficha">
+      <b>¿Y a ti?</b>
+      <span>English · A2 · 50 min</span>
+      <span>Opinar, dar razones y discrepar: charla con locales</span>
+    </div>
+    <div class="indice" id="indice"></div>
+    <button class="vaciar" id="bVaciar">VACIAR LA SESIÓN</button>
+  </aside>
+  <main id="escena"><div class="lamina" id="lamina"></div></main>
+</div>
+<div id="velo" hidden><div class="popup" id="pop" role="dialog" aria-modal="true"><button class="x" id="popX" aria-label="Cerrar">✕</button><div id="popC"></div></div></div>
+<script>
+(()=>{
+'use strict';
+/* ================= utilidades ================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const REDUCE=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const sacude=el=>{el.classList.remove('tiembla');void el.getBoundingClientRect();el.classList.add('tiembla')};
+const INK='#1D1B33';
+/* pieza de progreso: una entrada */
+const tiq=(lleno,s=20,osc)=>{const c=lleno?'#F5B82E':(osc?'#1D1B33':'#ffffff70');return `<svg width="${s*1.25}" height="${s}" viewBox="0 0 30 24" aria-hidden="true"><path d="M3 4h24a1 1 0 0 1 1 1v4a3 3 0 0 0 0 6v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-4a3 3 0 0 0 0-6V5a1 1 0 0 1 1-1z" fill="${lleno?'#F5B82E':'none'}" stroke="${c}" stroke-width="2"/><path d="M11 6v12" stroke="${lleno?INK:c}" stroke-width="1.8" stroke-dasharray="2.2 2.2"/></svg>`};
+const tiqT=`<svg width="22" height="18" viewBox="0 0 30 24" aria-hidden="true"><path d="M3 4h24a1 1 0 0 1 1 1v4a3 3 0 0 0 0 6v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-4a3 3 0 0 0 0-6V5a1 1 0 0 1 1-1z" fill="#2B46C8"/><path d="M11 6v12" stroke="#fff" stroke-width="1.8" stroke-dasharray="2.2 2.2"/></svg>`;
+const MANO='<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="#2B46C8" stroke-width="2" stroke-dasharray="3 3"/><path d="M9 9l11 4-4.500 2.200L13 20z" fill="#1D1B33"/></svg>';
+const IC={
+ intro:'<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 6h24v16H14l-7 6v-6H4z" fill="#fff"/><path d="M13 12a3 3 0 1 1 4.500 2.600c-1 .6-1.500 1.100-1.500 2.400M16 19.600v.4" fill="none" stroke="#D4263E" stroke-width="2.400" stroke-linecap="round"/></svg>',
+ obj:'<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="18" width="6" height="9" rx="1.5" fill="#fff"/><rect x="13" y="12" width="6" height="15" rx="1.5" fill="#fff"/><rect x="21" y="5" width="6" height="22" rx="1.5" fill="#fff"/></svg>',
+ cont:'<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 9h26v5a2.500 2.500 0 0 0 0 5v5H3v-5a2.500 2.500 0 0 0 0-5z" fill="#fff"/><path d="M12 10v13" stroke="#2B46C8" stroke-width="2" stroke-dasharray="2.500 2.500"/></svg>',
+ res:'<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="6" y="4" width="20" height="25" rx="3" fill="#fff"/><path d="M10 12h12M10 17h12M10 22h8" stroke="#8C2A78" stroke-width="2.400" stroke-linecap="round"/></svg>',
+ tarea:'<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 15L16 4l12 11v13H4z" fill="#fff"/><rect x="13" y="18" width="6" height="10" fill="#0F7F74"/></svg>'
+};
+const MOM={intro:{n:'INTRODUCTION',c:'var(--rojo)'},obj:{n:'GOALS',c:'var(--ambar)'},cont:{n:'ACTIVITY',c:'var(--cobalto)'},res:{n:'SUMMARY',c:'var(--ciruela)'},tarea:{n:'HOMEWORK',c:'var(--teal)'}};
+const TITULO='¿Y a ti?';
+/* textos de los bloques que añade el profesor, en la lengua de las consignas de este estudiante */
+const TXT={video:'Watch the clip with your teacher.',imagen:'Roll the die and talk about the picture. Your teacher answers too.',cuento:'Read with your teacher. Tap the arrows to turn the page.',pregunta:'Listen, think and answer out loud.',
+  abrir:'Open the video',verdesde:'Start at',verhasta:'Stop at',dado:'Roll',estrella:'I said it!',hablar:'Talk'};
+
+/* ---- pictogramas: tinta y un color, sobre un disco blanco con sombra desplazada (dibujos originales de este tablero) ---- */
+const TONO={musica:'#8C2A78',cancion:'#8C2A78',futbol:'#177E48',equipo:'#D4263E',partido:'#177E48',cine:'#2B46C8',pelicula:'#2B46C8',bici:'#0F7F74',perro:'#B97A10',cafe:'#8A5A2B',genial:'#D9A31F',divertido:'#D4263E',aburrido:'#7A7F99',interesante:'#2B46C8',caro:'#177E48'};
+const PIC={
+ musica:c=>`<circle cx="15" cy="35" r="6" fill="${INK}"/><circle cx="35" cy="31" r="6" fill="${INK}"/><path d="M21 35V12l20-4v23" fill="none" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><path d="M21 20l20-4" stroke="${c}" stroke-width="5"/>`,
+ cancion:c=>`<path d="M8 30v-6a16 16 0 0 1 32 0v6" fill="none" stroke="${INK}" stroke-width="4"/><rect x="4" y="27" width="11" height="16" rx="4" fill="${c}" stroke="${INK}" stroke-width="2.500"/><rect x="33" y="27" width="11" height="16" rx="4" fill="${c}" stroke="${INK}" stroke-width="2.500"/>`,
+ futbol:c=>`<circle cx="24" cy="24" r="18" fill="#fff" stroke="${INK}" stroke-width="3.500"/><path d="M24 15l8.500 6.200-3.200 10H18.700l-3.200-10z" fill="${c}" stroke="${INK}" stroke-width="2"/><path d="M24 15V6M32.500 21.200l8.500-3M29.300 31.200l5.500 7.500M18.700 31.200l-5.500 7.500M15.500 21.200l-8.500-3" stroke="${INK}" stroke-width="3"/>`,
+ equipo:c=>`<path d="M17 7L5 14l5 9 5-3v21h18V20l5 3 5-9-12-7c-1.500 3-4 4.500-7 4.500S18.500 10 17 7z" fill="${c}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M24 20v14" stroke="#fff" stroke-width="3"/>`,
+ partido:c=>`<rect x="4" y="11" width="40" height="26" rx="5" fill="${INK}"/><rect x="8" y="15" width="13" height="18" rx="2" fill="${c}"/><rect x="27" y="15" width="13" height="18" rx="2" fill="${c}"/><path d="M12 21l3-2v10M31 20h5v4h-5v5h5.500" fill="none" stroke="#fff" stroke-width="2.400"/>`,
+ cine:c=>`<rect x="6" y="20" width="36" height="21" rx="3" fill="${INK}"/><path d="M6 13l34-7 1.500 7-34 7z" fill="${c}" stroke="${INK}" stroke-width="2.500" stroke-linejoin="round"/><path d="M15 11.200l3 6.200M24 9.400l3 6.200M33 7.600l3 6.200" stroke="${INK}" stroke-width="2.500"/>`,
+ pelicula:c=>`<rect x="5" y="9" width="38" height="30" rx="4" fill="${INK}"/><rect x="12" y="15" width="24" height="18" rx="2" fill="#fff"/><path d="M21 19v10l9-5z" fill="${c}"/><path d="M8.500 13v2M8.500 19v2M8.500 25v2M8.500 31v2M39.500 13v2M39.500 19v2M39.500 25v2M39.500 31v2" stroke="#fff" stroke-width="2.200"/>`,
+ bici:c=>`<circle cx="11" cy="31" r="8" fill="none" stroke="${INK}" stroke-width="3.500"/><circle cx="37" cy="31" r="8" fill="none" stroke="${INK}" stroke-width="3.500"/><path d="M11 31l8-15h12l6 15M19 16l8 15H11M16 12h7M30 12h5l-4 4" fill="none" stroke="${c}" stroke-width="3.500" stroke-linejoin="round" stroke-linecap="round"/>`,
+ perro:c=>`<path d="M13 34v8M18 35v7M26 35v7M30 34v8" stroke="${INK}" stroke-width="3.500" stroke-linecap="round"/><path d="M10 25l-5-6" stroke="${INK}" stroke-width="3.500" stroke-linecap="round"/><rect x="9" y="22" width="24" height="13" rx="6.500" fill="${c}" stroke="${INK}" stroke-width="2.500"/><circle cx="34" cy="18" r="8" fill="${c}" stroke="${INK}" stroke-width="2.500"/><path d="M28.500 9.500l1 8.500 6-5z" fill="${INK}"/><circle cx="36" cy="17" r="1.600" fill="${INK}"/><circle cx="41.500" cy="20" r="2" fill="${INK}"/>`,
+ cafe:c=>`<path d="M9 17h24v10a10 10 0 0 1-10 10h-4A10 10 0 0 1 9 27z" fill="${c}" stroke="${INK}" stroke-width="3"/><path d="M33 20h3a4.500 4.500 0 0 1 0 9h-3" fill="none" stroke="${INK}" stroke-width="3"/><path d="M16 6c-2 3 2 4 0 7M24 6c-2 3 2 4 0 7" fill="none" stroke="${INK}" stroke-width="2.500" stroke-linecap="round"/><path d="M6 42h30" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`,
+ genial:c=>`<path d="M24 5l5.600 12 13 1.600-9.600 9 2.500 13L24 34.200l-11.500 6.400 2.500-13-9.600-9 13-1.600z" fill="${c}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`,
+ divertido:c=>`<circle cx="24" cy="24" r="18" fill="${c}" stroke="${INK}" stroke-width="3"/><circle cx="17" cy="19" r="2.800" fill="${INK}"/><circle cx="31" cy="19" r="2.800" fill="${INK}"/><path d="M13 26c2 10 20 10 22 0z" fill="#fff" stroke="${INK}" stroke-width="2.500" stroke-linejoin="round"/>`,
+ aburrido:c=>`<circle cx="22" cy="26" r="17" fill="${c}" stroke="${INK}" stroke-width="3"/><path d="M12 23h7M25 23h7M15 34h14" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><path d="M35 4h9l-9 9h9" fill="none" stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`,
+ interesante:c=>`<path d="M24 5a13 13 0 0 0-7 24v5h14v-5a13 13 0 0 0-7-24z" fill="${c}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M18 39.500h12M20.500 44.500h7" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><path d="M24 12a6 6 0 0 0-6 6" fill="none" stroke="#fff" stroke-width="2.500" stroke-linecap="round"/>`,
+ caro:c=>`<circle cx="24" cy="24" r="18" fill="${c}" stroke="${INK}" stroke-width="3"/><path d="M31 16.500a9 9 0 1 0 0 15M13.500 21.500h12M13.500 26.500h12" fill="none" stroke="#fff" stroke-width="3.200" stroke-linecap="round"/>`
+};
+const pic=(k,s=48)=>`<svg width="${s}" height="${s}" viewBox="0 0 48 48" aria-hidden="true"><circle cx="26.500" cy="26.500" r="20.500" fill="${TONO[k]}" opacity=".3"/><circle cx="22.500" cy="22.500" r="20.500" fill="#fff" stroke="${INK}" stroke-width="2"/><g transform="translate(22.500 22.500) scale(.6) translate(-24 -24)">${PIC[k](TONO[k])}</g></svg>`;
+/* Pau y Laia: personajes originales de este tablero */
+const persona=(q,s=44)=>{const pau=q==='pau';return `<svg width="${s}" height="${s}" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="10" fill="${pau?'#E4E9FC':'#F6DCEF'}"/><path d="M7 48c1-10 8-14 17-14s16 4 17 14z" fill="${pau?'#2B46C8':'#8C2A78'}" stroke="${INK}" stroke-width="2"/>${pau?'':`<path d="M11 36V20a13 13 0 0 1 26 0v16z" fill="${INK}"/>`}<circle cx="24" cy="22" r="11" fill="#E8B48C" stroke="${INK}" stroke-width="2"/>${pau?`<path d="M13 21c0-9 5-13 11-13s11 4 11 12c-4-1-7-4-9-7-2 4-7 7-13 8z" fill="${INK}"/><path d="M17 27c2 6 12 6 14 0" fill="none" stroke="${INK}" stroke-width="3"/>`:`<path d="M13 20c1-8 6-12 11-12s10 4 11 12c-5 0-9-2-11-6-2 4-6 6-11 6z" fill="${INK}"/><path d="M20 27q4 3.500 8 0" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`}</svg>`};
+const cor=(s=20)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8.500-5.400-8.500-11.300A4.700 4.700 0 0 1 12 6.600a4.700 4.700 0 0 1 8.500 3.100C20.500 15.600 12 21 12 21z" fill="#D4263E"/></svg>`;
+const cruz=(s=20)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="#1D1B33" stroke-width="4" stroke-linecap="round"/></svg>`;
+const nivIc=(n,s=20)=>`<span class="nv">${[cor(s)+cor(s),cor(s),cruz(s),cruz(s)+cruz(s)][n]}</span>`;
+const NIV=['I love','I like','I don’t like','I don’t like … at all'];
+const COSAS={
+ futbol:{es:'el fútbol',en:'football',p:'futbol'},
+ musica:{es:'la música',en:'music',p:'musica',f:1},
+ cine:{es:'el cine',en:'the cinema',p:'cine'},
+ pelis:{es:'las películas de acción',en:'action films',pl:1,p:'pelicula',f:1},
+ canciones:{es:'las canciones en inglés',en:'songs in English',pl:1,p:'cancion',f:1},
+ perros:{es:'los perros pequeños',en:'small dogs',pl:1,p:'perro'},
+ bici:{es:'montar en bici',en:'riding my bike',v:1,p:'bici'},
+ partido:{es:'ver un partido',en:'watching a match',v:1,p:'partido'},
+ cafe:{es:'el café',en:'coffee',p:'cafe'}
+};
+/* razones · f = [masc., fem., masc. plural, fem. plural] · pos = va con «me gusta / me encanta» */
+const RAZ={
+ div:{en:'fun',f:['divertido','divertida','divertidos','divertidas'],p:'divertido',pos:1},
+ gen:{en:'great',f:['genial','genial','geniales','geniales'],p:'genial',pos:1},
+ int:{en:'interesting',f:['interesante','interesante','interesantes','interesantes'],p:'interesante',pos:1},
+ abu:{en:'boring',f:['aburrido','aburrida','aburridos','aburridas'],p:'aburrido',pos:0},
+ car:{en:'expensive',f:['caro','cara','caros','caras'],p:'caro',pos:0}};
+const razDe=n=>Object.keys(RAZ).filter(r=>!!RAZ[r].pos===(n<2));
+function frase(n,k,html,r){const c=COSAS[k],s=c.pl?(html?'<b class="f">n</b>':'n'):'',B=x=>html?'<b class="f">'+x+'</b>':x;
+  return [`Me encanta${s}`,`Me gusta${s}`,`No me gusta${s}`,`No me gusta${s} nada`][n]+' '+c.es+(r?' '+B('porque')+' '+B(c.pl?'son':'es')+' '+RAZ[r].f[(c.pl?2:0)+(c.f?1:0)]:'')+'.'}
+const fraseEn=(n,k,r)=>{const c=COSAS[k],e=c.en;return ['I love '+e,'I like '+e,'I don’t like '+e,'I don’t like '+e+' at all'][n]+(r?' because '+(c.pl?'they are ':'it is ')+RAZ[r].en:'')+'.'};
+
+/* ================= estado ================= */
+const nuevoEstado=()=>({pantalla:0,tab:0,hechas:[],vol:{},vol2:{},juego:null,perfil:{},tarea:{},actualizado:0});
+let estado=nuevoEstado();
+let contenido={extras:{},fijos:{},actualizado:0};
+const mediaMem=new Map();
+let db=null,aplicando=false,editando=false;
+const cache=new Map();
+const guard=$('#guard');
+const marca=(t,c)=>{guard.textContent=t;guard.className='guard '+(c||'')};
+function escritor(ruta,datos){let t=null,ocupado=false,sucio=false;
+  async function ya(){if(ocupado){sucio=true;return}ocupado=true;
+    try{await db.doc(ruta).set(JSON.parse(JSON.stringify(datos())));marca('GUARDADO','ok')}catch(e){marca('SOLO ESTA SESIÓN')}
+    ocupado=false;if(sucio){sucio=false;ya()}}
+  return()=>{if(aplicando)return;if(!db){marca('SOLO ESTA SESIÓN');return}marca('GUARDANDO…');clearTimeout(t);t=setTimeout(ya,500)}}
+const _gE=escritor('sesion/estado',()=>estado),_gC=escritor('sesion/contenido',()=>contenido);
+const guardar=()=>{if(aplicando)return;estado.actualizado=Date.now();_gE()};
+const guardarContenido=()=>{contenido.actualizado=Date.now();_gC()};
+async function guardarMedia(id,d){mediaMem.set(id,d);if(db){try{await db.doc('media/'+id).set({d})}catch(e){marca('SOLO ESTA SESIÓN')}}}
+async function leerMedia(id){if(mediaMem.has(id))return mediaMem.get(id);if(!db)return null;
+  try{const s=await db.doc('media/'+id).get();if(s.exists){const d=s.data().d;mediaMem.set(id,d);return d}}catch(e){}return null}
+async function conectar(){
+  try{db=window.claude&&window.claude.use?await window.claude.use('db'):null}catch(e){db=null}
+  if(!db){marca('SOLO ESTA SESIÓN');return}
+  marca('GUARDADO','ok');
+  db.doc('sesion/estado').onSnapshot(s=>{if(!s.exists||s.metadata.hasPendingWrites)return;const d=s.data();
+    if(!d||!(d.actualizado>estado.actualizado))return;
+    const antes=estado.pantalla;aplicando=true;estado=Object.assign(nuevoEstado(),JSON.parse(JSON.stringify(d)));
+    [...cache.keys()].filter(k=>/^(obj|a6|res|tarea)\//.test(k)).forEach(k=>cache.delete(k));
+    if(estado.pantalla!==antes)reiniciaCrono();pintar();aplicando=false},()=>marca('SOLO ESTA SESIÓN'));
+  db.doc('sesion/contenido').onSnapshot(s=>{if(!s.exists||s.metadata.hasPendingWrites)return;const d=s.data();
+    if(!d||!(d.actualizado>contenido.actualizado))return;
+    contenido=Object.assign({extras:{},fijos:{}},JSON.parse(JSON.stringify(d)));cache.clear();pintar()},()=>{});
+}
+
+/* ================= ventana ================= */
+const velo=$('#velo'),pop=$('#pop'),popC=$('#popC');let ultimo=null;
+function abrir(html,cls){ultimo=document.activeElement;pop.className='popup '+(cls||'');popC.innerHTML=html;velo.hidden=false;const f=$('input,textarea,button:not(.x)',popC);(f||$('#popX')).focus({preventScroll:true})}
+function cerrar(){velo.hidden=true;popC.innerHTML='';popC.onpaste=null;if(ultimo&&document.contains(ultimo)&&ultimo.focus)ultimo.focus({preventScroll:true});ultimo=null}
+$('#popX').onclick=cerrar;velo.addEventListener('click',e=>{if(e.target===velo)cerrar()});
+/* la ventana de las palabras: una entrada con su resguardo */
+function ventana(o){abrir(`<div class="vt-cab" style="--c:${o.c||'var(--cobalto)'}">${o.ic||''}<div><small>${o.et||''}</small><b>${o.t}</b></div></div><div class="vt-cu">${o.h}</div>`,'vt')}
+
+/* ================= secciones ================= */
+const SECS=[];   // se llena al final
+const extrasDe=id=>contenido.extras[id]||[];
+const ICX={video:'▶',imagen:'▣',cuento:'❡',pregunta:'?'};
+function tabsDe(s){
+  const base=s.tabs.filter(t=>!t.si||t.si());
+  const ex=extrasDe(s.id).map(b=>({k:'x'+b.id,lab:ICX[b.tipo],extra:b,instr:TXT[b.tipo],r:(el,api)=>rExtra(el,api,b,s)}));
+  return base.concat(ex)}
+const hecha=id=>estado.hechas.includes(id);
+const lam=$('#lamina');
+function pintar(){
+  if(estado.pantalla>=SECS.length||estado.pantalla<0)estado.pantalla=0;
+  const s=SECS[estado.pantalla],tabs=tabsDe(s);
+  if(estado.tab>=tabs.length||estado.tab<0)estado.tab=0;
+  const t=tabs[estado.tab],m=MOM[s.m];
+  lam.style.setProperty('--mcol',m.c);
+  lam.innerHTML=`<header class="cab"><div class="icono">${IC[s.m]}</div><h1>${TITULO}</h1><div class="serie">BARCELONA · N.º 001<br>ESPAÑOL · A2</div></header>
+   <div class="tagrow"><div class="tag">${m.n}${s.n?`<i>${s.n}</i>`:''}</div><div class="sub">${s.t}</div><div class="min">${s.min} MIN</div>
+     <div class="tabs" role="tablist">${tabs.length>1?tabs.map((x,i)=>`<button role="tab" class="${x.extra?'extra':''}" aria-selected="${i===estado.tab}" data-t="${i}">${x.lab||i+1}</button>`).join(''):''}</div></div>
+   <div class="instr">${MANO}<span>${typeof t.instr==='function'?t.instr():(t.instr||'')}</span></div>
+   <div class="panel" id="panel"></div>
+   <div class="pie"><div class="editbar"><b>Añadir aquí</b>
+       <button class="chipadd" data-add="video">▶ Video de YouTube</button><button class="chipadd" data-add="imagen">▣ Imagen para describir</button>
+       <button class="chipadd" data-add="cuento">❡ Cuento</button><button class="chipadd" data-add="pregunta">? Pregunta</button></div>
+     <button class="hecha ${hecha(s.id)?'si':''}" id="bHecha">${hecha(s.id)?'Done ✓':'Mark as done '+tiq(true,18)}</button></div>`;
+  const clave=s.id+'/'+t.k;let nodo=cache.get(clave);
+  if(!nodo){nodo=document.createElement('div');cache.set(clave,nodo);t.r(nodo,{pager:p=>nodo._pager=p,sec:s})}
+  $('#panel').appendChild(nodo);
+  $$('.tabs button',lam).forEach(b=>b.onclick=()=>{estado.tab=+b.dataset.t;pintar();guardar()});
+  $$('[data-add]',lam).forEach(b=>b.onclick=()=>editarBloque(s,{tipo:b.dataset.add},true));
+  $('#bHecha').onclick=()=>{const i=estado.hechas.indexOf(s.id);i<0?estado.hechas.push(s.id):estado.hechas.splice(i,1);pintar();guardar();$('#bHecha').focus({preventScroll:true})};
+  pintarIndice();pintarProg();
+  $('#bAnt').disabled=estado.pantalla===0&&estado.tab===0;
+}
+const corto=s=>s.m==='intro'?'¿?':s.m==='obj'?'◎':s.m==='res'?'≡':s.m==='tarea'?'⌂':s.n;
+function pintarIndice(){
+  $('#indice').innerHTML=SECS.map((s,i)=>`<button class="it ${i===estado.pantalla?'on':''} ${hecha(s.id)?'ok':''}" data-i="${i}" style="--mcol:${MOM[s.m].c}" title="${esc(s.t)}"><span class="pt2">${hecha(s.id)?'✓':corto(s)}</span><span class="tx"><small>${MOM[s.m].n}${s.n?' '+s.n:''} · ${s.min} MIN</small>${s.t}</span></button>`).join('');
+  $$('#indice .it').forEach(b=>b.onclick=()=>{if(window.innerWidth<900)plegar(true);irA(+b.dataset.i,0)});
+}
+function pintarProg(){$('#prog').innerHTML=SECS.map(s=>tiq(hecha(s.id))).join('')}
+function irA(i,tab){estado.pantalla=i;estado.tab=tab==='ultima'?tabsDe(SECS[i]).length-1:(tab||0);reiniciaCrono();pintar();$('#escena').scrollTop=0;guardar()}
+function avanzar(d){
+  const s=SECS[estado.pantalla],tabs=tabsDe(s),nodo=cache.get(s.id+'/'+(tabs[estado.tab]||{}).k);
+  if(nodo&&nodo._pager&&nodo._pager.mover(d))return;
+  const nt=estado.tab+d;if(nt>=0&&nt<tabs.length){estado.tab=nt;pintar();$('#escena').scrollTop=0;guardar();return}
+  const np=estado.pantalla+d;if(np>=0&&np<SECS.length)irA(np,d<0?'ultima':0)}
+$('#bAnt').onclick=()=>avanzar(-1);$('#bSig').onclick=()=>avanzar(1);$('#bInicio').onclick=()=>irA(0,0);
+
+/* menú, edición, vaciar, teclado */
+const app=$('#app');
+function plegar(v){app.classList.toggle('plegado',v);$('#lMenu').textContent=v?'Mostrar el menú':'Ocultar el menú'}
+$('#bMenu').onclick=()=>plegar(!app.classList.contains('plegado'));
+if(window.innerWidth<900)plegar(true);
+$('#bEditar').onclick=()=>{editando=!editando;document.body.classList.toggle('editando',editando);$('#bEditar').innerHTML=editando?'✓ <span>Listo</span>':'＋ <span>Añadir</span>'};
+let armado=null;const bV=$('#bVaciar');
+bV.onclick=()=>{if(!armado){bV.classList.add('arma');bV.textContent='¿SEGURO? PULSA OTRA VEZ';armado=setTimeout(()=>{armado=null;bV.classList.remove('arma');bV.textContent='VACIAR LA SESIÓN'},3500);return}
+  clearTimeout(armado);armado=null;bV.classList.remove('arma');bV.textContent='VACIAR LA SESIÓN';estado=nuevoEstado();cache.clear();reiniciaCrono();pintar();guardar()};
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&!velo.hidden){cerrar();return}
+  if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)||!velo.hidden||e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==='ArrowRight'){e.preventDefault();avanzar(1)}else if(e.key==='ArrowLeft'){e.preventDefault();avanzar(-1)}
+  else if(e.key==='s'||e.key==='S')plegar(!app.classList.contains('plegado'))});
+
+/* cronómetro */
+let resta=0,corre=false,tic=null;const cr=$('#crono');
+function pintaCrono(){const a=Math.abs(resta),m=a/60|0,s=String(a%60).padStart(2,'0');cr.textContent=(resta<0?'+':'')+m+':'+s;cr.classList.toggle('pasado',resta<0);cr.classList.toggle('va',corre&&resta>=0)}
+function reiniciaCrono(){clearInterval(tic);corre=false;resta=(SECS[estado.pantalla]||{min:0}).min*60;pintaCrono()}
+cr.onclick=()=>{corre=!corre;clearInterval(tic);if(corre)tic=setInterval(()=>{resta--;pintaCrono()},1000);pintaCrono()};
+
+/* ================= piezas que se repiten ================= */
+/* serie: un ítem cada vez, con contador, «Next» y «Start again»; al terminar manda a decir algo en voz alta */
+/* «Need help?»: las rutas de respuesta quedan detrás de un botón (A2) */
+const ayudaHTML=r=>`<div class="ayuda"><button class="mini" aria-expanded="false">Need help?</button><div class="rutas">${r.map(x=>`<span class="ruta">${x}</span>`).join('')}</div></div>`;
+function activaAyuda(root){$$('.ayuda>.mini',root).forEach(b=>b.onclick=()=>{const a=b.parentNode.classList.toggle('abierta');b.setAttribute('aria-expanded',a);b.textContent=a?'Hide the help':'Need help?'})}
+
+/* ================= motores de las actividades ================= */
+/* introducción 1: de memoria, lo de la clase pasada */
+function rRepaso(root){
+  root.innerHTML=`<p class="lead"><span class="rev">From memory</span>Two from the bar, four from your own study. Say it in Spanish, then tap the card to check.</p>
+   <div class="tapas">${REPASO.map((r,k)=>`<button class="tapa"><span class="n">0${k+1}</span><span class="que">${r[0]}</span><i>SAY IT · THEN TAP</i><span class="res">${r[1]}</span></button>`).join('')}</div>
+   <div class="fila"><span class="en cuenta"></span><span class="hueco"></span><button class="mini re">↻ Hide all</button></div>`;
+  const ver=()=>{const n=$$('.tapa.vista',root).length;$('.cuenta',root).textContent=n===REPASO.length?'All there. So today we skip the basics and go for opinions.':''};
+  $$('.tapa',root).forEach(b=>b.onclick=()=>{b.classList.toggle('vista');ver()});
+  $('.re',root).onclick=()=>{$$('.tapa',root).forEach(b=>b.classList.remove('vista'));ver()}}
+/* introducción 2: cada palabra abre su ventana */
+function rClaves(root){
+  const vistas=new Set();
+  root.innerHTML=`<div class="claves">${CLAVES.map((c,k)=>`<button class="clave" data-k="${k}">${pic(c.p,66)}<b>${c.es}</b><i>TAP TO OPEN</i></button>`).join('')}</div>
+   <div class="fila"><span class="pts"></span><span class="en">Say what you think it means first. Then open it.</span></div>`;
+  const pp=()=>$('.pts',root).innerHTML=tiqT+' '+vistas.size+' / '+CLAVES.length;pp();
+  $$('.clave',root).forEach(b=>b.onclick=()=>{const c=CLAVES[+b.dataset.k];vistas.add(c.es);b.classList.add('vista');$('i',b).textContent='OPENED ✓';pp();
+    ventana({c:TONO[c.p],ic:pic(c.p,72),et:'WORD OF THE DAY',t:c.es,h:`<p class="vt-en">${c.en}</p><div class="ej"><span class="es">${c.ej[0]}</span><span class="en">${c.ej[1]}</span></div>${c.n?`<p class="vt-nota">${c.n}</p>`:''}`})})}
+
+/* objetivos (y cierre): el volumen. Una, dos o tres barras */
+function rVolumen(root,segunda){
+  const S=segunda?(estado.vol2||(estado.vol2={})):(estado.vol||(estado.vol={})),antes=estado.vol||{};
+  const L=['Not yet','Almost','I can do it'];
+  root.innerHTML=`<h2 class="t">${segunda?'And now? Turn the volume up.':'By the end of this class you can…'}</h2>
+   <p class="lead en">${segunda?'Set each goal again. The dotted line shows where you started.':'How loud can you say each one today? Tap one, two or three bars.'}</p>
+   <div class="metas">${METAS.map((m,k)=>`<div class="meta" data-k="${k}"><div class="q">${m.q}</div><div class="ejm">${m.es}<small>${m.en}</small></div>
+      <div class="vol" role="group" aria-label="${m.q}">${L.map((l,v)=>`<button class="barra b${v}" data-v="${v}" aria-pressed="false" aria-label="${l}" title="${l}"></button>`).join('')}<span class="vl"></span></div></div>`).join('')}</div>
+   ${segunda?`<ul class="aprendi">${APRENDI.map(a=>`<li>${a}</li>`).join('')}</ul>`:`<div class="reto"><b>Today’s final challenge:</b> small talk at a bar in Barcelona. Tell Pau five true things about you, each with a reason, and ask him back.</div>`}`;
+  function ver(){$$('.meta',root).forEach(m=>{const k=m.dataset.k,v=S[k];
+    $$('.barra',m).forEach(b=>{const bv=+b.dataset.v;b.setAttribute('aria-pressed',v!=null&&bv<=v);b.classList.toggle('fue',!!segunda&&antes[k]!=null&&bv===antes[k])});
+    $('.vl',m).textContent=v!=null?L[v]:''})}
+  $$('.barra',root).forEach(b=>b.onclick=()=>{const k=b.closest('.meta').dataset.k,v=+b.dataset.v;S[k]===v?delete S[k]:S[k]=v;ver();guardar()});
+  ver()}
+
+/* muestra 1: la conversación avanza línea a línea; cada frase azul abre su ventana */
+const conBloques=(s,vistos)=>s.replace(/\{(\w+)\|([^}]+)\}/g,(_,k,t)=>`<button class="blq${vistos.has(k)?' vista':''}" data-b="${k}">${t}</button>`);
+function rDialogo(root,api){
+  let n=1;const T=DIA.length,vistos=new Set();
+  root.innerHTML=`<div class="dialogo"></div><div class="pasapag"><button class="flecha izq" aria-label="Previous line">←</button><span class="npag"></span><button class="flecha der" aria-label="Next line">→</button><span class="pts"></span><span class="en fin" hidden>Now read it out loud: you are the student. Finish the last line with your real favourite film. Then swap roles.</span></div>`;
+  const D=$('.dialogo',root);
+  const linea=(l,nueva)=>`<div class="linea-d ${l.q}${nueva?' entra':''}"><div class="quien">${l.q==='tu'?'<div class="yo">D</div>YOU':persona('pau',44)+'PAU'}</div><div class="globo"><span class="es">${conBloques(l.es,vistos)}</span><span class="en">${l.en}</span></div></div>`;
+  function ver(nueva){D.innerHTML=DIA.slice(0,n).map((l,k)=>linea(l,nueva&&k===n-1)).join('');
+    $('.izq',root).disabled=n===1;$('.der',root).disabled=n===T;$('.npag',root).textContent=n+' / '+T;$('.fin',root).hidden=n<T;
+    $('.pts',root).innerHTML=tiqT+' '+vistos.size+' / '+Object.keys(BLQ).length+' opened';
+    if(nueva&&D.lastElementChild&&D.lastElementChild.scrollIntoView)D.lastElementChild.scrollIntoView({block:'nearest'})}
+  D.onclick=e=>{const b=e.target.closest('.blq');if(!b)return;const k=b.dataset.b,B=BLQ[k];vistos.add(k);
+    $$('.blq',D).forEach(x=>{if(x.dataset.b===k)x.classList.add('vista')});
+    $('.pts',root).innerHTML=tiqT+' '+vistos.size+' / '+Object.keys(BLQ).length+' opened';
+    ventana({et:'TODAY’S PHRASE',t:B.t,h:`<p class="vt-en">${B.en}</p><p class="vt-como">${B.how}</p>${B.ej.map(x=>`<div class="ej"><span class="es">${x[0]}</span><span class="en">${x[1]}</span></div>`).join('')}`})};
+  const mover=d=>{const m=n+d;if(m<1||m>T)return false;n=m;ver(d>0);return true};
+  $('.izq',root).onclick=()=>mover(-1);$('.der',root).onclick=()=>mover(1);api.pager({mover});ver(false)}
+
+/* muestra 2: la mesa de mezclas. Cambia cuánto y qué, y mira cómo cambia la frase */
+function rMezcla(root){
+  let n=1,k='futbol',r=null;const KS=['futbol','musica','cine','pelis','canciones','perros','bici','partido'];
+  root.innerHTML=`<div class="cont2"><div><p class="etq">1 · How much?</p><div class="chips niv">${NIV.map((x,i)=>`<button class="chip" data-n="${i}" aria-pressed="false">${nivIc(i)}<span>${x}</span></button>`).join('')}</div>
+     <p class="etq">2 · What?</p><div class="chips cos">${KS.map(c=>`<button class="chip" data-k="${c}" aria-pressed="false">${pic(COSAS[c].p,34)}<span>${COSAS[c].en}</span></button>`).join('')}</div>
+     <p class="etq">3 · Why?</p><div class="chips raz"></div></div>
+    <div class="sal"><p class="etq">In Spanish</p><div class="tq" aria-live="polite"></div><p class="en gl" style="margin:0"></p>
+     <div class="regla"><div data-r="0"><b>ONE thing</b> → gust<b class="f">a</b> + el / la</div><div data-r="1"><b>MANY things</b> → gust<b class="f">an</b> + los / las</div><div data-r="2"><b>An ACTION</b> → gust<b class="f">a</b> + verb</div><div data-r="3"><b>WHY</b> → porque <b class="f">es</b> / <b class="f">son</b> + a word that matches the thing</div></div>
+     <p class="en" style="margin:0">Now say three true sentences about you, each with its reason.</p></div></div>`;
+  function razones(){$('.raz',root).innerHTML=`<button class="chip sin" data-r="" aria-pressed="false"><span>no reason</span></button>`+razDe(n).map(x=>`<button class="chip" data-r="${x}" aria-pressed="false">${pic(RAZ[x].p,34)}<span>${RAZ[x].en}</span></button>`).join('');
+    $$('.raz .chip',root).forEach(b=>b.onclick=()=>{r=b.dataset.r||null;ver()})}
+  function ver(){const c=COSAS[k];$$('.niv .chip',root).forEach(b=>b.setAttribute('aria-pressed',+b.dataset.n===n));$$('.cos .chip',root).forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k));
+    $$('.raz .chip',root).forEach(b=>b.setAttribute('aria-pressed',(b.dataset.r||null)===r));
+    $('.tq',root).innerHTML=frase(n,k,true,r);$('.gl',root).textContent=fraseEn(n,k,r);
+    const g=c.pl?1:c.v?2:0;$$('.regla div',root).forEach(d=>{const x=+d.dataset.r;d.classList.toggle('on',x===3?!!r:x===g)})}
+  $$('.niv .chip',root).forEach(b=>b.onclick=()=>{const antes=n<2;n=+b.dataset.n;if((n<2)!==antes){r=null;razones()}ver()});
+  $$('.cos .chip',root).forEach(b=>b.onclick=()=>{k=b.dataset.k;ver()});razones();ver()}
+
+/* reconocer: ¿quién lo dijo? Dos fichas de gustos y una frase */
+
+/* manipular: la tragamonedas. Gira, dilo y comprueba */
+
+/* manipular: Pau dice algo y tú estás de acuerdo. ¿También o tampoco? */
+
+/* contraste: caza del error. ¿Hay una palabra que suena a inglés? */
+
+/* mirar y hablar: toca un número de la plaza y aparece su pregunta */
+
+/* dado de preguntas: el formato del bloque «Imagen para describir» que añade el profesor */
+function rDescribir(root,imgHTML,consigna){
+  let st=0;
+  root.innerHTML=`<div class="imgdesc"><div class="marco">${imgHTML}</div><div>
+     ${consigna?`<p class="lead es" style="overflow-wrap:anywhere">${esc(consigna)}</p>`:''}
+     <div class="orden"><button class="dado" aria-label="${TXT.dado} the die">?</button><div><span class="en">${TXT.dado} the die. Answer in Spanish.</span><div class="preg">&nbsp;</div><span class="en pregen"></span></div></div>
+     ${ayudaHTML(['Hay…','Me parece…','Me gusta porque…','Prefiero…'])}
+     <div class="fila"><button class="btn sol dije">${TXT.estrella} +1</button><span class="pts"></span><button class="mini re" aria-label="Reset">↻</button></div></div></div>`;
+  activaAyuda(root);
+  const d=$('.dado',root),pts=$('.pts',root),pp=()=>pts.innerHTML=tiqT+' '+st;
+  d.onclick=()=>{const k=Math.random()*6|0;d.classList.remove('gira');void d.offsetWidth;d.classList.add('gira');d.textContent=k+1;$('.preg',root).textContent=DADO[k].es;$('.pregen',root).textContent=DADO[k].en};
+  $('.dije',root).onclick=()=>{st++;pp()};$('.re',root).onclick=()=>{st=0;pp()};pp()}
+
+/* lectura por páginas: el perfil de Pau (texto de muestra) o el cuento que pega el profesor */
+function paginar(texto,max){
+  const paras=String(texto).replace(/\r/g,'').split(/\n+/).map(s=>s.trim()).filter(Boolean),pags=[];let cur=[],len=0;
+  for(const p of paras){const fr=p.match(/[^.!?…]+[.!?…]+["»”’)]*\s*|[^.!?…]+$/g)||[p];let buf='';const tr=[];
+    for(const f of fr){if((buf+f).length>max&&buf){tr.push(buf.trim());buf=f}else buf+=f}
+    if(buf.trim())tr.push(buf.trim());
+    for(const t of tr){if(len+t.length>max&&cur.length){pags.push(cur);cur=[];len=0}cur.push(t);len+=t.length}}
+  if(cur.length)pags.push(cur);return pags.length?pags:[['']]}
+function rLibro(root,api,c,muestra){
+  const max={corta:150,media:340,larga:700}[c.pag||'corta']||150,pags=c.pags||paginar(c.texto,max);let i=-1;
+  root.innerHTML=`<div class="movil ${muestra?'':'libro'}" style="--fs:${c.pags||max<200?25:max<500?22:20}px"><div class="barra-m">${muestra?persona('pau',46)+'<div><b>Pau</b><small>31 · BARCELONA · ES → EN</small></div>':'<div><small>READING</small></div>'}</div><div class="hoja"><div class="txt"></div></div>
+    <div class="nav"><button class="flecha a" aria-label="Previous page">←</button><span class="npag"></span><button class="flecha s" aria-label="Next page">→</button></div></div>`;
+  const tx=$('.txt',root),a=$('.a',root),s=$('.s',root);
+  function ver(){
+    tx.innerHTML=i<0?`<h2 class="tit">${esc(c.titulo||'')}</h2><p class="aut">${esc(c.autor||'')}${c.fuente?' · '+esc(c.fuente):''}</p>`:pags[i].map(p=>`<p>${esc(p)}</p>`).join('');
+    a.disabled=i<0;s.disabled=i===pags.length-1;$('.npag',root).textContent=i<0?'':(i+1)+' / '+pags.length}
+  const mover=d=>{const n=i+d;if(n<-1||n>=pags.length)return false;i=n;ver();return true};
+  a.onclick=()=>mover(-1);s.onclick=()=>mover(1);api.pager({mover});ver()}
+/* las palabras del perfil: cada una abre una ventana con tres significados */
+/* comprensión: ¿lo diría Pau? */
+/* preguntas personales: tres entradas que se rasgan */
+
+/* juego grande: tres en raya. Para quedarte la casilla, termina la frase sobre ti */
+
+/* tarea final: mi entrada. Tus gustos de verdad, y después lo dices todo de una vez */
+
+/* resumen: ráfaga. Lo dices de memoria, lo destapas y te marcas */
+
+/* tarea: la misión, con su lista para marcar */
+
+/* ================= bloques que añade el profesor ================= */
+function rCajas(root,items){
+  root.innerHTML=`<div class="cajas">${items.map((q,k)=>`<div class="caja2"><button><i>${k+1}</i><span>${q.t}</span></button><div class="den">${q.d}</div></div>`).join('')}</div>`;
+  $$('.caja2>button',root).forEach(b=>b.onclick=()=>b.parentNode.classList.toggle('abierta'))}
+function ytId(u){const m=String(u).match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([\w-]{11})/);return m?m[1]:null}
+function aSeg(t){t=String(t||'').trim();if(!t)return 0;const p=t.split(':').map(Number);if(p.some(isNaN))return 0;return p.reduce((a,b)=>a*60+b,0)}
+const mmss=s=>(s/60|0)+':'+String(s%60).padStart(2,'0');
+function herr(root,s,b){
+  const h=document.createElement('div');h.className='herr';h.innerHTML='<button class="mini ed">Editar este bloque</button><button class="mini qu">Quitar</button>';
+  root.prepend(h);$('.ed',h).onclick=()=>editarBloque(s,b,false);
+  const q=$('.qu',h);let arm=false;q.onclick=()=>{if(!arm){arm=true;q.textContent='¿Quitar? Pulsa otra vez';setTimeout(()=>{arm=false;q.textContent='Quitar'},3000);return}
+    contenido.extras[s.id]=extrasDe(s.id).filter(x=>x.id!==b.id);cache.clear();estado.tab=0;pintar();guardarContenido()}}
+function rExtra(root,api,b,s){
+  if(b.tipo==='video'){const id=ytId(b.url),ini=aSeg(b.ini),fin=aSeg(b.fin);
+    root.innerHTML=id?`<div class="video"><a class="poster" href="https://www.youtube.com/watch?v=${id}${ini?'&t='+ini+'s':''}" target="_blank" rel="noopener" aria-label="${TXT.abrir}"><em>YouTube · opens in a new tab</em></a>
+      <div style="min-width:0"><h2 class="t">${esc(b.titulo||'Video')}</h2><div class="tiempos"><span>${TXT.verdesde} ${mmss(ini)}</span>${fin?`<span>${TXT.verhasta} ${mmss(fin)}</span><span>${mmss(Math.max(0,fin-ini))}</span>`:''}</div>
+      ${b.consigna?`<p class="lead es" style="overflow-wrap:anywhere">${esc(b.consigna)}</p>`:''}<a class="btn" href="https://www.youtube.com/watch?v=${id}${ini?'&t='+ini+'s':''}" target="_blank" rel="noopener">${TXT.abrir} ▸</a></div></div>`
+      :'<div class="vacio2">No reconozco ese enlace de YouTube. Toca «Editar este bloque» y pégalo otra vez.</div>'}
+  else if(b.tipo==='imagen'){rDescribir(root,'<div class="vacio2">…</div>',b.consigna);
+    leerMedia(b.media).then(d=>{$('.marco',root).innerHTML=d?`<img src="${d}" alt="${esc(b.titulo||'Picture to describe')}">`:'<div class="vacio2">La imagen no está disponible en este dispositivo.</div>'})}
+  else if(b.tipo==='cuento'){const qs=String(b.preguntas||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    const L=document.createElement('div'),Q=document.createElement('div');root.append(L,Q);rLibro(L,api,b,false);
+    if(qs.length){Q.style.marginTop='14px';rCajas(Q,qs.map(q=>({t:TXT.hablar,d:`<p class="dicho-x">${esc(q)}</p>`})))}}
+  else{const ru=String(b.rutas||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    root.innerHTML=`<h2 class="t pregx" style="font-size:clamp(30px,4.6vw,50px)">${esc(b.texto||'')}</h2>${ru.length?`<div class="rutas">${ru.map(r=>`<span class="ruta">${esc(r)}</span>`).join('')}</div>`:''}`}
+  herr(root,s,b)}
+
+function comprimir(file){return new Promise((ok,ko)=>{const fr=new FileReader();fr.onerror=ko;fr.onload=()=>{const img=new Image();img.onerror=ko;img.onload=()=>{
+  let max=1280,q=.82,d='';for(let k=0;k<7;k++){const r=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*r));c.height=Math.max(1,Math.round(img.height*r));
+    const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);d=c.toDataURL('image/jpeg',q);if(d.length<230000)break;max=Math.round(max*.82);q=Math.max(.6,q-.05)}
+  ok(d)};img.src=fr.result};fr.readAsDataURL(file)})}
+
+const FORM={
+ video:{t:'Video de YouTube',c:`<label for="f_url">Enlace de YouTube</label><input type="text" id="f_url" placeholder="https://www.youtube.com/watch?v=…">
+   <div class="dos"><div><label for="f_ini">Empieza en <small>(min:seg)</small></label><input type="text" id="f_ini" placeholder="0:45"></div><div><label for="f_fin">Termina en <small>(opcional)</small></label><input type="text" id="f_fin" placeholder="1:30"></div></div>
+   <label for="f_titulo">Título</label><input type="text" id="f_titulo"><label for="f_consigna">Consigna para el estudiante <small>(qué mirar o qué responder)</small></label><input type="text" id="f_consigna">
+   <p class="en">El video se abre en una pestaña nueva, en el segundo exacto. El tablero no puede reproducirlo dentro.</p>`,k:['url','ini','fin','titulo','consigna']},
+ imagen:{t:'Imagen para describir',c:`<label for="f_file">Imagen <small>(elige un archivo o pégala con Ctrl+V)</small></label><input type="file" id="f_file" accept="image/*"><div id="f_prev" style="margin-top:8px"></div>
+   <label for="f_titulo">Título <small>(opcional)</small></label><input type="text" id="f_titulo"><label for="f_consigna">Consigna para el estudiante <small>(opcional)</small></label><input type="text" id="f_consigna">
+   <p class="en">Junto a la imagen aparecen las preguntas y las rutas de respuesta.</p>`,k:['titulo','consigna']},
+ cuento:{t:'Cuento',c:`<div class="dos"><div><label for="f_titulo">Título</label><input type="text" id="f_titulo"></div><div><label for="f_autor">Autor</label><input type="text" id="f_autor"></div></div>
+   <label for="f_fuente">Fuente <small>(libro, año o sitio)</small></label><input type="text" id="f_fuente"><label for="f_texto">Texto <small>(pégalo aquí; se reparte en páginas solo)</small></label><textarea id="f_texto"></textarea>
+   <label for="f_pag">Tamaño de página</label><select id="f_pag"><option value="corta">Corta · principiantes y niños</option><option value="media">Media</option><option value="larga">Larga · niveles altos</option></select>
+   <label for="f_preguntas">Preguntas para conversar <small>(una por línea, opcional)</small></label><textarea id="f_preguntas" style="min-height:70px"></textarea>`,k:['titulo','autor','fuente','texto','pag','preguntas']},
+ pregunta:{t:'Pregunta o consigna',c:`<label for="f_texto">Pregunta <small>(se muestra en grande)</small></label><input type="text" id="f_texto"><label for="f_rutas">Rutas de respuesta <small>(comienzos de frase, uno por línea)</small></label><textarea id="f_rutas" style="min-height:80px"></textarea>`,k:['texto','rutas']}
+};
+function editarBloque(s,b,nuevo,alGuardar){
+  const F=FORM[b.tipo];let dataImg=null;
+  abrir(`<h3>${F.t}</h3>${F.c}<div class="err" id="f_err" aria-live="polite"></div><div class="fila"><span class="hueco"></span><button class="mini" id="f_no">Cancelar</button><button class="btn" id="f_ok">Guardar</button></div>`);
+  F.k.forEach(k=>{const e=$('#f_'+k);if(e&&b[k]!=null)e.value=b[k]});
+  const err=m=>$('#f_err').textContent=m;
+  if(b.tipo==='imagen'){const pv=$('#f_prev');
+    const toma=async f=>{if(!f||!/^image\//.test(f.type)){err('Ese archivo no es una imagen.');return}err('Preparando la imagen…');try{dataImg=await comprimir(f);pv.innerHTML=`<img src="${dataImg}" alt="" style="max-height:150px;border-radius:10px">`;err('')}catch(e){err('No pude leer esa imagen. Prueba con JPG o PNG.')}};
+    $('#f_file').onchange=e=>toma(e.target.files[0]);
+    popC.onpaste=e=>{const f=[...(e.clipboardData&&e.clipboardData.files||[])][0];if(f){e.preventDefault();toma(f)}};
+    if(b.media)leerMedia(b.media).then(d=>{if(d&&!dataImg&&$('#f_prev'))$('#f_prev').innerHTML=`<img src="${d}" alt="" style="max-height:150px;border-radius:10px">`})}
+  $('#f_no').onclick=cerrar;
+  $('#f_ok').onclick=async()=>{
+    const v={};F.k.forEach(k=>v[k]=$('#f_'+k).value.trim());
+    if(b.tipo==='video'){if(!ytId(v.url))return err('Pega un enlace de YouTube completo (youtube.com/watch?v=… o youtu.be/…).');
+      if(v.fin&&aSeg(v.fin)<=aSeg(v.ini))return err('El final tiene que ser posterior al inicio.')}
+    if(b.tipo==='imagen'&&!dataImg&&!b.media)return err('Elige una imagen primero.');
+    if(b.tipo==='cuento'&&!v.texto)return err('Pega el texto del cuento.');
+    if(b.tipo==='pregunta'&&!v.texto)return err('Escribe la pregunta.');
+    Object.assign(b,v);
+    if(dataImg){b.media=uid();await guardarMedia(b.media,dataImg)}
+    if(alGuardar){alGuardar(b)}
+    else{if(nuevo){b.id=uid();(contenido.extras[s.id]=extrasDe(s.id)).push(b)}
+      cache.clear();if(nuevo)estado.tab=tabsDe(s).length-1}
+    cerrar();pintar();guardarContenido()}}
+
+/* ================= la plaza: escena para mirar y hablar (dibujo original de este tablero) ================= */
+
+/* ================= contenido de esta clase ================= */
+const REPASO=[
+ ['Order a beer and a sandwich.','Quiero una cerveza y un bocadillo, por favor.'],
+ ['Ask for the bill.','La cuenta, por favor.'],
+ ['Say: I like football.','Me gusta el fútbol.'],
+ ['Say: I love music.','Me encanta la música.'],
+ ['Say: I don’t like coffee.','No me gusta el café.'],
+ ['Ask your teacher: do you like the cinema?','¿Te gusta el cine?']];
+const CLAVES=[
+ {p:'genial',es:'genial',en:'great · brilliant',ej:['Barcelona es genial.','Barcelona is great.'],n:'It stays the same for el and la: un bar <b>genial</b>, una canción <b>genial</b>. Many things: genial<b>es</b>.'},
+ {p:'divertido',es:'divertido',en:'fun',ej:['El partido es muy divertido.','The match is really fun.'],n:'It matches the thing: divertid<b>o</b>, divertid<b>a</b>, divertid<b>os</b>, divertid<b>as</b>.'},
+ {p:'aburrido',es:'aburrido',en:'boring',ej:['La película es aburrida.','The film is boring.'],n:'It matches the thing too: una película aburrid<b>a</b>.'},
+ {p:'cancion',es:'la canción',en:'the song',ej:['Es una canción muy famosa.','It is a very famous song.'],n:'Two or more: <b>las canciones</b>.'},
+ {p:'equipo',es:'el equipo',en:'the team',ej:['El Liverpool es mi equipo.','Liverpool is my team.'],n:'In Spanish a club takes <b>el</b>: el Liverpool, el Barça.'},
+ {p:'partido',es:'el partido',en:'the match',ej:['Hoy hay un partido.','There is a match today.']},
+ {p:'pelicula',es:'la película',en:'the film',ej:['Es una película inglesa.','It is an English film.'],n:'Two or more: <b>las películas</b>.'},
+ {p:'bici',es:'la bici',en:'the bike',ej:['Monto en bici los domingos.','I ride my bike on Sundays.'],n:'bici = bicicleta. <b>Montar en bici</b> = to ride a bike.'},
+ {p:'perro',es:'el perro',en:'the dog',ej:['Quiero un perro pequeño.','I want a small dog.'],n:'The describing word goes after: un perro <b>pequeño</b>.'}];
+const METAS=[
+ {q:'say what you like and give a reason',es:'Me gustan las películas de acción porque son divertidas.',en:'I like action films because they are fun.'},
+ {q:'ask for an opinion and give yours',es:'¿Qué te parece el rock? — Me parece genial.',en:'What do you think of rock? — I think it is great.'},
+ {q:'agree, disagree and keep the chat going',es:'— No me gusta el café. — A mí sí.',en:'— I don’t like coffee. — I do.'}];
+const APRENDI=['Today you learned to <b>give a reason</b>: «Me gustan las películas de acción porque son divertidas.»','to <b>ask for and give an opinion</b>: «¿Qué te parece? — Me parece genial.»','and to <b>agree or disagree</b>: «A mí también. A mí tampoco. A mí sí. A mí no.»'];
+/* muestra · {clave|texto} marca la frase que abre una ventana */
+const DIA=[
+ {q:'pau',es:'¡Hola! ¿Te gusta el fútbol?',en:'Hi! Do you like football?'},
+ {q:'tu',es:'Sí, me encanta. {soy|Soy del} Liverpool. {yati|¿Y tú?}',en:'Yes, I love it. I support Liverpool. And you?'},
+ {q:'pau',es:'Yo soy del Barça. ¿Y qué música te gusta?',en:'I support Barça. And what music do you like?'},
+ {q:'tu',es:'{gustan|Me gustan} las canciones de rock. {yati|¿Y a ti?}',en:'I like rock songs. And you?'},
+ {q:'pau',es:'{tamb|A mí también.} {loque|Lo que más me gusta} es el rock inglés.',en:'Me too. What I like most is English rock.'},
+ {q:'tu',es:'¿Y el cine? {parece|¿Qué te parece?}',en:'And the cinema? What do you think of it?'},
+ {q:'pau',es:'{parece|Me parece} genial, pero no me gustan nada las películas largas.',en:'I think it is great, but I don’t like long films at all.'},
+ {q:'tu',es:'{tamb|A mí tampoco.} Me gustan las películas de acción {porque|porque} son divertidas.',en:'Me neither. I like action films because they are fun.'},
+ {q:'pau',es:'¿De acción? {ano|A mí no.} Me parecen aburridas. {pref|Prefiero} las comedias.',en:'Action? I don’t. I find them boring. I prefer comedies.'},
+ {q:'tu',es:'{pref|Me da igual}: acción o comedia. {fav|Mi película favorita es}…',en:'I don’t mind: action or comedy. My favourite film is… (your turn: finish it!)'}];
+const BLQ={
+ soy:{t:'Soy del Liverpool.',en:'I support Liverpool.',how:'soy de + el = <b>soy del</b> + team. Careful: <b>Soy de Liverpool</b> means “I am from Liverpool”, the city.',ej:[['Soy del Liverpool.','I support Liverpool.'],['¿De qué equipo eres?','Which team do you support?']]},
+ yati:{t:'¿Y a ti? · ¿Y tú?',en:'And you?',how:'Two ways to send the question back. After <b>me gusta, me encanta, me parece</b>: ¿Y <b>a ti</b>? After any other verb (soy, prefiero, vivo): ¿Y <b>tú</b>?',ej:[['Me gusta el rock. ¿Y a ti?','I like rock. And you?'],['Prefiero el cine. ¿Y tú?','I prefer the cinema. And you?']]},
+ gustan:{t:'Me gustan…',en:'I like… (many things)',how:'One thing → <b>me gusta</b>. Many things → <b>me gustan</b>. The same with me encant<b>an</b>. And keep <b>el / la / los / las</b>.',ej:[['Me gusta la canción.','I like the song.'],['Me gustan las canciones.','I like the songs.']]},
+ tamb:{t:'A mí también. · A mí tampoco.',en:'Me too. · Me neither.',how:'To feel the same. After a <b>yes</b>-sentence: A mí también. After a <b>no</b>-sentence: A mí tampoco. Spanish needs the <b>A</b>. After soy, prefiero, tengo… it is <b>Yo también / Yo tampoco</b>.',ej:[['— Me gusta el rock. — A mí también.','— I like rock. — Me too.'],['— No me gusta el café. — A mí tampoco.','— I don’t like coffee. — Me neither.']]},
+ loque:{t:'Lo que más me gusta es…',en:'What I like most is…',how:'A ready-made start for your number one. It takes a thing or an action.',ej:[['Lo que más me gusta es el fútbol.','What I like most is football.'],['Lo que más me gusta es ver un partido con amigos.','What I like most is watching a match with friends.']]},
+ parece:{t:'¿Qué te parece…? · Me parece…',en:'What do you think of…? · I think it is…',how:'To ask for an opinion and give one. It works like gustar: one thing → me parec<b>e</b>, many things → me parec<b>en</b>. The describing word matches the thing.',ej:[['¿Qué te parece Barcelona? — Me parece genial.','What do you think of Barcelona? — I think it is great.'],['Las películas largas me parecen aburridas.','I find long films boring.']]},
+ porque:{t:'… porque …',en:'… because …',how:'Add a reason and your sentence doubles. <b>porque</b> = because. The question is two words: <b>¿Por qué?</b> = why?',ej:[['Me gusta el rock porque es divertido.','I like rock because it is fun.'],['— ¿Por qué? — Porque me encanta.','— Why? — Because I love it.']]},
+ ano:{t:'A mí no. · A mí sí.',en:'I don’t. · I do.',how:'To feel the opposite, you flip it. They like it and you don’t: <b>A mí no.</b> They don’t like it and you do: <b>A mí sí.</b>',ej:[['— Me gustan las películas de acción. — A mí no.','— I like action films. — I don’t.'],['— No me gusta el fútbol. — ¡A mí sí!','— I don’t like football. — I do!']]},
+ pref:{t:'Prefiero… · Me da igual.',en:'I prefer… · I don’t mind.',how:'For two options. You choose: <b>prefiero</b> + a thing or an action. Both are fine: <b>me da igual</b>. To ask a friend: <b>¿Prefieres… o…?</b>',ej:[['— ¿Prefieres el café o la cerveza? — Prefiero la cerveza.','— Do you prefer coffee or beer? — I prefer beer.'],['— ¿El sábado o el domingo? — Me da igual.','— Saturday or Sunday? — I don’t mind.']]},
+ fav:{t:'Mi película favorita es…',en:'My favourite film is…',how:'<b>favorito / favorita</b> goes AFTER the thing: mi película favorit<b>a</b>, mi equipo favorit<b>o</b>.',ej:[['Mi película favorita es…','My favourite film is…'],['Mi equipo favorito es el Liverpool.','My favourite team is Liverpool.']]}};
+/* ¿quién lo dijo? · 0 me encanta · 1 me gusta · 2 no me gusta · 3 no me gusta nada */
+/* reaccionar · [frase, glosa, 1 = frase afirmativa, 1 = sientes lo mismo] */
+/* un solo error por frase, de los que hace de verdad quien piensa en inglés; x = -1: la frase está bien */
+/* la plaza: x, y en % de la imagen */
+const DADO=[{es:'¿Qué hay?',en:'What is there?'},{es:'¿Te gusta? ¿Por qué?',en:'Do you like it? Why?'},{es:'¿Qué no te gusta?',en:'What don’t you like?'},{es:'¿Qué te parece?',en:'What do you think of it?'},{es:'¿Qué prefieres?',en:'What do you prefer?'},{es:'¿Y a ti?',en:'Ask your teacher back.'}];
+/* lectura: un perfil en una app para practicar idiomas (texto propio de Lingua's Academy) */
+/* 0 sí · 1 no · 2 el perfil no lo dice */
+
+/* ================= las secciones: 4 + 2 + 8 + 8 + 5 + 5 + 6 + 7 + 3 + 2 = 50 min ================= */
+SECS.push(
+ {id:'intro',m:'intro',t:'What do you already know?',min:4,tabs:[
+   {k:'repaso',instr:'Say it in Spanish first. Then tap the card to check.',r:rRepaso},
+   {k:'claves',instr:'Nine words for today. Tap a word and its ticket opens.',r:rClaves}]},
+ {id:'obj',m:'obj',t:'Where you are going',min:2,tabs:[{k:'vol',instr:'Read each goal and set your volume: one, two or three bars.',r:el=>rVolumen(el,false)}]},
+ {id:'a1',m:'cont',n:'1',t:'At the bar with Pau',min:8,tabs:[
+   {k:'dialogo',instr:'Tap → for the next line and read it out loud. Tap each blue phrase to open it.',r:rDialogo},
+   {k:'mezcla',instr:'Change “how much”, “what” and “why”. Watch how the Spanish sentence changes.',r:rMezcla}]}
+);
+
+/* ================= arranque: primero se dibuja, después se conecta ================= */
+reiniciaCrono();pintar();conectar();
+})();
+</script>
+
+
+<!-- ═══ Vista previa · Lingua's Academy (generada por herramientas/vista_previa.mjs) ═══ -->
+<style id="vp-estilo">
+#vp-cinta{position:fixed;z-index:60;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  max-width:calc(100vw - 24px);padding:8px 8px 8px 10px;background:var(--hoja,#FFFDF9);color:var(--tinta,#17223D);border:2.5px solid var(--tinta,#17223D);border-radius:18px;box-shadow:5px 5px 0 var(--tinta,#17223D);
+  font:500 15px/1.3 "Instrument Sans",system-ui,sans-serif}
+#vp-cinta .vp-et{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:10px;background:var(--mostaza,#D6992A);color:var(--tinta,#17223D);font:500 13px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap}
+#vp-cinta .vp-txt{color:var(--tinta2,#2C3A5C)}
+.vp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:8px 16px;border-radius:14px;border:2.5px solid var(--tinta,#17223D);box-shadow:3px 3px 0 var(--tinta,#17223D);
+  font:600 15px/1.2 "Instrument Sans",system-ui,sans-serif;text-decoration:none;cursor:pointer;background:var(--hoja,#FFFDF9);color:var(--tinta,#17223D);transition:transform .12s,box-shadow .12s}
+.vp-btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--tinta,#17223D)}
+.vp-btn--pri{background:var(--terra,#C2533A);color:#fff}
+.vp-btn:focus-visible,#vp-lado button:focus-visible{outline:3px solid var(--mar,#1B7A88);outline-offset:3px}
+.vp-i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body.vp-con-cinta{padding-bottom:96px}
+#vp-lado{margin-top:14px;padding-top:12px;border-top:2px dashed var(--linea,#D9D2C4)}
+#vp-lado h3{display:flex;align-items:center;gap:6px;margin:0 0 8px;font:500 12px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ayuda,#5B6478)}
+#vp-lado ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+#vp-lado button{width:100%;display:flex;align-items:center;gap:8px;text-align:left;font:500 14px/1.3 "Instrument Sans",system-ui,sans-serif;color:var(--ayuda,#5B6478);
+  background:var(--papel,#F5F2EC);border:2px dashed var(--linea,#D9D2C4);border-radius:12px;padding:7px 10px;cursor:pointer}
+#vp-lado button:hover{border-color:var(--tinta2,#2C3A5C);color:var(--tinta,#17223D)}
+#vp-lado .vp-pt{width:9px;height:9px;border-radius:50%;flex:none;background:var(--c)}
+#vp-lado .vp-tt{flex:1;min-width:0;overflow-wrap:anywhere}
+#vp-lado .vp-min{font:500 12px/1 "JetBrains Mono",ui-monospace,monospace}
+#vp-fin{border:0;padding:0;background:transparent;max-width:min(640px,calc(100vw - 24px));width:100%;color:var(--tinta,#17223D)}
+#vp-fin::backdrop{background:rgba(23,34,61,.55)}
+#vp-fin .vp-lam{background:var(--hoja,#FFFDF9);border:2.5px solid var(--tinta,#17223D);border-radius:26px;box-shadow:5px 5px 0 var(--tinta,#17223D);overflow:hidden}
+#vp-fin .vp-cab{display:flex;align-items:center;gap:12px;background:var(--tinta,#17223D);color:var(--hoja,#FFFDF9);padding:16px 22px}
+#vp-fin .vp-cab .vp-i{width:28px;height:28px;stroke-width:1.75;color:var(--mostaza,#D6992A)}
+#vp-fin h2{margin:0;font:400 clamp(1.3rem,3.6vw,1.7rem)/1.2 "Young Serif",Georgia,serif}
+#vp-fin .vp-cuerpo{padding:20px 22px 22px;font:400 17px/1.5 "Instrument Sans",system-ui,sans-serif}
+#vp-fin .vp-cuerpo p{margin:0 0 14px}
+#vp-fin ol{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:6px;max-height:40vh;overflow:auto}
+#vp-fin li{display:flex;align-items:center;gap:10px;padding:8px 12px;border:2px dashed var(--linea,#D9D2C4);border-radius:12px;background:var(--papel,#F5F2EC);color:var(--tinta2,#2C3A5C)}
+#vp-fin li .vp-m{font:500 12px/1 "JetBrains Mono",ui-monospace,monospace;padding:4px 8px;border-radius:8px;background:var(--cf);color:var(--tinta,#17223D);white-space:nowrap}
+#vp-fin li .vp-tt{flex:1;min-width:0;overflow-wrap:anywhere}
+#vp-fin .vp-acc{display:flex;flex-wrap:wrap;gap:10px}
+@media (max-width:560px){#vp-cinta{flex-wrap:nowrap;gap:8px;padding:6px}#vp-cinta .vp-txt{display:none}#vp-cinta .vp-btn{padding:6px 12px;font-size:14px;white-space:nowrap}body.vp-con-cinta{padding-bottom:84px}}
+@media (prefers-reduced-motion:reduce){.vp-btn{transition:none}}
+@media print{#vp-cinta,#vp-fin{display:none}}
+</style>
+<div id="vp-cinta" role="region" aria-label="Vista previa">
+  <span class="vp-et"><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-vp="cinta">Vista previa</span></span>
+  <span class="vp-txt" data-vp="cintaTxt">Ves el principio de la clase.</span>
+  <button type="button" class="vp-btn vp-btn--pri" data-vp-abrir><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-vp="verResto">Ver el resto de la clase</span></button>
+</div>
+<dialog id="vp-fin" aria-labelledby="vp-fin-t">
+  <div class="vp-lam">
+    <div class="vp-cab"><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><h2 id="vp-fin-t" data-vp="finT">Hasta aquí la vista previa</h2></div>
+    <div class="vp-cuerpo">
+      <p data-vp="finTxt">El resto de la clase (actividades, lectura, juego, resumen y tarea) está disponible con la suscripción.</p>
+      <ol id="vp-fin-lista"></ol>
+      <div class="vp-acc">
+        <a class="vp-btn vp-btn--pri" id="vp-ir" href="../suscripcion.html"><span data-vp="suscribir">Desbloquear con la suscripción</span><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <button type="button" class="vp-btn" data-vp-cerrar><span data-vp="seguir">Seguir en la vista previa</span></button>
+      </div>
+    </div>
+  </div>
+</dialog>
+<script id="vp-datos" type="application/json">{"bloqueadas":[{"m":"cont","t":"Hearts and crosses","min":8},{"m":"cont","t":"English brain, Spanish mouth","min":5},{"m":"cont","t":"Look and talk","min":5},{"m":"cont","t":"Pau’s profile","min":6},{"m":"cont","t":"Three in a row","min":7},{"m":"res","t":"What stayed?","min":3},{"m":"tarea","t":"For next class","min":2}],"suscripcion":"../suscripcion.html","inicio":"../","nombre":"a2-y-a-ti"}</script>
+<script>
+/* Vista previa · Lingua's Academy. Iconos: Lucide, ISC */
+(function(){
+  "use strict";
+  var D = JSON.parse(document.getElementById("vp-datos").textContent);
+  var T = {
+    es:{cinta:"Vista previa",cintaTxt:"Ves el principio de la clase.",verResto:"Ver el resto de la clase",finT:"Hasta aquí la vista previa",
+      finTxt:"El resto de la clase (actividades, lectura, juego, resumen y tarea) está disponible con la suscripción.",suscribir:"Desbloquear con la suscripción",
+      seguir:"Seguir en la vista previa",lado:"En la clase completa",bloq:"Bloqueado: ",m:{intro:"Introducción",obj:"Objetivos",cont:"Contenido",res:"Resumen",tarea:"Tarea"}},
+    en:{cinta:"Preview",cintaTxt:"You're seeing the start of the lesson.",verResto:"See the rest of the lesson",finT:"This is where the preview ends",
+      finTxt:"The rest of the lesson (activities, reading, game, review and homework) is available with a subscription.",suscribir:"Unlock with a subscription",
+      seguir:"Keep exploring the preview",lado:"In the full lesson",bloq:"Locked: ",m:{intro:"Warm-up",obj:"Goals",cont:"Content",res:"Review",tarea:"Homework"}},
+    pt:{cinta:"Prévia",cintaTxt:"Você está vendo o começo da aula.",verResto:"Ver o resto da aula",finT:"A prévia termina aqui",
+      finTxt:"O resto da aula (atividades, leitura, jogo, resumo e tarefa) está disponível com a assinatura.",suscribir:"Desbloquear com a assinatura",
+      seguir:"Continuar na prévia",lado:"Na aula completa",bloq:"Bloqueado: ",m:{intro:"Introdução",obj:"Objetivos",cont:"Conteúdo",res:"Resumo",tarea:"Tarefa"}}
+  };
+  var L = "es";
+  try { L = new URLSearchParams(location.search).get("lang") || localStorage.getItem("la-lang") || ""; } catch (e) {}
+  if (!T[L]) { var nv = String(navigator.language || "").toLowerCase(); L = nv.indexOf("pt") === 0 ? "pt" : nv.indexOf("en") === 0 ? "en" : "es"; }
+  var t = T[L];
+  var COL = {intro:["--terra","#C2533A","--terraf","#F8E3DC"],obj:["--mostaza","#D6992A","--mostazaf","#FBEFD6"],cont:["--mar","#1B7A88","--marf","#DDEFF1"],res:["--ciruela","#6D4B80","--ciruelaf","#ECE3F2"],tarea:["--verde","#4A8656","--verdef","#E1F0E3"]};
+  var CANDADO = '<svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  function nombre(b){ return b.t || t.m[b.m]; }
+  document.querySelectorAll("[data-vp]").forEach(function(el){ var k = el.getAttribute("data-vp"); if (t[k]) el.textContent = t[k]; });
+  var cinta = document.getElementById("vp-cinta"); cinta.setAttribute("aria-label", t.cinta);
+  document.body.classList.add("vp-con-cinta");
+  var ir = document.getElementById("vp-ir");
+  ir.href = D.suscripcion + (L !== "es" ? "?lang=" + L : "");
+
+  /* la lámina final */
+  var dlg = document.getElementById("vp-fin"), lista = document.getElementById("vp-fin-lista");
+  D.bloqueadas.forEach(function(b){
+    var li = document.createElement("li"), c = COL[b.m] || COL.cont;
+    li.style.setProperty("--cf", "var(" + c[2] + "," + c[3] + ")");
+    li.innerHTML = CANDADO + '<span class="vp-m"></span><span class="vp-tt"></span>';
+    li.children[1].textContent = t.m[b.m]; li.children[2].textContent = nombre(b);
+    lista.appendChild(li);
+  });
+  function abrir(){
+    if (dlg.open) return;
+    if (typeof dlg.showModal === "function") { try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); } } else dlg.setAttribute("open", "");
+    ir.focus();
+  }
+  function cerrar(){ if (typeof dlg.close === "function" && dlg.open) dlg.close(); else dlg.removeAttribute("open"); }
+  window.LA_VISTA_PREVIA = { abrir: abrir, cerrar: cerrar };
+  cinta.querySelector("[data-vp-abrir]").addEventListener("click", abrir);
+  dlg.querySelector("[data-vp-cerrar]").addEventListener("click", cerrar);
+  dlg.addEventListener("click", function(e){ if (e.target === dlg) cerrar(); });
+
+  /* el menú lateral: las secciones bloqueadas, con candado */
+  function bloqueLado(){
+    var d = document.createElement("div"); d.id = "vp-lado";
+    d.innerHTML = '<h3>' + CANDADO + '<span></span></h3><ol></ol>';
+    d.querySelector("h3 span").textContent = t.lado;
+    var ol = d.querySelector("ol");
+    D.bloqueadas.forEach(function(b){
+      var li = document.createElement("li"), bt = document.createElement("button"), c = COL[b.m] || COL.cont;
+      bt.type = "button"; bt.style.setProperty("--c", "var(" + c[0] + "," + c[1] + ")");
+      bt.setAttribute("aria-label", t.bloq + t.m[b.m] + " · " + nombre(b));
+      bt.innerHTML = '<span class="vp-pt" aria-hidden="true"></span><span class="vp-tt"></span>' + (b.min ? '<span class="vp-min"></span>' : "") + CANDADO;
+      bt.querySelector(".vp-tt").textContent = nombre(b);
+      if (b.min) bt.querySelector(".vp-min").textContent = b.min + " min";
+      bt.addEventListener("click", abrir);
+      li.appendChild(bt); ol.appendChild(li);
+    });
+    return d;
+  }
+  var lado = document.getElementById("lado") || document.querySelector("aside, nav#mapa, #mapa, .mapa");
+  if (lado) {
+    var puesto = bloqueLado(); lado.appendChild(puesto);
+    new MutationObserver(function(){ if (!lado.contains(puesto)) { puesto = bloqueLado(); lado.appendChild(puesto); } }).observe(lado, { childList: true, subtree: true });
+  }
+
+  /* «Siguiente» al final de lo que se ve: en vez de no hacer nada, abre la lámina bloqueada */
+  var zona = function(){ return document.getElementById("lamina") || document.querySelector("main") || document.getElementById("app") || document.body; };
+  var firma = function(){ var z = zona(); return z ? z.innerHTML.length + ":" + z.innerHTML.slice(0, 4000) + location.hash : ""; };
+  function esSiguiente(el){
+    if (!el || el.closest("#vp-cinta, #vp-fin, #vp-lado")) return false;
+    var b = el.closest("button, a, [role=button]"); if (!b) return false;
+    var id = (b.id || "") + " " + (b.getAttribute("data-accion") || "") + " " + (b.getAttribute("aria-label") || "") + " " + (b.getAttribute("title") || "");
+    var txt = (b.textContent || "").trim();
+    return /(^|\s)(bSig|bSiguiente|sig|siguiente|next)(\s|$)/i.test(id) || /^siguiente\b/i.test(id.trim()) || /^(siguiente|next|próximo)\b/i.test(txt);
+  }
+  function vigila(){
+    var antes = firma();
+    setTimeout(function(){ if (!dlg.open && firma() === antes) abrir(); }, 220);
+  }
+  document.addEventListener("click", function(e){ if (esSiguiente(e.target)) vigila(); }, true);
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "ArrowRight" || e.altKey || e.ctrlKey || e.metaKey || dlg.open) return;
+    var a = document.activeElement; if (a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable)) return;
+    vigila();
+  }, true);
+  /* si el tablero apaga «Siguiente» en la última pantalla, se deja encendido para llegar a la lámina final */
+  function encender(){
+    document.querySelectorAll("button[disabled], [aria-disabled=true]").forEach(function(b){
+      if (esSiguiente(b)) { b.disabled = false; b.removeAttribute("aria-disabled"); }
+    });
+  }
+  new MutationObserver(encender).observe(document.body, { attributes: true, subtree: true, attributeFilter: ["disabled", "aria-disabled"] });
+  encender();
+})();
+</script>
+</body></html>

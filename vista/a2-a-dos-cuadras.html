@@ -1,0 +1,1124 @@
+<!doctype html><html><head>
+<script>/* Vista previa: sin sala en vivo. El tablero funciona solo en esta pantalla. */window.claude={use:async function(){return null}};window.LA_VISTA_PREVIA=true;</script>
+<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="robots" content="noindex, nofollow">
+<title>Vista previa · A dos cuadras</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;700;800;900&family=Overpass+Mono:wght@400;600&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap">
+<style>
+/* Lámina de aula sobre un plano de barrio: barra de visor arriba, mapa de ruta a la izquierda y una sola lámina con pestañas y páginas.
+   Identidad: señalética de calle (placas azules con filete blanco, líneas de carril, pin de mapa). Aspecto único y claro a propósito: se comparte por videollamada. */
+:root{
+  --asfalto:#1E2A35; --asfalto2:#141D25; --senal:#1D4E89; --senal2:#2F6DB5; --cielo:#E3EEF9;
+  --plano:#E4EAF0; --lamina:#F2F5F8; --papel:#FFFFFF; --linea:#C6D0DA; --via:#CDD6DF;
+  --taxi:#FFC629; --taxi2:#FFF3C4; --pin:#C2255C; --ambar:#9A6700; --morado:#5F3DC4; --teal:#0F766E; --rojo:#E0392B;
+  --tinta:#16212B; --ayuda:#52636F; --ok:#1B8A4B; --mal:#C92A2A; --okf:#DDF3E4; --malf:#FBE3E1;
+  --display:'Overpass','Arial Narrow','Helvetica Neue',Arial,sans-serif;
+  --texto:'Source Sans 3','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'Overpass Mono',ui-monospace,Menlo,Consolas,monospace;
+  --ease-out:cubic-bezier(.23,1,.32,1); --ease-io:cubic-bezier(.77,0,.175,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+body{margin:0;background:var(--plano);color:var(--tinta);font:500 19px/1.45 var(--texto);overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+a{touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--taxi);outline-offset:2px}
+.es{color:var(--tinta);font-weight:700}
+.pt{color:var(--ayuda);font-size:.88em;font-weight:500}
+.mono{font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+b.f,.f{color:var(--senal);font-weight:800}
+
+#app{height:100%;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+
+/* ---- barra del visor: angosta (40 px), flotante y redondeada ---- */
+#top{grid-column:1/-1;height:40px;margin:5px 8px 0;border-radius:14px;overflow:hidden;display:flex;align-items:center;gap:8px;background:var(--asfalto);color:#fff;padding-right:8px}
+#top button{color:#fff}
+.tmenu{height:40px;width:264px;flex:none;display:flex;align-items:center;gap:8px;padding:0 12px!important;background:var(--senal);font:800 15px/1 var(--display);letter-spacing:.02em}
+.plegado .tmenu{width:48px;justify-content:center;padding:0!important}
+.plegado .tmenu span{display:none}
+.tmenu svg{display:block;flex:none;width:24px;height:24px}
+.tnav{display:flex;align-items:center;gap:2px;margin-left:2px}
+.tnav button{height:32px;display:flex;align-items:center;gap:6px;padding:0 9px;border-radius:10px;font:700 15px/1 var(--display)}
+.tnav i{width:24px;height:24px;font-size:11px;border-radius:7px;background:var(--senal2);display:grid;place-items:center;font-style:normal;line-height:1}
+.tnav button:disabled{opacity:.4;cursor:default}
+.tprog{flex:1;min-width:0;display:flex;justify-content:center;align-items:center;gap:2px;overflow:hidden}
+.tprog svg{flex:none;width:20px;height:22px}
+.crono{font:600 15px/1 var(--mono);height:30px;padding:0 10px!important;border-radius:9px;background:#ffffff1a;min-width:66px;font-variant-numeric:tabular-nums}
+.crono.va{background:var(--senal2)}
+.crono.pasado{background:var(--rojo)}
+.guard{font:400 11px var(--mono);letter-spacing:.06em;opacity:.8;white-space:nowrap}
+.guard.ok{color:#9BE8BF;opacity:1}
+.tedit{height:30px;padding:0 12px!important;border-radius:9px;background:var(--taxi);color:var(--tinta)!important;font:800 15px/1 var(--display)}
+.editando .tedit{background:#fff}
+
+/* ---- mapa lateral: al ocultarlo desaparece por completo; vuelve con el botón del logo o la tecla S ---- */
+#lado{grid-column:1;grid-row:2;margin-top:6px;border-radius:0 14px 0 0;background:var(--asfalto);color:#fff;width:272px;overflow-y:auto;display:flex;flex-direction:column;overscroll-behavior:contain}
+.plegado #lado{display:none}
+.ficha{padding:14px 16px 10px;border-bottom:1px solid #ffffff22;font-size:15px;line-height:1.4}
+.ficha b{display:block;font:800 22px/1.1 var(--display)}
+.ficha span{display:block;color:#B9C7D4}
+.indice{position:relative;padding:10px 0;flex:1}
+.indice::before{content:"";position:absolute;left:29px;top:26px;bottom:26px;border-left:3px dashed var(--taxi);opacity:.55}
+.it{position:relative;display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:5px 12px;color:#fff}
+.it .pt2{flex:none;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;line-height:1;background:var(--asfalto2);border:3px solid var(--mcol);font:800 16px/1 var(--display)}
+.it .tx{min-width:0;font:600 16px/1.15 var(--texto)}
+.it .tx small{display:block;font:400 10.5px var(--mono);letter-spacing:.08em;color:#A9B8C6}
+.it.on{background:#ffffff1c}
+.it.on .pt2{background:var(--mcol);color:#fff}
+.it.ok .pt2{background:var(--ok);border-color:var(--ok)}
+.vaciar{margin:8px 12px 14px;padding:8px 10px!important;border:1px solid #ffffff55!important;border-radius:8px;font:400 12px var(--mono);letter-spacing:.05em;color:#fff}
+.vaciar.arma{background:var(--rojo);border-color:var(--rojo)!important}
+
+/* ---- lámina ---- */
+#escena{grid-column:2;grid-row:2;overflow:auto;padding:8px 14px 12px;overscroll-behavior:contain}
+.lamina{--mcol:var(--senal);max-width:1160px;min-height:100%;margin:0 auto;display:flex;flex-direction:column;background:var(--lamina);border-radius:16px;overflow:hidden;box-shadow:0 6px 22px #1e2a3524}
+/* cabecera: una placa de calle */
+.cab{display:flex;align-items:center;gap:12px;margin:10px 12px 0;padding:7px 16px 7px 9px;min-height:54px;border-radius:12px;background:var(--senal);color:#fff;box-shadow:inset 0 0 0 3px var(--senal),inset 0 0 0 5px #ffffffd9;flex:none}
+.cab .icono{flex:none;width:40px;height:40px;border-radius:50%;background:var(--mcol);box-shadow:0 0 0 2.5px #fff;display:grid;place-items:center}
+.cab h1{margin:0;flex:1;min-width:0;font:800 clamp(18px,2.4vw,27px)/1.05 var(--display);letter-spacing:.035em;text-transform:uppercase;text-wrap:balance;padding-top:3px}
+.cab .barrio{flex:none;font:400 11px/1.3 var(--mono);letter-spacing:.1em;text-align:right;opacity:.9}
+.tagrow{display:flex;align-items:flex-end;flex-wrap:wrap;gap:6px 14px;padding:10px 14px 0 14px}
+.tag{display:flex;align-items:center;gap:8px;background:var(--mcol);color:#fff;font:800 15px/1 var(--display);letter-spacing:.08em;padding:7px 12px 5px;border-radius:8px}
+.tag i{font-style:normal;background:#fff;color:var(--mcol);border-radius:5px;padding:2px 7px 0;margin:-2px 0}
+.sub{font:800 19px/1.2 var(--display);color:var(--tinta);letter-spacing:.01em;padding-bottom:2px;min-width:0}
+.min{font:400 12px var(--mono);letter-spacing:.08em;color:var(--ayuda);padding-bottom:5px}
+/* pestañas: números de línea, como en una parada */
+.tabs{margin-left:auto;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;align-self:flex-end;padding-bottom:1px;min-width:0}
+.tabs button{min-width:40px;height:40px;padding:2px 10px 0;border-radius:20px;background:#fff;color:var(--ayuda);border:2.5px solid var(--linea);font:800 18px/1 var(--display);display:grid;place-items:center}
+.tabs button[aria-selected="true"]{background:var(--mcol);border-color:var(--mcol);color:#fff}
+.tabs button.extra{border-style:dashed;border-color:var(--teal);color:var(--teal)}
+.tabs button.extra[aria-selected="true"]{background:var(--teal);border-style:solid;color:#fff}
+.instr{display:flex;align-items:flex-start;gap:8px;padding:8px 16px 8px;font:italic 500 18px/1.3 var(--texto);color:var(--tinta)}
+.instr svg{flex:none;margin-top:1px}
+.panel{position:relative;flex:1;margin:0 12px;background:var(--papel);border-radius:14px;padding:18px clamp(14px,2.6vw,30px);min-height:300px;min-width:0}
+.pie{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px 12px}
+.hecha{margin-left:auto;height:44px;padding:2px 18px 0!important;border-radius:12px;background:var(--tinta);color:#fff!important;font:800 17px/1 var(--display);letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.hecha.si{background:var(--ok)}
+.hecha svg{width:18px;height:20px}
+.editbar{display:none;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px}
+.editando .editbar{display:flex}
+.editbar b{font:400 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ayuda)}
+.chipadd{height:38px;padding:0 14px!important;border-radius:10px;border:2px dashed var(--teal)!important;color:var(--teal)!important;font:700 15px var(--texto);background:#fff!important}
+
+/* ---- piezas comunes ---- */
+button,.poster{transition:transform .12s var(--ease-out)}
+button:active:not(:disabled){transform:scale(.97)}
+.btn{min-height:48px;padding:3px 22px 0;border-radius:12px;background:var(--senal);color:#fff;font:800 18px/1.1 var(--display);letter-spacing:.01em}
+.btn.sol{background:var(--taxi);color:var(--tinta)}
+.btn.osc{background:var(--tinta)}
+.btn:disabled{opacity:.35;cursor:default}
+.mini{min-height:40px;padding:0 14px;border-radius:10px;border:2px solid var(--linea);font:600 15px/1.1 var(--texto);color:var(--ayuda);background:#fff}
+.fila{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+.hueco{flex:1}
+.fb{min-height:36px;margin-top:12px;padding:7px 14px;border-radius:10px;font-weight:600;font-size:18px;line-height:1.3}
+.fb:empty{padding:0}
+.fb.ok{background:var(--okf);color:#0E5B31}
+.fb.mal{background:var(--malf);color:#8E1F1F}
+.fb.inf{background:var(--cielo);color:var(--senal)}
+.fb b{font-weight:800}
+.pts{font:800 18px/1 var(--display);color:var(--tinta);display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.pts svg{width:17px;height:19px}
+h2.t{overflow-wrap:anywhere;margin:0 0 4px;font:800 clamp(23px,3vw,33px)/1.1 var(--display);letter-spacing:-.005em;text-wrap:balance}
+p.lead{margin:0 0 14px;max-width:62ch}
+/* placa: la forma de casi todo lo que está en español */
+.placa{display:inline-block;background:var(--senal);color:#fff;border-radius:10px;padding:9px 16px 6px;font:800 clamp(21px,2.7vw,30px)/1.15 var(--display);box-shadow:inset 0 0 0 2px var(--senal),inset 0 0 0 4px #ffffffd9;text-wrap:balance}
+.placa b{color:var(--taxi);font-weight:800}
+.placa.clara{background:#fff;color:var(--tinta);box-shadow:inset 0 0 0 2.5px var(--senal)}
+.placa.clara b{color:var(--senal)}
+.rutas{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.ruta{padding:7px 14px 5px;border-radius:10px;background:var(--taxi2);border:2px solid #E7C65A;font:700 19px/1.2 var(--display)}
+.ayuda{margin-top:10px}
+.ayuda>.mini{border-style:dashed;border-color:var(--senal2);color:var(--senal)}
+.ayuda .rutas{display:none}
+.ayuda.abierta .rutas{display:flex}
+@keyframes tiembla{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.tiembla{animation:tiembla .22s 2}
+@keyframes aparece{from{opacity:0}to{opacity:1}}
+.entra{animation:aparece .18s var(--ease-out)}
+.cont2{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr);gap:18px;align-items:start}
+.rev{display:inline-block;font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pin);border:1.5px solid var(--pin);border-radius:6px;padding:4px 7px 3px;vertical-align:middle}
+
+/* ---- el plano del barrio ---- */
+.plano-sc{overflow-x:auto;border-radius:14px;border:2.5px solid var(--linea);background:var(--via);overscroll-behavior-x:contain}
+.plano{min-width:540px}
+.plano svg{display:block;width:100%;height:auto}
+.plano text{font-family:var(--display);font-weight:700}
+.lote{cursor:default}
+.plano.toca .lote[data-p]{cursor:pointer}
+.lote .base{fill:#fff;stroke:#B7C3CF;stroke-width:2}
+.lote .anillo{fill:none;stroke:var(--taxi);stroke-width:5;opacity:0}
+.lote:focus{outline:none}
+.lote:focus-visible .anillo{opacity:1}
+.lote.dest .base{stroke:var(--pin);stroke-width:5}
+.lote.bien .base{stroke:var(--ok);stroke-width:6;fill:var(--okf)}
+.lote.malo .base{stroke:var(--mal);stroke-width:5;fill:var(--malf)}
+.andante{transition:transform .42s var(--ease-io)}
+.andante.quieto{transition:none}
+.tramo{stroke:var(--pin);stroke-width:9;stroke-linecap:round;fill:none}
+.plano.choque .andante circle{fill:var(--mal)}
+
+/* ---- introducción: ¿hay o no hay? ---- */
+.lugares{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.lug{border:2.5px solid var(--linea);border-radius:14px;padding:10px 12px 8px;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:12px;align-items:center;text-align:left}
+.lug>svg{grid-row:1/3}
+.lug .dos,.lug .dicho{grid-column:1/-1}
+.lug .n{font:800 clamp(19px,2vw,23px)/1.1 var(--display);align-self:end;overflow-wrap:anywhere}
+.lug .pt{align-self:start}
+.lug .dos{display:flex;gap:6px;margin-top:6px}
+.lug .dos button{min-height:40px;padding:2px 12px 0;border-radius:9px;border:2px solid var(--linea);font:800 16px/1 var(--display);background:#fff}
+.lug .dos button[aria-pressed="true"]{background:var(--senal);border-color:var(--senal);color:#fff}
+.lug .dos button.no[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta)}
+.lug .dicho{min-height:42px;font:700 17px/1.25 var(--texto);color:var(--senal);margin-top:5px}
+.lug.si{border-color:var(--senal);background:#F4F8FD}
+.claves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.clave{display:grid;align-content:start;justify-items:start;gap:6px;text-align:left;border-radius:14px;padding:16px 18px 14px;background:var(--senal);color:#fff;box-shadow:inset 0 0 0 3px var(--senal),inset 0 0 0 5px #ffffffd9;min-height:270px;width:100%}
+.clave b{display:block;font:800 clamp(27px,3.2vw,38px)/1.05 var(--display)}
+.clave .g{display:block;font:600 19px/1.25 var(--texto);color:var(--taxi)}
+.clave .e{display:block;font:700 20px/1.25 var(--display);margin-top:6px}
+.clave .t{display:block;font:500 16.5px/1.3 var(--texto);opacity:.9}
+.clave .g,.clave .e,.clave .t{opacity:0;transition:opacity .16s ease}
+.clave.vista .g,.clave.vista .e{opacity:1}
+.clave.vista .t{opacity:.9}
+.clave small{display:block;font:400 11px var(--mono);letter-spacing:.08em;opacity:.8}
+.clave.vista small{display:none}
+
+/* ---- objetivos: el semáforo ---- */
+.metas{display:grid;gap:10px}
+.meta{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;align-items:center;border:2.5px solid var(--linea);border-radius:14px;padding:12px 16px}
+.meta .q{font:700 20px/1.2 var(--texto)}
+.meta .ej{grid-column:1;font:800 clamp(19px,2.3vw,25px)/1.2 var(--display);color:var(--senal)}
+.meta .ej small{display:block;font:500 15.5px/1.3 var(--texto);color:var(--ayuda)}
+.luces{grid-row:1/3;grid-column:2;display:flex;gap:7px;background:var(--tinta);padding:8px 10px;border-radius:26px}
+.luz{width:38px;height:38px;border-radius:50%;background:#3A4A57;border:0;position:relative}
+.luz[aria-pressed="true"].r{background:#F03E3E;box-shadow:0 0 0 3px #fff inset}
+.luz[aria-pressed="true"].a{background:var(--taxi);box-shadow:0 0 0 3px #fff inset}
+.luz[aria-pressed="true"].v{background:#40C057;box-shadow:0 0 0 3px #fff inset}
+.luz.fue::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px dashed #ffffffb0}
+.leyenda{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 12px;font-size:16px;color:var(--ayuda)}
+.leyenda i{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.reto{margin-top:14px;padding:12px 16px;border-radius:12px;background:var(--taxi2);border:2px solid #E7C65A}
+
+/* ---- muestra: paradas en el mapa ---- */
+.parada{display:grid;gap:10px;align-content:start}
+.parada .num{font:400 12px var(--mono);letter-spacing:.1em;color:var(--ayuda)}
+.parada .pt{font-size:19px}
+.parada .nota{padding:9px 14px;border-radius:10px;background:var(--cielo);font-size:17px;line-height:1.35}
+.pasapag{display:flex;align-items:center;gap:12px;margin-top:6px}
+.flecha{width:48px;height:48px;border-radius:12px;background:var(--tinta)!important;color:#fff!important;font:800 22px/1 var(--display);display:grid;place-items:center}
+.flecha:disabled{opacity:.25;cursor:default}
+.npag{font:400 13px var(--mono);color:var(--ayuda);font-variant-numeric:tabular-nums}
+
+/* ---- muestra: diálogo línea a línea ---- */
+.dialogo{display:grid;gap:10px;max-width:780px}
+.linea-d{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start}
+.linea-d.ve{grid-template-columns:minmax(0,1fr) auto}
+.linea-d.ve .quien{order:2}
+.linea-d.ve .globo{justify-self:end;background:#F1F4F7;border-color:var(--linea)}
+.quien{width:46px;text-align:center;font:400 10px/1.2 var(--mono);letter-spacing:.06em;color:var(--ayuda)}
+.quien svg{display:block;margin:0 auto 2px}
+.globo{justify-self:start;max-width:92%;border:2.5px solid var(--senal);border-radius:14px;padding:9px 14px 8px;background:#F4F8FD}
+.globo .es{display:block;font:700 clamp(19px,2.3vw,24px)/1.25 var(--display)}
+.globo .pt{display:block;margin-top:2px}
+.junta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:4px}
+.junta div{border-radius:12px;padding:10px 14px;background:var(--taxi2);border:2px solid #E7C65A}
+.junta b{font:800 22px/1.2 var(--display);display:block}
+.junta span{display:block;font-size:17px}
+
+/* ---- seguir el camino / construir la ruta ---- */
+.pasos-r{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:6px;counter-reset:p}
+.pasos-r li{counter-increment:p;display:grid;grid-template-columns:30px minmax(0,1fr);gap:8px;align-items:start;font:700 clamp(18px,2vw,22px)/1.25 var(--display)}
+.pasos-r li::before{content:counter(p);width:28px;height:28px;border-radius:8px;background:var(--tinta);color:#fff;display:grid;place-items:center;font:800 15px/1 var(--display);padding-top:2px}
+.pasos-r:empty::after{content:attr(data-vacio);font:500 17px var(--texto);color:var(--ayuda)}
+.donde{font-size:17px;color:var(--ayuda);margin:8px 0 0}
+.donde b{color:var(--tinta);font-family:var(--display);font-weight:800}
+.fichas-c{display:grid;gap:7px;margin-top:10px}
+.cmd{display:flex;align-items:center;gap:10px;min-height:50px;padding:3px 14px 0 8px;border-radius:12px;background:var(--senal);color:#fff!important;font:800 18px/1.15 var(--display);text-align:left;box-shadow:inset 0 0 0 2px var(--senal),inset 0 0 0 3.5px #ffffffd0}
+.cmd svg{flex:none}
+.cmd:disabled{opacity:.35;cursor:default}
+.herr-r{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+
+/* ---- huecos ---- */
+.frase{font:800 clamp(25px,3.6vw,38px)/1.25 var(--display);margin:6px 0 14px}
+.frase u{text-decoration:none;display:inline-block;min-width:96px;border-bottom:5px solid var(--tinta);text-align:center;color:var(--senal)}
+.ops{display:flex;flex-wrap:wrap;gap:10px}
+.op{min-height:54px;padding:5px 22px 2px;border-radius:12px;border:2.5px solid var(--linea);background:#fff;font:800 23px/1.1 var(--display)}
+.op.pt-op{font:600 18px/1.2 var(--texto);padding:6px 16px}
+.op.ok{border-color:var(--ok);background:var(--okf)}
+.op.mal{border-color:var(--mal);background:var(--malf)}
+
+/* ---- contraste: dilo y destapa ---- */
+.pares{display:grid;gap:6px}
+.par{display:grid;grid-template-columns:minmax(0,1fr) 34px minmax(0,1.25fr);align-items:stretch;gap:0;width:100%;text-align:left;border-radius:12px;overflow:hidden;border:2.5px solid var(--linea);background:#fff}
+.par .a{padding:6px 14px;font:500 18px/1.3 var(--texto);color:var(--ayuda);align-self:center}
+.par .fl{display:grid;place-items:center;font:800 18px var(--display);color:var(--linea)}
+.par .b{padding:6px 14px 4px;background:var(--senal);color:#fff;display:grid;align-content:center;gap:0;min-height:50px}
+.par .b b{font:800 clamp(19px,2.2vw,23px)/1.2 var(--display);opacity:0;transition:opacity .16s ease}
+.par .b small{font:500 15px/1.3 var(--texto);opacity:0;transition:opacity .16s ease}
+.par .b i{font:400 11px var(--mono);font-style:normal;letter-spacing:.08em}
+.par.visto .b b,.par.visto .b small{opacity:1}
+.par.visto .b i{display:none}
+.par.visto{border-color:var(--senal)}
+
+/* ---- contraste: la palabra intrusa ---- */
+.gps{display:flex;align-items:center;gap:10px;font:400 12px var(--mono);letter-spacing:.08em;color:var(--ayuda);margin-bottom:8px}
+.intr{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.intr button{min-height:56px;padding:5px 14px 2px;border-radius:12px;border:2.5px solid var(--linea);background:#fff;font:800 clamp(22px,3vw,30px)/1.1 var(--display)}
+.intr button.ok{border-color:var(--ok);background:var(--okf);text-decoration:line-through;text-decoration-thickness:3px}
+.intr button.mal{border-color:var(--mal);background:var(--malf)}
+.arreglo{margin-top:10px}
+
+/* ---- imagen para hablar: mazo de cartas ---- */
+.marco{border-radius:14px;overflow:hidden;background:var(--lamina);border:2.5px solid var(--linea)}
+.marco svg,.marco img{display:block;width:100%;height:auto;max-height:58vh;object-fit:contain}
+.marco text{font-family:var(--display);font-weight:700}
+.mazo{display:grid;gap:10px}
+.naipe{position:relative;min-height:176px;border-radius:14px;background:#fff;border:2.5px solid var(--senal);padding:14px 16px 12px;box-shadow:5px 5px 0 #C9D6E5,10px 10px 0 #DDE6F0}
+.naipe.vacio{border-style:dashed;display:grid;place-items:center;text-align:center;color:var(--ayuda);box-shadow:none}
+.naipe .n{font:400 12px var(--mono);letter-spacing:.1em;color:var(--ayuda)}
+.naipe .q{font:800 clamp(22px,2.6vw,29px)/1.15 var(--display);margin:4px 0 2px;text-wrap:balance}
+.dado{width:84px;height:84px;border-radius:18px;background:var(--pin)!important;color:#fff!important;font:800 48px/1 var(--display);display:grid;place-items:center;box-shadow:inset 0 -7px 0 #0000002e}
+@keyframes rueda{to{transform:rotate(360deg)}}
+.dado.gira{animation:rueda .45s var(--ease-out)}
+.preg{font:800 clamp(22px,2.8vw,29px)/1.15 var(--display);margin-top:6px}
+.orden{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+/* ---- lectura: una nota ---- */
+.nota-l{position:relative;max-width:820px;margin:0 auto;border-radius:6px;background:#FFFDF2;border:2px solid #E3D9A8;box-shadow:6px 8px 0 #E9EDF1;padding:0 0 60px}
+.nota-l .cinta{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 18px 7px;background:var(--taxi);font:600 12px var(--mono);letter-spacing:.1em;border-radius:4px 4px 0 0}
+.nota-l .hoja{padding:18px clamp(16px,3vw,34px) 6px;min-height:230px;display:flex;flex-direction:column;justify-content:center}
+.nota-l .tit{font:800 clamp(25px,3.3vw,36px)/1.1 var(--display);margin:0;overflow-wrap:anywhere}
+.nota-l .hoja,.nota-l .txt{min-width:0}
+.nota-l .aut{font:400 13px var(--mono);letter-spacing:.05em;color:var(--ayuda);margin:6px 0 0;overflow-wrap:anywhere}
+.nota-l .txt p{margin:0 0 .55em;font:500 var(--fs,25px)/1.5 var(--texto);overflow-wrap:anywhere}
+.nota-l .nav{position:absolute;left:0;right:0;bottom:10px;display:flex;align-items:center;justify-content:center;gap:16px}
+.nota-l .nav span{min-width:54px;text-align:center}
+.nota-l.libro{background:#fff;border-color:var(--linea)}
+.nota-l.libro .cinta{background:var(--cielo)}
+
+/* ---- emparejar ---- */
+.empa{display:grid;grid-template-columns:1fr 1fr;gap:10px clamp(14px,5vw,56px);max-width:820px;margin:0 auto}
+.empa .col{display:grid;gap:8px;align-content:start}
+.ficha2{min-height:50px;padding:5px 12px 3px;border-radius:12px;border:2.5px solid var(--linea);background:#fff;font:800 20px/1.15 var(--display);display:grid;place-items:center;text-align:center}
+.ficha2.b{font:600 18px/1.2 var(--texto)}
+.ficha2.sel{border-color:var(--senal);background:var(--cielo)}
+.ficha2.hecho{border-color:var(--ok);background:var(--okf);cursor:default}
+
+/* ---- placas que giran ---- */
+.giran{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.tarjeta{display:block;perspective:1000px;height:356px;width:100%}
+.cara{display:block;position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .45s var(--ease-io)}
+.tarjeta.vuelta .cara{transform:rotateY(180deg)}
+.frente,.dorso{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:absolute;top:0;right:0;bottom:0;left:0;border-radius:14px;padding:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;text-align:center;transition:opacity .2s .1s}
+.frente{background:var(--senal);color:#fff;box-shadow:inset 0 0 0 3px var(--senal),inset 0 0 0 5px #ffffffd9;width:100%;cursor:pointer}
+.frente b{font:900 62px/1 var(--display)}
+.frente span{font:400 12px var(--mono);letter-spacing:.1em}
+.dorso{background:#fff;border:2.5px solid var(--senal);transform:rotateY(180deg);opacity:0;justify-content:flex-start;overflow:auto}
+.dorso .q{font:800 22px/1.2 var(--display);text-wrap:balance}
+.dorso .rutas{justify-content:center}
+.dorso .ruta{font-size:17px;padding:5px 12px 3px}
+.dorso .ayuda{margin-top:2px}
+.dorso .rutas{gap:6px;margin-top:8px}
+.tarjeta.vuelta .dorso{opacity:1}
+.tarjeta.vuelta .frente{opacity:0;pointer-events:none}
+.tarjeta:not(.vuelta) .dorso{pointer-events:none}
+
+/* ---- juego: el taxi ---- */
+.marcador{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:stretch}
+.jug{flex:1;min-width:130px;border-radius:12px;border:2.5px solid var(--linea);padding:6px 14px 4px;display:flex;align-items:center;justify-content:space-between;gap:8px;font:800 19px/1.1 var(--display)}
+.jug small{display:block;font:400 11px var(--mono);letter-spacing:.08em;color:var(--ayuda)}
+.jug b{font-size:36px;line-height:1;font-variant-numeric:tabular-nums}
+.jug.turno{border-color:var(--taxi);background:var(--taxi2)}
+.veredicto{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.veredicto .btn{min-height:52px;padding-left:10px;padding-right:10px}
+.final{margin-top:12px;padding:12px 16px;border-radius:12px;background:var(--taxi2);border:2px solid #E7C65A}
+
+/* ---- tarea final: mi ruta ---- */
+.compo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:18px;align-items:start}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 12px}
+.chip{min-height:42px;padding:4px 12px 2px;border-radius:10px;border:2.5px solid var(--linea);background:#fff;font:800 17px/1.15 var(--display)}
+.chip[aria-pressed="true"]{background:var(--senal);border-color:var(--senal);color:#fff}
+.chip.paso{border-color:var(--senal);color:var(--senal)}
+.tique{border-radius:6px;background:#FFFDF2;border:2px solid #E3D9A8;padding:0 0 12px;min-height:240px}
+.tique .cinta{padding:9px 16px 7px;background:var(--taxi);font:600 12px var(--mono);letter-spacing:.1em}
+.tique h3{margin:12px 16px 4px;font:800 clamp(20px,2.4vw,26px)/1.15 var(--display);text-wrap:balance}
+.tique ol{margin:6px 16px 0;padding:0;list-style:none;display:grid;gap:5px}
+.tique li{font:700 clamp(18px,2vw,21px)/1.3 var(--display)}
+.tique li i{font-style:normal;color:var(--pin)}
+.tique .vac{margin:10px 16px;color:var(--ayuda);font-size:17px}
+.etq{font:400 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ayuda);margin:0}
+
+/* ---- resumen: dime tres ---- */
+.tres{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.tapa{display:grid;align-content:start;width:100%;text-align:left;border-radius:14px;border:2.5px solid var(--linea);padding:12px 14px;min-height:150px;background:#fff}
+.tapa .cuanto{font:900 44px/1 var(--display);color:var(--morado)}
+.tapa .que{display:block;font:600 18px/1.25 var(--texto)}
+.tapa .res{display:none;margin-top:8px;font:800 19px/1.3 var(--display);color:var(--senal)}
+.tapa .res span{display:block}
+.tapa i{font:400 11px var(--mono);font-style:normal;letter-spacing:.08em;color:var(--ayuda);display:block;margin-top:8px}
+.tapa.vista{border-color:var(--morado);background:#F6F3FE}
+.tapa.vista .res{display:block}
+.tapa.vista i{display:none}
+.aprendi{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:5px}
+.aprendi li{padding-left:28px;position:relative}
+.aprendi li::before{content:"";position:absolute;left:4px;top:.45em;width:13px;height:13px;border-radius:50% 50% 50% 0;background:var(--morado);transform:rotate(-45deg)}
+
+/* ---- tarea: elige una ---- */
+.misiones{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.mision{display:grid;align-content:start;width:100%;text-align:left;border-radius:14px;border:2.5px solid var(--linea);background:#fff;overflow:hidden}
+.mision .cinta{display:flex;justify-content:space-between;gap:8px;padding:8px 14px 6px;background:var(--lamina);font:600 12px var(--mono);letter-spacing:.1em}
+.mision .cu{padding:10px 14px 14px;display:block}
+.mision b{display:block;font:800 22px/1.15 var(--display);margin-bottom:4px}
+.mision[aria-pressed="true"]{border-color:var(--teal)}
+.mision[aria-pressed="true"] .cinta{background:var(--teal);color:#fff}
+.mision .ruta{font-size:17px}
+
+/* ---- bloques añadidos por el profesor ---- */
+.imgdesc{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:16px;align-items:start}
+.video{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:center}
+.poster{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:14px;background:linear-gradient(135deg,#1E2A35,#1D4E89);display:grid;place-items:center;color:#fff;text-decoration:none;overflow:hidden}
+.poster::before{content:"";width:88px;height:88px;border-radius:50%;background:var(--rojo);box-shadow:0 0 0 10px #ffffff2e}
+.poster::after{content:"";position:absolute;border:20px solid transparent;border-left:32px solid #fff;border-right:0;margin-left:8px}
+.poster em{position:absolute;left:12px;bottom:10px;font:400 13px var(--mono);font-style:normal;background:#000000a0;padding:2px 8px;border-radius:6px}
+.video .tiempos{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.video .tiempos span{font:400 15px var(--mono);padding:4px 10px;border-radius:8px;background:var(--lamina)}
+.video a.btn{display:inline-flex;align-items:center;text-decoration:none}
+.video h2,.pregx{overflow-wrap:anywhere}
+.vacio{border:2.5px dashed var(--linea);border-radius:14px;padding:26px;text-align:center;color:var(--ayuda)}
+.herr{display:none;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.editando .herr{display:flex}
+.cajas{display:grid;gap:10px}
+.caja{border-radius:12px;border:2.5px solid var(--linea);overflow:hidden}
+.caja>button{width:100%;text-align:left;padding:12px 16px 10px;font:800 19px var(--display);display:flex;gap:10px;align-items:center}
+.caja>button i{font-style:normal;width:32px;height:32px;border-radius:8px;background:var(--taxi);display:grid;place-items:center;flex:none;line-height:1;padding-top:2px}
+.caja .den{display:none;padding:0 16px 14px}
+.caja.abierta .den{display:block}
+.caja.abierta{border-color:var(--senal)}
+.dicho-x{margin:6px 0 0;font:800 23px/1.3 var(--display);overflow-wrap:anywhere}
+
+/* ---- ventana ---- */
+#velo{position:fixed;inset:0;background:#141d25cc;display:grid;place-items:center;padding:16px;z-index:20}
+.popup{position:relative;background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:92%;overflow:auto;padding:24px 24px 20px;box-shadow:0 20px 60px #0006;overscroll-behavior:contain;animation:sale .18s var(--ease-out)}
+@keyframes sale{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.popup .x{position:absolute;right:10px;top:10px;width:40px;height:40px;border-radius:10px;background:var(--tinta);color:#fff;font:800 18px/1 var(--display);display:grid;place-items:center}
+.popup h3{margin:0 44px 10px 0;font:800 25px/1.1 var(--display)}
+.popup label{display:block;font:600 15px var(--texto);margin:10px 0 3px}
+.popup label small{font-weight:500;color:var(--ayuda)}
+.popup input[type=text],.popup textarea,.popup select{width:100%;font:500 17px var(--texto);padding:9px 12px;border:2px solid var(--linea);border-radius:10px;background:#fff;color:var(--tinta)}
+.popup input[type=file]{max-width:100%;font-size:16px}
+.popup textarea{min-height:120px;resize:vertical}
+.popup .dos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.popup .err{color:var(--mal);font-weight:700;font-size:15px;min-height:20px;margin-top:6px}
+
+@media (hover:hover) and (pointer:fine){
+  .tnav button:hover:not(:disabled){background:#ffffff1f}
+  .it:hover{background:#ffffff12}
+  .chipadd:hover{background:var(--cielo)!important}
+  .mini:hover{border-color:var(--senal2)}
+  .op:hover,.ficha2:hover,.chip:hover,.intr button:hover,.tapa:hover,.mision:hover{border-color:var(--senal2)}
+  .plano.toca .lote[data-p]:hover .base{stroke:var(--senal2);stroke-width:4}
+}
+@media (max-width:900px){
+  body{font-size:18px}
+  #app:not(.plegado) #lado{position:fixed;margin-top:0;top:calc(51px + env(safe-area-inset-top,0px));bottom:0;left:0;z-index:15;width:min(272px,86vw);box-shadow:8px 0 30px #0006}
+  .tmenu{width:48px;justify-content:center;padding:0!important}.tmenu span{display:none}
+  .tnav span,.guard,.tedit span{display:none}
+  .tprog{display:none}
+  #top{gap:3px;margin:5px 6px 0}
+  .crono{margin-left:auto}
+  .cont2,.imgdesc,.video,.compo{grid-template-columns:minmax(0,1fr)}
+  .cab .barrio{display:none}
+  .cab{margin:8px 8px 0}
+  #escena{padding:8px}
+  .panel{margin:0 8px;padding:14px 12px}
+  .claves{grid-template-columns:1fr}
+  .clave{min-height:0}
+  .lugares{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lug{grid-template-columns:minmax(0,1fr);row-gap:2px;padding:10px}
+  .lug>svg{grid-row:auto;width:46px;height:46px}
+  .lug .n{font-size:18px;overflow-wrap:normal}
+  .lug .dos button{padding:2px 9px 0}
+  .meta{grid-template-columns:1fr}
+  .luces{grid-row:auto;grid-column:1;justify-self:start}
+  .junta{grid-template-columns:1fr}
+  .par{grid-template-columns:1fr}
+  .par .fl{display:none}
+  .tabs{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}
+  .andante,.cara,button{transition:none!important}
+  .tarjeta.vuelta .cara{transform:none}
+  .tarjeta.vuelta .dorso{transform:none}
+}
+</style>
+
+<div id="app">
+  <header id="top">
+    <button id="bMenu" class="tmenu" title="Mostrar u ocultar el menú (tecla S)" aria-label="Mostrar u ocultar el menú">
+      <svg width="30" height="30" viewBox="0 0 732 732" aria-hidden="true" focusable="false"><circle cx="366" cy="366" r="338" fill="#F8F8F8"/><circle cx="366" cy="366" r="338" fill="none" stroke="#6FC0AB" stroke-width="40"/><g transform="translate(338 382) scale(1.1) translate(-366 -380)"><path d="M186 452 C158 404, 154 350, 178 302 C212 236, 286 190, 368 184 C408 181, 446 189, 472 199" fill="none" stroke="#1A6FAF" stroke-width="30" stroke-linecap="round"/><path d="M470 212 C420 194, 366 188, 322 196 C238 212, 176 268, 165 348 C158 402, 176 454, 212 488 C221 497, 223 506, 217 519 C207 543, 192 562, 185 572 C178 581, 184 590, 194 585 C233 570, 269 558, 303 556 L470 556 Z" fill="#14C49B"/><path d="M462 206 L628 322 L462 438 Z" fill="#F52323" stroke="#F52323" stroke-width="10" stroke-linejoin="round"/><circle cx="398" cy="282" r="25" fill="#111"/><circle cx="406" cy="274" r="7" fill="#fff"/></g></svg>
+      <span id="lMenu">Ocultar el menú</span>
+    </button>
+    <nav class="tnav" aria-label="Navegación">
+      <button id="bAnt" title="Anterior (←)"><i>◀</i><span>Anterior</span></button>
+      <button id="bInicio" title="Ir al inicio" aria-label="Ir al inicio"><i>⌂</i></button>
+      <button id="bSig" title="Siguiente (→)"><span>Siguiente</span><i>▶</i></button>
+    </nav>
+    <div class="tprog" id="prog" title="Secciones hechas"></div>
+    <button id="crono" class="crono" title="Cronómetro: clic para iniciar o pausar">4:00</button>
+    <span id="guard" class="guard">CONECTANDO…</span>
+    <button id="bEditar" class="tedit" title="Añadir video, imagen o cuento">＋ <span>Añadir</span></button>
+  </header>
+  <aside id="lado" aria-label="Mapa de la clase">
+    <div class="ficha">
+      <b>A dos cuadras</b>
+      <span>Portugués (BR) · A2 · 50 min</span>
+      <span>Pedir y dar el camino en el barrio</span>
+    </div>
+    <div class="indice" id="indice"></div>
+    <button class="vaciar" id="bVaciar">VACIAR LA SESIÓN</button>
+  </aside>
+  <main id="escena"><div class="lamina" id="lamina"></div></main>
+</div>
+<div id="velo" hidden><div class="popup" role="dialog" aria-modal="true"><button class="x" id="popX" aria-label="Cerrar">✕</button><div id="popC"></div></div></div>
+<script>
+(()=>{
+'use strict';
+/* ================= utilidades ================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const REDUCE=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const sacude=el=>{el.classList.remove('tiembla');void el.getBoundingClientRect();el.classList.add('tiembla')};
+/* pieza de progreso: un pin de mapa */
+const pin=(lleno,s=22)=>`<svg width="${s*.9}" height="${s}" viewBox="0 0 20 24" aria-hidden="true"><path d="M10 1.5a7.5 7.5 0 0 0-7.5 7.5c0 5.6 7.5 13.5 7.5 13.5s7.5-7.9 7.5-13.5A7.5 7.5 0 0 0 10 1.5z" fill="${lleno?'#FFC629':'none'}" stroke="${lleno?'#FFC629':'#ffffff70'}" stroke-width="2"/><circle cx="10" cy="9" r="2.8" fill="${lleno?'#16212B':'#ffffff70'}"/></svg>`;
+const pinT=`<svg width="16" height="19" viewBox="0 0 20 24" aria-hidden="true"><path d="M10 1.5a7.5 7.5 0 0 0-7.5 7.5c0 5.6 7.5 13.5 7.5 13.5s7.5-7.9 7.5-13.5A7.5 7.5 0 0 0 10 1.5z" fill="#C2255C"/><circle cx="10" cy="9" r="2.8" fill="#fff"/></svg>`;
+const MANO='<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="#2F6DB5" stroke-width="2" stroke-dasharray="3 3"/><path d="M9 9l11 4-4.5 2.2L13 20z" fill="#16212B"/></svg>';
+const IC={
+ intro:'<svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 6h24v16H14l-7 6v-6H4z" fill="#fff"/><path d="M13 12a3 3 0 1 1 4.5 2.6c-1 .6-1.5 1.1-1.5 2.4M16 19.6v.4" fill="none" stroke="#C2255C" stroke-width="2.4" stroke-linecap="round"/></svg>',
+ obj:'<svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true"><rect x="10" y="2" width="12" height="28" rx="6" fill="#fff"/><circle cx="16" cy="8.5" r="3" fill="#F03E3E"/><circle cx="16" cy="16" r="3" fill="#E8A800"/><circle cx="16" cy="23.5" r="3" fill="#2F9E44"/></svg>',
+ cont:'<svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 8l8-3 10 3 8-3v19l-8 3-10-3-8 3z" fill="#fff"/><path d="M11 5v19M21 8v19" stroke="#1D4E89" stroke-width="2"/></svg>',
+ res:'<svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true"><rect x="6" y="4" width="20" height="25" rx="3" fill="#fff"/><path d="M10 12h12M10 17h12M10 22h8" stroke="#5F3DC4" stroke-width="2.4" stroke-linecap="round"/></svg>',
+ tarea:'<svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 15L16 4l12 11v13H4z" fill="#fff"/><rect x="13" y="18" width="6" height="10" fill="#0F766E"/></svg>'
+};
+const MOM={intro:{n:'INTRODUÇÃO',c:'var(--pin)'},obj:{n:'OBJETIVOS',c:'var(--ambar)'},cont:{n:'ATIVIDADE',c:'var(--senal)'},res:{n:'RESUMO',c:'var(--morado)'},tarea:{n:'TAREFA',c:'var(--teal)'}};
+const TITULO='A dos cuadras';
+/* textos de los bloques que añade el profesor, en la lengua de las consignas de esta estudiante */
+const TXT={video:'Veja o trecho com o seu professor.',imagen:'Jogue o dado e fale sobre a imagem. O seu professor também responde.',cuento:'Leia com o seu professor. Toque nas setas para virar a página.',pregunta:'Escute, pense e responda em voz alta.',
+  abrir:'Abrir o vídeo',verdesde:'Começa em',verhasta:'Pare em',dado:'Jogue',estrella:'Já disse!',hablar:'Fale'};
+
+/* ================= estado ================= */
+const nuevoEstado=()=>({pantalla:0,tab:0,hechas:[],barrio:{},sem:{},sem2:{},juego:null,ruta:null,tarea:null,actualizado:0});
+let estado=nuevoEstado();
+let contenido={extras:{},fijos:{},actualizado:0};
+const mediaMem=new Map();
+let db=null,aplicando=false,editando=false;
+const cache=new Map();
+const guard=$('#guard');
+const marca=(t,c)=>{guard.textContent=t;guard.className='guard '+(c||'')};
+function escritor(ruta,datos){let t=null,ocupado=false,sucio=false;
+  async function ya(){if(ocupado){sucio=true;return}ocupado=true;
+    try{await db.doc(ruta).set(JSON.parse(JSON.stringify(datos())));marca('GUARDADO','ok')}catch(e){marca('SOLO ESTA SESIÓN')}
+    ocupado=false;if(sucio){sucio=false;ya()}}
+  return()=>{if(aplicando)return;if(!db){marca('SOLO ESTA SESIÓN');return}marca('GUARDANDO…');clearTimeout(t);t=setTimeout(ya,500)}}
+const _gE=escritor('sesion/estado',()=>estado),_gC=escritor('sesion/contenido',()=>contenido);
+const guardar=()=>{if(aplicando)return;estado.actualizado=Date.now();_gE()};
+const guardarContenido=()=>{contenido.actualizado=Date.now();_gC()};
+async function guardarMedia(id,d){mediaMem.set(id,d);if(db){try{await db.doc('media/'+id).set({d})}catch(e){marca('SOLO ESTA SESIÓN')}}}
+async function leerMedia(id){if(mediaMem.has(id))return mediaMem.get(id);if(!db)return null;
+  try{const s=await db.doc('media/'+id).get();if(s.exists){const d=s.data().d;mediaMem.set(id,d);return d}}catch(e){}return null}
+async function conectar(){
+  try{db=window.claude&&window.claude.use?await window.claude.use('db'):null}catch(e){db=null}
+  if(!db){marca('SOLO ESTA SESIÓN');return}
+  marca('GUARDADO','ok');
+  db.doc('sesion/estado').onSnapshot(s=>{if(!s.exists||s.metadata.hasPendingWrites)return;const d=s.data();
+    if(!d||!(d.actualizado>estado.actualizado))return;
+    const antes=estado.pantalla;aplicando=true;estado=Object.assign(nuevoEstado(),JSON.parse(JSON.stringify(d)));
+    [...cache.keys()].filter(k=>/^(intro|obj|a6|res|tarea)\//.test(k)).forEach(k=>cache.delete(k));
+    if(estado.pantalla!==antes)reiniciaCrono();pintar();aplicando=false},()=>marca('SOLO ESTA SESIÓN'));
+  db.doc('sesion/contenido').onSnapshot(s=>{if(!s.exists||s.metadata.hasPendingWrites)return;const d=s.data();
+    if(!d||!(d.actualizado>contenido.actualizado))return;
+    contenido=Object.assign({extras:{},fijos:{}},JSON.parse(JSON.stringify(d)));cache.clear();pintar()},()=>{});
+}
+
+/* ================= ventana ================= */
+const velo=$('#velo'),popC=$('#popC');
+function abrir(html){popC.innerHTML=html;velo.hidden=false;const f=$('input,textarea,button:not(.x)',popC);(f||$('#popX')).focus()}
+function cerrar(){velo.hidden=true;popC.innerHTML=''}
+$('#popX').onclick=cerrar;velo.addEventListener('click',e=>{if(e.target===velo)cerrar()});
+
+/* ================= secciones ================= */
+const SECS=[];   // se llena al final
+const extrasDe=id=>contenido.extras[id]||[];
+const ICX={video:'▶',imagen:'▣',cuento:'❡',pregunta:'?'};
+function tabsDe(s){
+  const base=s.tabs.filter(t=>!t.si||t.si());
+  const ex=extrasDe(s.id).map(b=>({k:'x'+b.id,lab:ICX[b.tipo],extra:b,instr:TXT[b.tipo],r:(el,api)=>rExtra(el,api,b,s)}));
+  return base.concat(ex)}
+const hecha=id=>estado.hechas.includes(id);
+const lam=$('#lamina');
+function pintar(){
+  if(estado.pantalla>=SECS.length||estado.pantalla<0)estado.pantalla=0;
+  const s=SECS[estado.pantalla],tabs=tabsDe(s);
+  if(estado.tab>=tabs.length||estado.tab<0)estado.tab=0;
+  const t=tabs[estado.tab],m=MOM[s.m];
+  lam.style.setProperty('--mcol',m.c);
+  lam.innerHTML=`<header class="cab"><div class="icono">${IC[s.m]}</div><h1>${TITULO}</h1><div class="barrio">BARRIO LAS FLORES<br>ESPAÑOL · A2</div></header>
+   <div class="tagrow"><div class="tag">${m.n}${s.n?`<i>${s.n}</i>`:''}</div><div class="sub">${s.t}</div><div class="min">${s.min} MIN</div>
+     <div class="tabs" role="tablist">${tabs.length>1?tabs.map((x,i)=>`<button role="tab" class="${x.extra?'extra':''}" aria-selected="${i===estado.tab}" data-t="${i}">${x.lab||i+1}</button>`).join(''):''}</div></div>
+   <div class="instr">${MANO}<span>${typeof t.instr==='function'?t.instr():(t.instr||'')}</span></div>
+   <div class="panel" id="panel"></div>
+   <div class="pie"><div class="editbar"><b>Añadir aquí</b>
+       <button class="chipadd" data-add="video">▶ Video de YouTube</button><button class="chipadd" data-add="imagen">▣ Imagen para describir</button>
+       <button class="chipadd" data-add="cuento">❡ Cuento</button><button class="chipadd" data-add="pregunta">? Pregunta</button></div>
+     <button class="hecha ${hecha(s.id)?'si':''}" id="bHecha">${hecha(s.id)?'Feita ✓':'Marcar feita '+pin(true,20)}</button></div>`;
+  const clave=s.id+'/'+t.k;let nodo=cache.get(clave);
+  if(!nodo){nodo=document.createElement('div');cache.set(clave,nodo);t.r(nodo,{pager:p=>nodo._pager=p,sec:s})}
+  $('#panel').appendChild(nodo);
+  $$('.tabs button',lam).forEach(b=>b.onclick=()=>{estado.tab=+b.dataset.t;pintar();guardar()});
+  $$('[data-add]',lam).forEach(b=>b.onclick=()=>editarBloque(s,{tipo:b.dataset.add},true));
+  $('#bHecha').onclick=()=>{const i=estado.hechas.indexOf(s.id);i<0?estado.hechas.push(s.id):estado.hechas.splice(i,1);pintar();guardar();$('#bHecha').focus({preventScroll:true})};
+  pintarIndice();pintarProg();
+  $('#bAnt').disabled=estado.pantalla===0&&estado.tab===0;
+}
+const corto=s=>s.m==='intro'?'¿?':s.m==='obj'?'◎':s.m==='res'?'≡':s.m==='tarea'?'⌂':s.n;
+function pintarIndice(){
+  $('#indice').innerHTML=SECS.map((s,i)=>`<button class="it ${i===estado.pantalla?'on':''} ${hecha(s.id)?'ok':''}" data-i="${i}" style="--mcol:${MOM[s.m].c}" title="${esc(s.t)}"><span class="pt2">${hecha(s.id)?'✓':corto(s)}</span><span class="tx"><small>${MOM[s.m].n}${s.n?' '+s.n:''} · ${s.min} MIN</small>${s.t}</span></button>`).join('');
+  $$('#indice .it').forEach(b=>b.onclick=()=>{if(window.innerWidth<900)plegar(true);irA(+b.dataset.i,0)});
+}
+function pintarProg(){$('#prog').innerHTML=SECS.map(s=>pin(hecha(s.id))).join('')}
+function irA(i,tab){estado.pantalla=i;estado.tab=tab==='ultima'?tabsDe(SECS[i]).length-1:(tab||0);reiniciaCrono();pintar();$('#escena').scrollTop=0;guardar()}
+function avanzar(d){
+  const s=SECS[estado.pantalla],tabs=tabsDe(s),nodo=cache.get(s.id+'/'+(tabs[estado.tab]||{}).k);
+  if(nodo&&nodo._pager&&nodo._pager.mover(d))return;
+  const nt=estado.tab+d;if(nt>=0&&nt<tabs.length){estado.tab=nt;pintar();$('#escena').scrollTop=0;guardar();return}
+  const np=estado.pantalla+d;if(np>=0&&np<SECS.length)irA(np,d<0?'ultima':0)}
+$('#bAnt').onclick=()=>avanzar(-1);$('#bSig').onclick=()=>avanzar(1);$('#bInicio').onclick=()=>irA(0,0);
+
+/* menú, edición, vaciar, teclado */
+const app=$('#app');
+function plegar(v){app.classList.toggle('plegado',v);$('#lMenu').textContent=v?'Mostrar el menú':'Ocultar el menú'}
+$('#bMenu').onclick=()=>plegar(!app.classList.contains('plegado'));
+if(window.innerWidth<900)plegar(true);
+$('#bEditar').onclick=()=>{editando=!editando;document.body.classList.toggle('editando',editando);$('#bEditar').innerHTML=editando?'✓ <span>Listo</span>':'＋ <span>Añadir</span>'};
+let armado=null;const bV=$('#bVaciar');
+bV.onclick=()=>{if(!armado){bV.classList.add('arma');bV.textContent='¿SEGURO? PULSA OTRA VEZ';armado=setTimeout(()=>{armado=null;bV.classList.remove('arma');bV.textContent='VACIAR LA SESIÓN'},3500);return}
+  clearTimeout(armado);armado=null;bV.classList.remove('arma');bV.textContent='VACIAR LA SESIÓN';estado=nuevoEstado();cache.clear();reiniciaCrono();pintar();guardar()};
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&!velo.hidden){cerrar();return}
+  if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)||!velo.hidden||e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==='ArrowRight'){e.preventDefault();avanzar(1)}else if(e.key==='ArrowLeft'){e.preventDefault();avanzar(-1)}
+  else if(e.key==='s'||e.key==='S')plegar(!app.classList.contains('plegado'))});
+
+/* cronómetro */
+let resta=0,corre=false,tic=null;const cr=$('#crono');
+function pintaCrono(){const a=Math.abs(resta),m=a/60|0,s=String(a%60).padStart(2,'0');cr.textContent=(resta<0?'+':'')+m+':'+s;cr.classList.toggle('pasado',resta<0);cr.classList.toggle('va',corre&&resta>=0)}
+function reiniciaCrono(){clearInterval(tic);corre=false;resta=(SECS[estado.pantalla]||{min:0}).min*60;pintaCrono()}
+cr.onclick=()=>{corre=!corre;clearInterval(tic);if(corre)tic=setInterval(()=>{resta--;pintaCrono()},1000);pintaCrono()};
+
+/* ================= piezas que se repiten ================= */
+/* serie: un ítem cada vez, con contador, «Próxima» y «Recomeçar»; al terminar manda a decir algo en voz alta */
+/* «Precisa de ajuda?»: las rutas de respuesta quedan detrás de un botón (A2) */
+const ayudaHTML=r=>`<div class="ayuda"><button class="mini" aria-expanded="false">Precisa de ajuda?</button><div class="rutas">${r.map(x=>`<span class="ruta">${x}</span>`).join('')}</div></div>`;
+function activaAyuda(root){$$('.ayuda>.mini',root).forEach(b=>b.onclick=()=>{const a=b.parentNode.classList.toggle('abierta');b.setAttribute('aria-expanded',a);b.textContent=a?'Esconder a ajuda':'Precisa de ajuda?'})}
+
+/* ================= el plano del barrio Las Flores ================= */
+const NX=[100,370,640,910],NY=[75,315,555],SW=46,VB=[1010,630];
+const DIR=[[0,-1],[1,0],[0,1],[-1,0]];            // norte, este, sur, oeste
+/* n: esquina de llegada · b: manzana · f: fila (t arriba, b abajo) · a: lado (l izquierda, r derecha) */
+const LUG={
+ iglesia:  {n:[0,0],b:[0,0],f:'t',a:'l',es:'la iglesia',al:'a la iglesia',suj:'La iglesia',pt:'a igreja',art:'una',col:'#6741D9'},
+ panaderia:{n:[0,1],b:[0,0],f:'b',a:'l',es:'la panadería',al:'a la panadería',suj:'La panadería',pt:'a padaria',art:'una',col:'#D9480F'},
+ cafe:     {n:[2,0],b:[1,0],f:'t',a:'r',es:'el café',al:'al café',suj:'El café',pt:'o café',art:'un',col:'#7B4B2A'},
+ banco:    {n:[3,0],b:[2,0],f:'t',a:'r',es:'el banco',al:'al banco',suj:'El banco',pt:'o banco',art:'un',col:'#1D4E89'},
+ farmacia: {n:[2,1],b:[2,0],f:'b',a:'l',es:'la farmacia',al:'a la farmacia',suj:'La farmacia',pt:'a farmácia',art:'una',col:'#2B8A3E'},
+ hotel:    {n:[3,1],b:[2,1],f:'t',a:'r',es:'el hotel',al:'al hotel',suj:'El hotel',pt:'o hotel',art:'un',col:'#C2255C'},
+ super:    {n:[2,2],b:[2,1],f:'b',a:'l',es:'el supermercado',al:'al supermercado',suj:'El supermercado',pt:'o supermercado',art:'un',col:'#0F766E'},
+ parque:   {n:[1,1],b:[1,1],f:'t',a:'l',es:'el parque',al:'al parque',suj:'El parque',pt:'o parque',art:'un',col:'#2F9E44'},
+ casa:     {n:[1,2],b:[0,1],f:'b',a:'r',es:'tu casa',al:'a tu casa',suj:'Tu casa',pt:'a sua casa',art:'',col:'#16212B'}
+};
+const EN_NODO={};for(const k in LUG)EN_NODO[LUG[k].n.join()]=k;
+/* pictogramas de señalética: blanco sobre el color del lugar (caja de 48) */
+const PIC={
+ iglesia:c=>`<path d="M24 5v9M20 9h8" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M11 42V25l13-10 13 10v17z" fill="#fff"/><path d="M20.5 42V32a3.5 3.5 0 0 1 7 0v10z" fill="${c}"/>`,
+ panaderia:c=>`<path d="M7 29c0-8 7.5-13.5 17-13.5S41 21 41 29v5a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3z" fill="#fff"/><path d="M17 20.5l-3 8M25 19.5l-3 9M33 20.5l-3 8" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+ cafe:c=>`<path d="M10 19h23v9a9 9 0 0 1-9 9h-5a9 9 0 0 1-9-9z" fill="#fff"/><path d="M33 22h3a4 4 0 0 1 0 8h-3" fill="none" stroke="#fff" stroke-width="3"/><path d="M17 8c-2.5 3 2.5 4 0 7M25 8c-2.5 3 2.5 4 0 7" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="8" y="39.5" width="27" height="3" rx="1.5" fill="#fff"/>`,
+ banco:c=>`<path d="M24 6L6 17v3.5h36V17z" fill="#fff"/><rect x="10.5" y="23.5" width="5.5" height="12" fill="#fff"/><rect x="21.25" y="23.5" width="5.5" height="12" fill="#fff"/><rect x="32" y="23.5" width="5.5" height="12" fill="#fff"/><rect x="6" y="38" width="36" height="4.5" fill="#fff"/>`,
+ farmacia:c=>`<path d="M19 8h10v11h11v10H29v11H19V29H8V19h11z" fill="#fff"/>`,
+ hotel:c=>`<path d="M8 11v27M8 31h32v7M40 31v-6a5 5 0 0 0-5-5H20v11" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="24" r="3.5" fill="#fff"/>`,
+ super:c=>`<path d="M5 10h6.5l5 20h19.5l4-13H14.5" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="37.5" r="3.5" fill="#fff"/><circle cx="33" cy="37.5" r="3.5" fill="#fff"/>`,
+ parque:c=>`<circle cx="24" cy="18" r="11.5" fill="#fff"/><circle cx="15" cy="24.5" r="7.5" fill="#fff"/><circle cx="33" cy="24.5" r="7.5" fill="#fff"/><rect x="21.5" y="26" width="5" height="16" rx="1.5" fill="#fff"/>`,
+ casa:c=>`<path d="M6 24L24 8l18 16v3h-4.5v15h-27V27H6z" fill="#fff"/><rect x="20" y="30" width="8" height="12" fill="${c}"/>`
+};
+const tile=(k,s=48)=>`<svg width="${s}" height="${s}" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="10" fill="${LUG[k].col}"/>${PIC[k](LUG[k].col)}</svg>`;
+const tileG=(k,x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s/48})"><rect width="48" height="48" rx="10" fill="${LUG[k].col}"/>${PIC[k](LUG[k].col)}</g>`;
+const SEMAF=(x,y,k=1)=>`<g transform="translate(${x} ${y}) scale(${k})"><rect width="26" height="62" rx="9" fill="#16212B"/><circle cx="13" cy="12" r="7" fill="#F03E3E"/><circle cx="13" cy="31" r="7" fill="#FFC629"/><circle cx="13" cy="50" r="7" fill="#40C057"/></g>`;
+
+function planoSVG(){
+  const ex=[NX[0]-270,...NX,NX[3]+270],ey=[NY[0]-240,...NY,NY[2]+240];
+  let s=`<svg viewBox="0 0 ${VB[0]} ${VB[1]}" role="img" aria-label="Plano do bairro Las Flores"><rect width="${VB[0]}" height="${VB[1]}" fill="#CDD6DF"/>`;
+  for(let i=0;i<5;i++)for(let j=0;j<4;j++){
+    const dentro=i>=1&&i<=3&&j>=1&&j<=2,par=i===2&&j===2;
+    s+=`<rect x="${ex[i]+SW/2}" y="${ey[j]+SW/2}" width="${ex[i+1]-ex[i]-SW}" height="${ey[j+1]-ey[j]-SW}" rx="12" fill="${par?'#CDEBC8':dentro?'#F8FAFC':'#E6ECF1'}" stroke="${par?'#9CCF95':'#B9C5D0'}" stroke-width="2"/>`}
+  NX.forEach(x=>s+=`<line x1="${x}" y1="0" x2="${x}" y2="${VB[1]}" stroke="#fff" stroke-width="2.5" stroke-dasharray="12 12"/>`);
+  NY.forEach(y=>s+=`<line x1="0" y1="${y}" x2="${VB[0]}" y2="${y}" stroke="#fff" stroke-width="2.5" stroke-dasharray="12 12"/>`);
+  /* pasos de cebra y semáforo en la esquina de la farmacia */
+  const sx=NX[2],sy=NY[1];
+  for(let k=0;k<4;k++){const o=-17+k*11.5;
+    s+=`<rect x="${sx-SW/2-20}" y="${sy+o}" width="16" height="6" fill="#fff"/><rect x="${sx+SW/2+4}" y="${sy+o}" width="16" height="6" fill="#fff"/><rect x="${sx+o}" y="${sy-SW/2-20}" width="6" height="16" fill="#fff"/><rect x="${sx+o}" y="${sy+SW/2+4}" width="6" height="16" fill="#fff"/>`}
+  s+=SEMAF(sx-SW/2-40,sy-SW/2-76)+`<text x="${sx-SW/2-50}" y="${sy-SW/2-22}" text-anchor="end" font-size="22" fill="#16212B">el semáforo</text>`;
+  /* árboles del parque */
+  [[575,395,24],[590,468,28],[470,492,24],[528,440,18],[420,455,16]].forEach(a=>s+=`<circle cx="${a[0]}" cy="${a[1]}" r="${a[2]}" fill="#8FCB86"/>`);
+  /* placas de calle */
+  ['CALLE 10','CALLE 9','CALLE 8'].forEach((t,j)=>s+=`<rect x="3" y="${NY[j]-12}" width="72" height="24" rx="5" fill="#1D4E89"/><text x="39" y="${NY[j]+5.5}" text-anchor="middle" font-size="13.5" fill="#fff" style="letter-spacing:.06em">${t}</text>`);
+  for(const k in LUG){const L=LUG[k],bi=L.b[0],bj=L.b[1],bx=NX[bi]+SW/2,by=NY[bj]+SW/2,bw=NX[bi+1]-NX[bi]-SW,bh=NY[bj+1]-NY[bj]-SW;
+    const pw=Math.min(bw-12,Math.max(112,L.es.length*13+26)),ph=88,x=L.a==='l'?bx+6:bx+bw-6-pw,y=L.f==='t'?by+6:by+bh-6-ph;
+    s+=`<g class="lote" data-p="${k}" aria-label="${L.es}"><rect class="anillo" x="${x-5}" y="${y-5}" width="${pw+10}" height="${ph+10}" rx="16"/><rect class="base" x="${x}" y="${y}" width="${pw}" height="${ph}" rx="12"/>${tileG(k,x+pw/2-22,y+7,44)}<text x="${x+pw/2}" y="${y+79}" text-anchor="middle" font-size="24.5" fill="#16212B">${L.es}</text><circle cx="${L.a==='l'?bx:bx+bw}" cy="${L.f==='t'?by:by+bh}" r="9" fill="${L.col}" stroke="#fff" stroke-width="3"/></g>`}
+  return s+`<g class="ruta-g"></g><g class="andante quieto"><g class="cuerpo"><circle r="22" fill="#FFC629" stroke="#16212B" stroke-width="3.5"/><path d="M0-14L10 9L0 4L-10 9z" fill="#16212B"/></g></g></svg>`}
+
+/* el plano con su flecha amarilla: se mueve con F (una cuadra), R (derecha), L (izquierda) y va dibujando la ruta */
+function Plano(host,o={}){
+  host.innerHTML=`<div class="plano-sc"><div class="plano${o.toca?' toca':''}">${planoSVG()}</div></div>`;
+  const pl=$('.plano',host),svg=$('svg',host),and=$('.andante',svg),cuerpo=$('.cuerpo',svg),rg=$('.ruta-g',svg);
+  let c=1,r=2,h=0,ang=0,ficha=0;
+  const pon=()=>{and.style.transform=`translate(${NX[c]}px,${NY[r]}px) rotate(${ang}deg)`};
+  const quieto=f=>{and.classList.add('quieto');f();void and.getBoundingClientRect();and.classList.remove('quieto')};
+  function reset(ini){ficha++;[c,r,h]=ini||[1,2,0];ang=h*90;rg.innerHTML='';pl.classList.remove('choque');quieto(pon)}
+  function cmd(k,anim=true){
+    if(k==='F'){const nc=c+DIR[h][0],nr=r+DIR[h][1];
+      if(nc<0||nc>3||nr<0||nr>2){if(anim){pl.classList.add('choque');sacude(cuerpo);setTimeout(()=>pl.classList.remove('choque'),520)}return false}
+      const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+      ln.setAttribute('class','tramo');ln.setAttribute('x1',NX[c]);ln.setAttribute('y1',NY[r]);ln.setAttribute('x2',NX[nc]);ln.setAttribute('y2',NY[nr]);ln.setAttribute('pathLength','1');ln.setAttribute('stroke-dasharray','1');
+      rg.appendChild(ln);
+      if(anim&&!REDUCE&&ln.animate)ln.animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:420,easing:'cubic-bezier(.77,0,.175,1)'});
+      c=nc;r=nr}
+    else if(k==='R'){h=(h+1)%4;ang+=90}
+    else{h=(h+3)%4;ang-=90}
+    anim?pon():quieto(pon);return true}
+  async function corre(cmds,t=500){const mi=ficha;for(const k of cmds){if(mi!==ficha)return false;cmd(k);await new Promise(z=>setTimeout(z,REDUCE?120:t))}return mi===ficha}
+  const lote=k=>$(`.lote[data-p="${k}"]`,svg);
+  const marcaL=(k,cls)=>{const l=lote(k);if(l)l.classList.add(cls)};
+  const limpia=()=>$$('.lote',svg).forEach(l=>l.classList.remove('dest','bien','malo'));
+  if(o.toca)$$('.lote',svg).forEach(l=>{l.setAttribute('tabindex','0');l.setAttribute('role','button');
+    const f=()=>o.toca(l.dataset.p,l);l.addEventListener('click',f);
+    l.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}})});
+  reset(o.ini);
+  return {reset,cmd,corre,marca:marcaL,limpia,lote,aqui:()=>EN_NODO[c+','+r]||null,pos:()=>[c,r,h]}}
+/* de una lista de órdenes a frases: FF → «Sigue derecho dos cuadras.» */
+
+/* la calle del Sol: escena para mirar y hablar (dibujo original de este tablero) */
+const persona=(c,s=38)=>`<svg width="${s}" height="${s}" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="17" fill="${c}"/><circle cx="17" cy="12.5" r="5.5" fill="#fff"/><path d="M6.5 30a10.5 10.5 0 0 1 21 0z" fill="#fff"/></svg>`;
+
+/* ================= motores de las actividades ================= */
+/* introducción: en mi barrio, ¿hay o no hay? */
+function rIntro(root){
+  const B=estado.barrio||(estado.barrio={}),K=['panaderia','farmacia','banco','parque','super','iglesia'];
+  root.innerHTML=`<p class="lead"><span class="rev">Revisão</span> &nbsp;<b>hay</b> = tem, há. Pense no bairro onde você mora.</p>
+   <div class="lugares">${K.map(k=>`<div class="lug" data-k="${k}">${tile(k,58)}<span class="n">${LUG[k].es}</span><span class="pt">${LUG[k].pt}</span>
+      <div class="dos"><button class="si" aria-pressed="false">Hay</button><button class="no" aria-pressed="false">No hay</button></div><div class="dicho" aria-live="polite"></div></div>`).join('')}</div>
+   <div class="fila"><span class="pt cuenta"></span><span class="hueco"></span><button class="mini re">↻ Limpar</button></div>`;
+  function ver(){let n=0,d=0;$$('.lug',root).forEach(l=>{const k=l.dataset.k,v=B[k];if(v!=null)d++;if(v===1)n++;
+      $('.si',l).setAttribute('aria-pressed',v===1);$('.no',l).setAttribute('aria-pressed',v===0);l.classList.toggle('si',v===1);
+      $('.dicho',l).textContent=v===1?`En mi barrio hay ${LUG[k].art} ${LUG[k].es.replace(/^(el|la) /,'')}.`:v===0?`En mi barrio no hay ${LUG[k].es.replace(/^(el|la) /,'')}.`:''});
+    $('.cuenta',root).innerHTML=d===K.length?`No seu bairro tem <b>${n} de ${K.length}</b>. Agora diga tudo junto: «En mi barrio hay… y… pero no hay…»`:'Diga a frase em espanhol e depois toque.'}
+  $$('.lug',root).forEach(l=>{const k=l.dataset.k;
+    $('.si',l).onclick=()=>{B[k]=1;ver();guardar()};$('.no',l).onclick=()=>{B[k]=0;ver();guardar()}});
+  $('.re',root).onclick=()=>{K.forEach(k=>delete B[k]);ver();guardar()};
+  ver()}
+/* introducción 2: las tres palabras del día, en placas de calle que se destapan */
+function rClaves(root){
+  root.innerHTML=`<div class="claves">${CLAVES.map(c=>`<button class="clave">${c[4]}<b>${c[0]}</b><small>TOQUE PARA VER</small><span class="g">${c[1]}</span><span class="e">${c[2]}</span><span class="t">${c[3]}</span></button>`).join('')}</div>`;
+  $$('.clave',root).forEach(b=>b.onclick=()=>b.classList.toggle('vista'))}
+
+/* objetivos (y cierre): el semáforo de «já sei / mais ou menos / ainda não» */
+function rSemaforo(root,segunda){
+  const S=segunda?(estado.sem2||(estado.sem2={})):(estado.sem||(estado.sem={})),antes=estado.sem||{};
+  const L=[['r','Ainda não'],['a','Mais ou menos'],['v','Já sei']];
+  root.innerHTML=`<h2 class="t">${segunda?'E agora? Olhe de novo os três objetivos.':'No fim da aula, você consegue…'}</h2>
+   <div class="leyenda"><span><i style="background:#F03E3E"></i>ainda não</span><span><i style="background:#FFC629"></i>mais ou menos</span><span><i style="background:#40C057"></i>já sei</span>${segunda?'<span>○ tracejado = como você começou</span>':''}</div>
+   <div class="metas">${METAS.map((m,k)=>`<div class="meta" data-k="${k}"><div class="q">${m.q}</div><div class="ej">${m.es}<small>${m.pt}</small></div>
+      <div class="luces" role="group" aria-label="${m.q}">${L.map((l,v)=>`<button class="luz ${l[0]}" data-v="${v}" aria-pressed="false" aria-label="${l[1]}" title="${l[1]}"></button>`).join('')}</div></div>`).join('')}</div>
+   <div class="reto">${segunda?'<b>Olhe a diferença.</b> Diga em voz alta uma frase de cada objetivo, sem ler.':'<b>Desafio final de hoje:</b> explicar ao seu professor como chegar da sua casa a um lugar do seu bairro.'}</div>`;
+  function ver(){$$('.meta',root).forEach(m=>{const k=m.dataset.k;$$('.luz',m).forEach(b=>{b.setAttribute('aria-pressed',S[k]===+b.dataset.v);b.classList.toggle('fue',!!segunda&&antes[k]===+b.dataset.v)})})}
+  $$('.luz',root).forEach(b=>b.onclick=()=>{const k=b.closest('.meta').dataset.k,v=+b.dataset.v;S[k]===v?delete S[k]:S[k]=v;ver();guardar()});
+  ver()}
+
+/* muestra 1: el mapa con paradas. «Siguiente» mueve la flecha y enseña un bloque en cada parada */
+function rParadas(root,api){
+  root.innerHTML=`<div class="cont2"><div class="mp"></div><div class="parada"><div class="num"></div><div><span class="placa"></span></div><div class="pt"></div><div class="nota"></div>
+    <div class="pasapag"><button class="flecha izq" aria-label="Parada anterior">←</button><span class="npag"></span><button class="flecha der" aria-label="Próxima parada">→</button></div></div></div>`;
+  const P=Plano($('.mp',root));let i=0;
+  function ver(anim){const p=PAR[i];let k=i;while(!PAR[k].s)k--;
+    P.limpia();P.reset(PAR[k].s);
+    for(let j=k+1;j<i;j++)(PAR[j].cmd||[]).forEach(x=>P.cmd(x,false));
+    if(i>k){const cs=p.cmd||[];anim?P.corre(cs,440):cs.forEach(x=>P.cmd(x,false))}
+    P.marca(PAR[k].dest,p.ok?'bien':'dest');
+    $('.num',root).textContent='PARADA '+(i+1)+' DE '+PAR.length;$('.placa',root).innerHTML=p.es;$('.pt',root).textContent=p.pt;$('.nota',root).innerHTML=p.n;
+    $('.izq',root).disabled=i===0;$('.der',root).disabled=i===PAR.length-1;$('.npag',root).textContent=(i+1)+' / '+PAR.length}
+  const mover=d=>{const n=i+d;if(n<0||n>=PAR.length)return false;i=n;ver(d>0);return true};
+  $('.izq',root).onclick=()=>mover(-1);$('.der',root).onclick=()=>mover(1);api.pager({mover});ver(false)}
+
+/* muestra 2: un diálogo que avanza línea a línea */
+function rDialogo(root,api){
+  let n=1;const T=DIA.length+1;
+  root.innerHTML=`<div class="dialogo"></div><div class="pasapag"><button class="flecha izq" aria-label="Linha anterior">←</button><span class="npag"></span><button class="flecha der" aria-label="Próxima linha">→</button><span class="pt fin" hidden>Agora leiam em voz alta: você faz as perguntas. Depois, troquem.</span></div>`;
+  const D=$('.dialogo',root);
+  const linea=(l,nueva)=>`<div class="linea-d ${l.q}${nueva?' entra':''}"><div class="quien">${persona(l.q==='tu'?'#C2255C':'#1D4E89')}${l.q==='tu'?'VOCÊ':'VECINA'}</div><div class="globo"><span class="es">${l.es}</span><span class="pt">${l.pt}</span></div></div>`;
+  function ver(nueva){D.innerHTML=DIA.slice(0,Math.min(n,DIA.length)).map((l,k)=>linea(l,nueva&&k===n-1)).join('')+(n>DIA.length?JUNTA:'');
+    $('.izq',root).disabled=n===1;$('.der',root).disabled=n===T;$('.npag',root).textContent=n+' / '+T;$('.fin',root).hidden=n<T;
+    if(nueva&&D.lastElementChild&&D.lastElementChild.scrollIntoView)D.lastElementChild.scrollIntoView({block:'nearest'})}
+  const mover=d=>{const m=n+d;if(m<1||m>T)return false;n=m;ver(d>0);return true};
+  $('.izq',root).onclick=()=>mover(-1);$('.der',root).onclick=()=>mover(1);api.pager({mover});ver(false)}
+
+/* reconocer: lee el camino y toca el lugar adonde llegas */
+
+/* manipular: lleva la flecha hasta el lugar tocando las fichas; la ruta se escribe sola */
+
+/* manipular: completar el hueco (al · a la · del · de la) */
+
+/* contraste 1: dilo en español y toca para comprobar */
+
+/* contraste 2: ¿hay una palabra del portugués escondida? */
+
+/* mirar y hablar: un mazo de cartas con preguntas sobre la imagen */
+
+/* dado de preguntas: es el formato del bloque «Imagen para describir» que añade el profesor */
+function rDescribir(root,imgHTML,consigna){
+  let st=0;
+  root.innerHTML=`<div class="imgdesc"><div class="marco">${imgHTML}</div><div>
+     ${consigna?`<p class="lead es" style="overflow-wrap:anywhere">${esc(consigna)}</p>`:''}
+     <div class="orden"><button class="dado" aria-label="${TXT.dado} o dado">?</button><div><span class="pt">${TXT.dado} o dado. Responda em espanhol.</span><div class="preg">&nbsp;</div><span class="pt pregpt"></span></div></div>
+     ${ayudaHTML(['Hay…','Está…','Es…','Me gusta porque…'])}
+     <div class="fila"><button class="btn sol dije">${TXT.estrella} +1</button><span class="pts"></span><button class="mini re" aria-label="Zerar">↻</button></div></div></div>`;
+  activaAyuda(root);
+  const d=$('.dado',root),pts=$('.pts',root),pp=()=>pts.innerHTML=pinT+' '+st;
+  d.onclick=()=>{const k=Math.random()*6|0;d.classList.remove('gira');void d.offsetWidth;d.classList.add('gira');d.textContent=k+1;$('.preg',root).textContent=DADO[k].es;$('.pregpt',root).textContent=DADO[k].pt};
+  $('.dije',root).onclick=()=>{st++;pp()};$('.re',root).onclick=()=>{st=0;pp()};pp()}
+
+/* lectura por páginas: una nota (texto de muestra) o el cuento que pega el profesor */
+function paginar(texto,max){
+  const paras=String(texto).replace(/\r/g,'').split(/\n+/).map(s=>s.trim()).filter(Boolean),pags=[];let cur=[],len=0;
+  for(const p of paras){const fr=p.match(/[^.!?…]+[.!?…]+["»”’)]*\s*|[^.!?…]+$/g)||[p];let buf='';const tr=[];
+    for(const f of fr){if((buf+f).length>max&&buf){tr.push(buf.trim());buf=f}else buf+=f}
+    if(buf.trim())tr.push(buf.trim());
+    for(const t of tr){if(len+t.length>max&&cur.length){pags.push(cur);cur=[];len=0}cur.push(t);len+=t.length}}
+  if(cur.length)pags.push(cur);return pags.length?pags:[['']]}
+function rLibro(root,api,c,muestra){
+  const max={corta:150,media:340,larga:700}[c.pag||'corta']||150,pags=c.pags||paginar(c.texto,max);let i=-1;
+  root.innerHTML=`<div class="nota-l ${muestra?'':'libro'}" style="--fs:${c.pags||max<200?25:max<500?22:20}px"><div class="cinta"><span>${muestra?'TEXTO DE MUESTRA · LINGUA’S ACADEMY':'LEITURA'}</span><span class="np"></span></div><div class="hoja"><div class="txt"></div></div>
+    <div class="nav"><button class="flecha a" aria-label="Página anterior">←</button><span class="npag"></span><button class="flecha s" aria-label="Próxima página">→</button></div></div>`;
+  const tx=$('.txt',root),a=$('.a',root),s=$('.s',root);
+  function ver(){
+    tx.innerHTML=i<0?`<h2 class="tit">${esc(c.titulo||'')}</h2><p class="aut">${esc(c.autor||'')}${c.fuente?' · '+esc(c.fuente):''}</p>`:pags[i].map(p=>`<p>${esc(p)}</p>`).join('');
+    a.disabled=i<0;s.disabled=i===pags.length-1;$('.npag',root).textContent=i<0?'':(i+1)+' / '+pags.length}
+  const mover=d=>{const n=i+d;if(n<-1||n>=pags.length)return false;i=n;ver();return true};
+  a.onclick=()=>mover(-1);s.onclick=()=>mover(1);api.pager({mover});ver()}
+
+/* emparejar: palabra del texto y su sentido */
+
+/* comprensión: verdadero, falso o el texto no lo dice */
+
+/* preguntas personales: tres placas que giran */
+
+/* juego grande: El taxi. Uno piensa un lugar y da el camino; el otro conduce con las fichas */
+
+/* tarea final: mi ruta, armada con fichas y dicha de una vez */
+
+/* resumen: «diga três». Primero de memoria, después se destapa */
+
+/* tarea: tres misiones para elegir una */
+
+/* ================= bloques que añade el profesor ================= */
+function rCajas(root,items){
+  root.innerHTML=`<div class="cajas">${items.map((q,k)=>`<div class="caja"><button><i>${k+1}</i><span>${q.t}</span></button><div class="den">${q.d}</div></div>`).join('')}</div>`;
+  $$('.caja>button',root).forEach(b=>b.onclick=()=>b.parentNode.classList.toggle('abierta'))}
+function ytId(u){const m=String(u).match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([\w-]{11})/);return m?m[1]:null}
+function aSeg(t){t=String(t||'').trim();if(!t)return 0;const p=t.split(':').map(Number);if(p.some(isNaN))return 0;return p.reduce((a,b)=>a*60+b,0)}
+const mmss=s=>(s/60|0)+':'+String(s%60).padStart(2,'0');
+function herr(root,s,b){
+  const h=document.createElement('div');h.className='herr';h.innerHTML='<button class="mini ed">Editar este bloque</button><button class="mini qu">Quitar</button>';
+  root.prepend(h);$('.ed',h).onclick=()=>editarBloque(s,b,false);
+  const q=$('.qu',h);let arm=false;q.onclick=()=>{if(!arm){arm=true;q.textContent='¿Quitar? Pulsa otra vez';setTimeout(()=>{arm=false;q.textContent='Quitar'},3000);return}
+    contenido.extras[s.id]=extrasDe(s.id).filter(x=>x.id!==b.id);cache.clear();estado.tab=0;pintar();guardarContenido()}}
+function rExtra(root,api,b,s){
+  if(b.tipo==='video'){const id=ytId(b.url),ini=aSeg(b.ini),fin=aSeg(b.fin);
+    root.innerHTML=id?`<div class="video"><a class="poster" href="https://www.youtube.com/watch?v=${id}${ini?'&t='+ini+'s':''}" target="_blank" rel="noopener" aria-label="${TXT.abrir}"><em>YouTube · abre em outra aba</em></a>
+      <div style="min-width:0"><h2 class="t">${esc(b.titulo||'Vídeo')}</h2><div class="tiempos"><span>${TXT.verdesde} ${mmss(ini)}</span>${fin?`<span>${TXT.verhasta} ${mmss(fin)}</span><span>${mmss(Math.max(0,fin-ini))}</span>`:''}</div>
+      ${b.consigna?`<p class="lead es" style="overflow-wrap:anywhere">${esc(b.consigna)}</p>`:''}<a class="btn" href="https://www.youtube.com/watch?v=${id}${ini?'&t='+ini+'s':''}" target="_blank" rel="noopener">${TXT.abrir} ▸</a></div></div>`
+      :'<div class="vacio">No reconozco ese enlace de YouTube. Toca «Editar este bloque» y pégalo otra vez.</div>'}
+  else if(b.tipo==='imagen'){rDescribir(root,'<div class="vacio">…</div>',b.consigna);
+    leerMedia(b.media).then(d=>{$('.marco',root).innerHTML=d?`<img src="${d}" alt="${esc(b.titulo||'Imagem para descrever')}">`:'<div class="vacio">La imagen no está disponible en este dispositivo.</div>'})}
+  else if(b.tipo==='cuento'){const qs=String(b.preguntas||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    const L=document.createElement('div'),Q=document.createElement('div');root.append(L,Q);rLibro(L,api,b,false);
+    if(qs.length){Q.style.marginTop='14px';rCajas(Q,qs.map(q=>({t:TXT.hablar,d:`<p class="dicho-x">${esc(q)}</p>`})))}}
+  else{const ru=String(b.rutas||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    root.innerHTML=`<h2 class="t pregx" style="font-size:clamp(27px,4.2vw,44px)">${esc(b.texto||'')}</h2>${ru.length?`<div class="rutas">${ru.map(r=>`<span class="ruta" style="overflow-wrap:anywhere">${esc(r)}</span>`).join('')}</div>`:''}`}
+  herr(root,s,b)}
+
+function comprimir(file){return new Promise((ok,ko)=>{const fr=new FileReader();fr.onerror=ko;fr.onload=()=>{const img=new Image();img.onerror=ko;img.onload=()=>{
+  let max=1280,q=.82,d='';for(let k=0;k<7;k++){const r=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*r));c.height=Math.max(1,Math.round(img.height*r));
+    const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);d=c.toDataURL('image/jpeg',q);if(d.length<230000)break;max=Math.round(max*.82);q=Math.max(.6,q-.05)}
+  ok(d)};img.src=fr.result};fr.readAsDataURL(file)})}
+
+const FORM={
+ video:{t:'Video de YouTube',c:`<label for="f_url">Enlace de YouTube</label><input type="text" id="f_url" placeholder="https://www.youtube.com/watch?v=…">
+   <div class="dos"><div><label for="f_ini">Empieza en <small>(min:seg)</small></label><input type="text" id="f_ini" placeholder="0:45"></div><div><label for="f_fin">Termina en <small>(opcional)</small></label><input type="text" id="f_fin" placeholder="1:30"></div></div>
+   <label for="f_titulo">Título</label><input type="text" id="f_titulo"><label for="f_consigna">Consigna para la estudiante <small>(qué mirar o qué responder)</small></label><input type="text" id="f_consigna">
+   <p class="pt">El video se abre en una pestaña nueva, en el segundo exacto. El tablero no puede reproducirlo dentro.</p>`,k:['url','ini','fin','titulo','consigna']},
+ imagen:{t:'Imagen para describir',c:`<label for="f_file">Imagen <small>(elige un archivo o pégala con Ctrl+V)</small></label><input type="file" id="f_file" accept="image/*"><div id="f_prev" style="margin-top:8px"></div>
+   <label for="f_titulo">Título <small>(opcional)</small></label><input type="text" id="f_titulo"><label for="f_consigna">Consigna para la estudiante <small>(opcional)</small></label><input type="text" id="f_consigna">
+   <p class="pt">Junto a la imagen aparecen las preguntas y las rutas de respuesta.</p>`,k:['titulo','consigna']},
+ cuento:{t:'Cuento',c:`<div class="dos"><div><label for="f_titulo">Título</label><input type="text" id="f_titulo"></div><div><label for="f_autor">Autor</label><input type="text" id="f_autor"></div></div>
+   <label for="f_fuente">Fuente <small>(libro, año o sitio)</small></label><input type="text" id="f_fuente"><label for="f_texto">Texto <small>(pégalo aquí; se reparte en páginas solo)</small></label><textarea id="f_texto"></textarea>
+   <label for="f_pag">Tamaño de página</label><select id="f_pag"><option value="corta">Corta · principiantes y niños</option><option value="media">Media</option><option value="larga">Larga · niveles altos</option></select>
+   <label for="f_preguntas">Preguntas para conversar <small>(una por línea, opcional)</small></label><textarea id="f_preguntas" style="min-height:70px"></textarea>`,k:['titulo','autor','fuente','texto','pag','preguntas']},
+ pregunta:{t:'Pregunta o consigna',c:`<label for="f_texto">Pregunta <small>(se muestra en grande)</small></label><input type="text" id="f_texto"><label for="f_rutas">Rutas de respuesta <small>(comienzos de frase, uno por línea)</small></label><textarea id="f_rutas" style="min-height:80px"></textarea>`,k:['texto','rutas']}
+};
+function editarBloque(s,b,nuevo,alGuardar){
+  const F=FORM[b.tipo];let dataImg=null;
+  abrir(`<h3>${F.t}</h3>${F.c}<div class="err" id="f_err" aria-live="polite"></div><div class="fila"><span class="hueco"></span><button class="mini" id="f_no">Cancelar</button><button class="btn" id="f_ok">Guardar</button></div>`);
+  F.k.forEach(k=>{const e=$('#f_'+k);if(e&&b[k]!=null)e.value=b[k]});
+  const err=m=>$('#f_err').textContent=m;
+  if(b.tipo==='imagen'){const pv=$('#f_prev');
+    const toma=async f=>{if(!f||!/^image\//.test(f.type)){err('Ese archivo no es una imagen.');return}err('Preparando la imagen…');try{dataImg=await comprimir(f);pv.innerHTML=`<img src="${dataImg}" alt="" style="max-height:150px;border-radius:10px">`;err('')}catch(e){err('No pude leer esa imagen. Prueba con JPG o PNG.')}};
+    $('#f_file').onchange=e=>toma(e.target.files[0]);
+    popC.onpaste=e=>{const f=[...(e.clipboardData&&e.clipboardData.files||[])][0];if(f){e.preventDefault();toma(f)}};
+    if(b.media)leerMedia(b.media).then(d=>{if(d&&!dataImg)pv.innerHTML=`<img src="${d}" alt="" style="max-height:150px;border-radius:10px">`})}
+  else popC.onpaste=null;
+  $('#f_no').onclick=cerrar;
+  $('#f_ok').onclick=async()=>{
+    const v={};F.k.forEach(k=>v[k]=$('#f_'+k).value.trim());
+    if(b.tipo==='video'){if(!ytId(v.url))return err('Pega un enlace de YouTube completo (youtube.com/watch?v=… o youtu.be/…).');
+      if(v.fin&&aSeg(v.fin)<=aSeg(v.ini))return err('El final tiene que ser posterior al inicio.')}
+    if(b.tipo==='imagen'&&!dataImg&&!b.media)return err('Elige una imagen primero.');
+    if(b.tipo==='cuento'&&!v.texto)return err('Pega el texto del cuento.');
+    if(b.tipo==='pregunta'&&!v.texto)return err('Escribe la pregunta.');
+    Object.assign(b,v);
+    if(dataImg){b.media=uid();await guardarMedia(b.media,dataImg)}
+    if(alGuardar){alGuardar(b)}
+    else{if(nuevo){b.id=uid();(contenido.extras[s.id]=extrasDe(s.id)).push(b)}
+      cache.clear();if(nuevo)estado.tab=tabsDe(s).length-1}
+    cerrar();pintar();guardarContenido()}}
+
+/* ================= contenido de esta clase ================= */
+const IB=(d)=>`<svg width="74" height="58" viewBox="0 0 74 58" aria-hidden="true">${d}</svg>`;
+const CLAVES=[
+ ['el barrio','o bairro','Mi barrio es tranquilo.','O meu bairro é tranquilo.',IB('<rect x="1" y="1" width="72" height="56" rx="8" fill="#ffffff22"/><rect x="8" y="8" width="24" height="18" rx="3" fill="#fff"/><rect x="42" y="8" width="24" height="18" rx="3" fill="#fff"/><rect x="8" y="34" width="24" height="16" rx="3" fill="#fff"/><rect x="42" y="34" width="24" height="16" rx="3" fill="#FFC629"/>')],
+ ['la calle','a rua · diz-se «caye»','Vivo en la calle 8.','Moro na rua 8.',IB('<rect x="1" y="1" width="72" height="56" rx="8" fill="#ffffff22"/><rect x="1" y="19" width="72" height="20" fill="#fff"/><path d="M6 29h62" stroke="#1D4E89" stroke-width="3" stroke-dasharray="8 7"/>')],
+ ['la cuadra','o quarteirão','La panadería queda a dos cuadras.','A padaria fica a dois quarteirões.',IB('<rect x="1" y="1" width="72" height="56" rx="8" fill="#ffffff22"/><rect x="24" y="16" width="26" height="26" rx="4" fill="#FFC629"/><path d="M17 4v50M57 4v50M4 9h66M4 49h66" stroke="#fff" stroke-width="3"/>')]];
+const METAS=[
+ {q:'perguntar o caminho',es:'Perdón, ¿cómo llego a la farmacia?',pt:'Com licença, como eu chego à farmácia?'},
+ {q:'entender e dar um caminho',es:'Sigue derecho dos cuadras y gira a la derecha.',pt:'Siga reto dois quarteirões e vire à direita.'},
+ {q:'dizer onde fica um lugar',es:'Está en la esquina, al lado del banco.',pt:'Fica na esquina, ao lado do banco.'}];
+/* muestra 1 · s: empieza aquí (columna, fila, rumbo) · cmd: lo que hace la flecha · dest: adónde vamos */
+const PAR=[
+ {es:'¿Cómo <b>llego</b> a la farmacia?',pt:'Como eu chego à farmácia?',n:'Você está em casa: é a seta amarela. «llego» se diz <b>«yego»</b>.',s:[1,2,0],dest:'farmacia'},
+ {es:'Sigue <b>derecho</b> una cuadra.',pt:'Siga reto um quarteirão.',n:'derech<b>o</b> = reto, em frente. <b>una cuadra</b> = um quarteirão.',cmd:['F']},
+ {es:'Gira <b>a la derecha</b>.',pt:'Vire à direita.',n:'derech<b>a</b> = direita. O «g» de «gira» é forte, como o «r» de «rua».',cmd:['R']},
+ {es:'Sigue derecho <b>hasta</b> el semáforo.',pt:'Siga reto até o semáforo.',n:'<b>hasta</b> = até.',cmd:['F']},
+ {es:'La farmacia está <b>en la esquina</b>.',pt:'A farmácia fica na esquina.',n:'Queda <b>a dos cuadras</b> de tu casa = fica a dois quarteirões da sua casa.',ok:1},
+ {es:'¿Y cómo llego a la iglesia?',pt:'E como eu chego à igreja?',n:'De novo em casa. Antes de avançar: para que lado você vai?',s:[1,2,0],dest:'iglesia'},
+ {es:'Sigue derecho <b>dos cuadras</b>.',pt:'Siga reto dois quarteirões.',n:'una cuadra · dos cuadras · tres cuadras',cmd:['F','F']},
+ {es:'Gira <b>a la izquierda</b>.',pt:'Vire à esquerda.',n:'izquierda = esquerda. Diz-se <b>«iskierda»</b>.',cmd:['L']},
+ {es:'Sigue derecho una cuadra y <b>cruza la calle</b>.',pt:'Siga reto um quarteirão e atravesse a rua.',n:'<b>cruza la calle</b> = atravesse a rua. «calle» se diz <b>«caye»</b>.',cmd:['F']},
+ {es:'La iglesia está en la esquina, <b>al lado de</b> la panadería.',pt:'A igreja fica na esquina, ao lado da padaria.',n:'Queda a tres cuadras de tu casa. Agora diga os dois caminhos sem olhar a placa.',ok:1}];
+const DIA=[
+ {q:'tu',es:'Perdón, ¿dónde queda el banco?',pt:'Com licença, onde fica o banco?'},
+ {q:'ve',es:'¿El banco? Queda cerca: a cuatro cuadras de aquí.',pt:'O banco? Fica perto: a quatro quarteirões daqui.'},
+ {q:'tu',es:'¿Y cómo llego?',pt:'E como eu chego?'},
+ {q:'ve',es:'Sigue derecho dos cuadras y gira a la derecha.',pt:'Siga reto dois quarteirões e vire à direita.'},
+ {q:'ve',es:'Después, sigue derecho dos cuadras más. El banco está en la esquina.',pt:'Depois, siga reto mais dois quarteirões. O banco fica na esquina.'},
+ {q:'tu',es:'Muchas gracias. Voy <b class="f">al</b> banco y después voy <b class="f">a la</b> farmacia.',pt:'Muito obrigada. Vou ao banco e depois vou à farmácia.'},
+ {q:'ve',es:'¡Qué bien! La farmacia está al lado <b class="f">del</b> banco.',pt:'Que bom! A farmácia fica ao lado do banco.'},
+ {q:'tu',es:'¡Gracias! — De nada.',pt:'Obrigada! — De nada.'}];
+const JUNTA=`<div class="junta entra"><div><b>a + el = al</b><span class="es">Voy al banco. Voy al parque.</span><span class="pt">Vou ao banco. Vou ao parque.</span></div>
+ <div><b>a + la = a la</b><span class="es">Voy a la farmacia.</span><span class="pt">Vou à farmácia. Em espanhol não se junta.</span></div>
+ <div><b>de + el = del</b><span class="es">Está al lado del banco.</span><span class="pt">Fica ao lado do banco.</span></div>
+ <div><b>de + la = de la</b><span class="es">Está enfrente de la iglesia.</span><span class="pt">Fica em frente à igreja.</span></div></div>`;
+/* un solo error por frase, de los que hace de verdad quien habla portugués; x = -1: la frase está bien */
+const DADO=[{es:'¿Qué hay?',pt:'O que tem?'},{es:'¿Dónde está?',pt:'Onde está?'},{es:'¿Cuántos hay?',pt:'Quantos tem?'},{es:'¿De qué color es?',pt:'De que cor é?'},{es:'¿Cómo es?',pt:'Como é?'},{es:'¿Te gusta? ¿Por qué?',pt:'Você gosta? Por quê?'}];
+/* lectura: nota de bienvenida (texto propio de Lingua's Academy). Describe el mismo barrio del plano */
+
+/* ================= las secciones: 4 + 2 + 7 + 9 + 5 + 4 + 7 + 9 + 2 + 1 = 50 min ================= */
+SECS.push(
+ {id:'intro',m:'intro',t:'O que tem no seu bairro?',min:4,tabs:[
+   {k:'claves',instr:'Três palavras de hoje. Diga o que você acha que significam e toque para conferir.',r:rClaves},
+   {k:'hay',instr:'Diga a frase em espanhol. Depois toque em «Hay» ou «No hay».',r:rIntro}]},
+ {id:'obj',m:'obj',t:'Aonde você quer chegar',min:2,tabs:[{k:'semaforo',instr:'Leia cada objetivo e acenda uma luz: vermelha, amarela ou verde.',r:el=>rSemaforo(el,false)}]},
+ {id:'a1',m:'cont',n:'1',t:'As palavras do caminho',min:7,tabs:[
+   {k:'paradas',instr:'Toque na seta → para andar pelo bairro. Em cada parada, leia a placa azul em voz alta.',r:rParadas},
+   {k:'dialogo',instr:'Toque na seta → para ver a próxima linha. Leia cada linha em voz alta.',r:rDialogo}]}
+);
+
+/* ================= arranque: primero se dibuja, después se conecta ================= */
+reiniciaCrono();pintar();conectar();
+})();
+</script>
+
+
+<!-- ═══ Vista previa · Lingua's Academy (generada por herramientas/vista_previa.mjs) ═══ -->
+<style id="vp-estilo">
+#vp-cinta{position:fixed;z-index:60;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  max-width:calc(100vw - 24px);padding:8px 8px 8px 10px;background:var(--hoja,#FFFDF9);color:var(--tinta,#17223D);border:2.5px solid var(--tinta,#17223D);border-radius:18px;box-shadow:5px 5px 0 var(--tinta,#17223D);
+  font:500 15px/1.3 "Instrument Sans",system-ui,sans-serif}
+#vp-cinta .vp-et{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:10px;background:var(--mostaza,#D6992A);color:var(--tinta,#17223D);font:500 13px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap}
+#vp-cinta .vp-txt{color:var(--tinta2,#2C3A5C)}
+.vp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:8px 16px;border-radius:14px;border:2.5px solid var(--tinta,#17223D);box-shadow:3px 3px 0 var(--tinta,#17223D);
+  font:600 15px/1.2 "Instrument Sans",system-ui,sans-serif;text-decoration:none;cursor:pointer;background:var(--hoja,#FFFDF9);color:var(--tinta,#17223D);transition:transform .12s,box-shadow .12s}
+.vp-btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--tinta,#17223D)}
+.vp-btn--pri{background:var(--terra,#C2533A);color:#fff}
+.vp-btn:focus-visible,#vp-lado button:focus-visible{outline:3px solid var(--mar,#1B7A88);outline-offset:3px}
+.vp-i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body.vp-con-cinta{padding-bottom:96px}
+#vp-lado{margin-top:14px;padding-top:12px;border-top:2px dashed var(--linea,#D9D2C4)}
+#vp-lado h3{display:flex;align-items:center;gap:6px;margin:0 0 8px;font:500 12px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ayuda,#5B6478)}
+#vp-lado ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+#vp-lado button{width:100%;display:flex;align-items:center;gap:8px;text-align:left;font:500 14px/1.3 "Instrument Sans",system-ui,sans-serif;color:var(--ayuda,#5B6478);
+  background:var(--papel,#F5F2EC);border:2px dashed var(--linea,#D9D2C4);border-radius:12px;padding:7px 10px;cursor:pointer}
+#vp-lado button:hover{border-color:var(--tinta2,#2C3A5C);color:var(--tinta,#17223D)}
+#vp-lado .vp-pt{width:9px;height:9px;border-radius:50%;flex:none;background:var(--c)}
+#vp-lado .vp-tt{flex:1;min-width:0;overflow-wrap:anywhere}
+#vp-lado .vp-min{font:500 12px/1 "JetBrains Mono",ui-monospace,monospace}
+#vp-fin{border:0;padding:0;background:transparent;max-width:min(640px,calc(100vw - 24px));width:100%;color:var(--tinta,#17223D)}
+#vp-fin::backdrop{background:rgba(23,34,61,.55)}
+#vp-fin .vp-lam{background:var(--hoja,#FFFDF9);border:2.5px solid var(--tinta,#17223D);border-radius:26px;box-shadow:5px 5px 0 var(--tinta,#17223D);overflow:hidden}
+#vp-fin .vp-cab{display:flex;align-items:center;gap:12px;background:var(--tinta,#17223D);color:var(--hoja,#FFFDF9);padding:16px 22px}
+#vp-fin .vp-cab .vp-i{width:28px;height:28px;stroke-width:1.75;color:var(--mostaza,#D6992A)}
+#vp-fin h2{margin:0;font:400 clamp(1.3rem,3.6vw,1.7rem)/1.2 "Young Serif",Georgia,serif}
+#vp-fin .vp-cuerpo{padding:20px 22px 22px;font:400 17px/1.5 "Instrument Sans",system-ui,sans-serif}
+#vp-fin .vp-cuerpo p{margin:0 0 14px}
+#vp-fin ol{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:6px;max-height:40vh;overflow:auto}
+#vp-fin li{display:flex;align-items:center;gap:10px;padding:8px 12px;border:2px dashed var(--linea,#D9D2C4);border-radius:12px;background:var(--papel,#F5F2EC);color:var(--tinta2,#2C3A5C)}
+#vp-fin li .vp-m{font:500 12px/1 "JetBrains Mono",ui-monospace,monospace;padding:4px 8px;border-radius:8px;background:var(--cf);color:var(--tinta,#17223D);white-space:nowrap}
+#vp-fin li .vp-tt{flex:1;min-width:0;overflow-wrap:anywhere}
+#vp-fin .vp-acc{display:flex;flex-wrap:wrap;gap:10px}
+@media (max-width:560px){#vp-cinta{flex-wrap:nowrap;gap:8px;padding:6px}#vp-cinta .vp-txt{display:none}#vp-cinta .vp-btn{padding:6px 12px;font-size:14px;white-space:nowrap}body.vp-con-cinta{padding-bottom:84px}}
+@media (prefers-reduced-motion:reduce){.vp-btn{transition:none}}
+@media print{#vp-cinta,#vp-fin{display:none}}
+</style>
+<div id="vp-cinta" role="region" aria-label="Vista previa">
+  <span class="vp-et"><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-vp="cinta">Vista previa</span></span>
+  <span class="vp-txt" data-vp="cintaTxt">Ves el principio de la clase.</span>
+  <button type="button" class="vp-btn vp-btn--pri" data-vp-abrir><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-vp="verResto">Ver el resto de la clase</span></button>
+</div>
+<dialog id="vp-fin" aria-labelledby="vp-fin-t">
+  <div class="vp-lam">
+    <div class="vp-cab"><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><h2 id="vp-fin-t" data-vp="finT">Hasta aquí la vista previa</h2></div>
+    <div class="vp-cuerpo">
+      <p data-vp="finTxt">El resto de la clase (actividades, lectura, juego, resumen y tarea) está disponible con la suscripción.</p>
+      <ol id="vp-fin-lista"></ol>
+      <div class="vp-acc">
+        <a class="vp-btn vp-btn--pri" id="vp-ir" href="../suscripcion.html"><span data-vp="suscribir">Desbloquear con la suscripción</span><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <button type="button" class="vp-btn" data-vp-cerrar><span data-vp="seguir">Seguir en la vista previa</span></button>
+      </div>
+    </div>
+  </div>
+</dialog>
+<script id="vp-datos" type="application/json">{"bloqueadas":[{"m":"cont","t":"Siga o caminho","min":9},{"m":"cont","t":"Espanhol ou portunhol?","min":5},{"m":"cont","t":"Olhe e fale","min":4},{"m":"cont","t":"Um bilhete para você","min":7},{"m":"cont","t":"El taxi","min":9},{"m":"res","t":"O que ficou?","min":2},{"m":"tarea","t":"Para a próxima aula","min":1}],"suscripcion":"../suscripcion.html","inicio":"../","nombre":"a2-a-dos-cuadras"}</script>
+<script>
+/* Vista previa · Lingua's Academy. Iconos: Lucide, ISC */
+(function(){
+  "use strict";
+  var D = JSON.parse(document.getElementById("vp-datos").textContent);
+  var T = {
+    es:{cinta:"Vista previa",cintaTxt:"Ves el principio de la clase.",verResto:"Ver el resto de la clase",finT:"Hasta aquí la vista previa",
+      finTxt:"El resto de la clase (actividades, lectura, juego, resumen y tarea) está disponible con la suscripción.",suscribir:"Desbloquear con la suscripción",
+      seguir:"Seguir en la vista previa",lado:"En la clase completa",bloq:"Bloqueado: ",m:{intro:"Introducción",obj:"Objetivos",cont:"Contenido",res:"Resumen",tarea:"Tarea"}},
+    en:{cinta:"Preview",cintaTxt:"You're seeing the start of the lesson.",verResto:"See the rest of the lesson",finT:"This is where the preview ends",
+      finTxt:"The rest of the lesson (activities, reading, game, review and homework) is available with a subscription.",suscribir:"Unlock with a subscription",
+      seguir:"Keep exploring the preview",lado:"In the full lesson",bloq:"Locked: ",m:{intro:"Warm-up",obj:"Goals",cont:"Content",res:"Review",tarea:"Homework"}},
+    pt:{cinta:"Prévia",cintaTxt:"Você está vendo o começo da aula.",verResto:"Ver o resto da aula",finT:"A prévia termina aqui",
+      finTxt:"O resto da aula (atividades, leitura, jogo, resumo e tarefa) está disponível com a assinatura.",suscribir:"Desbloquear com a assinatura",
+      seguir:"Continuar na prévia",lado:"Na aula completa",bloq:"Bloqueado: ",m:{intro:"Introdução",obj:"Objetivos",cont:"Conteúdo",res:"Resumo",tarea:"Tarefa"}}
+  };
+  var L = "es";
+  try { L = new URLSearchParams(location.search).get("lang") || localStorage.getItem("la-lang") || ""; } catch (e) {}
+  if (!T[L]) { var nv = String(navigator.language || "").toLowerCase(); L = nv.indexOf("pt") === 0 ? "pt" : nv.indexOf("en") === 0 ? "en" : "es"; }
+  var t = T[L];
+  var COL = {intro:["--terra","#C2533A","--terraf","#F8E3DC"],obj:["--mostaza","#D6992A","--mostazaf","#FBEFD6"],cont:["--mar","#1B7A88","--marf","#DDEFF1"],res:["--ciruela","#6D4B80","--ciruelaf","#ECE3F2"],tarea:["--verde","#4A8656","--verdef","#E1F0E3"]};
+  var CANDADO = '<svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  function nombre(b){ return b.t || t.m[b.m]; }
+  document.querySelectorAll("[data-vp]").forEach(function(el){ var k = el.getAttribute("data-vp"); if (t[k]) el.textContent = t[k]; });
+  var cinta = document.getElementById("vp-cinta"); cinta.setAttribute("aria-label", t.cinta);
+  document.body.classList.add("vp-con-cinta");
+  var ir = document.getElementById("vp-ir");
+  ir.href = D.suscripcion + (L !== "es" ? "?lang=" + L : "");
+
+  /* la lámina final */
+  var dlg = document.getElementById("vp-fin"), lista = document.getElementById("vp-fin-lista");
+  D.bloqueadas.forEach(function(b){
+    var li = document.createElement("li"), c = COL[b.m] || COL.cont;
+    li.style.setProperty("--cf", "var(" + c[2] + "," + c[3] + ")");
+    li.innerHTML = CANDADO + '<span class="vp-m"></span><span class="vp-tt"></span>';
+    li.children[1].textContent = t.m[b.m]; li.children[2].textContent = nombre(b);
+    lista.appendChild(li);
+  });
+  function abrir(){
+    if (dlg.open) return;
+    if (typeof dlg.showModal === "function") { try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); } } else dlg.setAttribute("open", "");
+    ir.focus();
+  }
+  function cerrar(){ if (typeof dlg.close === "function" && dlg.open) dlg.close(); else dlg.removeAttribute("open"); }
+  window.LA_VISTA_PREVIA = { abrir: abrir, cerrar: cerrar };
+  cinta.querySelector("[data-vp-abrir]").addEventListener("click", abrir);
+  dlg.querySelector("[data-vp-cerrar]").addEventListener("click", cerrar);
+  dlg.addEventListener("click", function(e){ if (e.target === dlg) cerrar(); });
+
+  /* el menú lateral: las secciones bloqueadas, con candado */
+  function bloqueLado(){
+    var d = document.createElement("div"); d.id = "vp-lado";
+    d.innerHTML = '<h3>' + CANDADO + '<span></span></h3><ol></ol>';
+    d.querySelector("h3 span").textContent = t.lado;
+    var ol = d.querySelector("ol");
+    D.bloqueadas.forEach(function(b){
+      var li = document.createElement("li"), bt = document.createElement("button"), c = COL[b.m] || COL.cont;
+      bt.type = "button"; bt.style.setProperty("--c", "var(" + c[0] + "," + c[1] + ")");
+      bt.setAttribute("aria-label", t.bloq + t.m[b.m] + " · " + nombre(b));
+      bt.innerHTML = '<span class="vp-pt" aria-hidden="true"></span><span class="vp-tt"></span>' + (b.min ? '<span class="vp-min"></span>' : "") + CANDADO;
+      bt.querySelector(".vp-tt").textContent = nombre(b);
+      if (b.min) bt.querySelector(".vp-min").textContent = b.min + " min";
+      bt.addEventListener("click", abrir);
+      li.appendChild(bt); ol.appendChild(li);
+    });
+    return d;
+  }
+  var lado = document.getElementById("lado") || document.querySelector("aside, nav#mapa, #mapa, .mapa");
+  if (lado) {
+    var puesto = bloqueLado(); lado.appendChild(puesto);
+    new MutationObserver(function(){ if (!lado.contains(puesto)) { puesto = bloqueLado(); lado.appendChild(puesto); } }).observe(lado, { childList: true, subtree: true });
+  }
+
+  /* «Siguiente» al final de lo que se ve: en vez de no hacer nada, abre la lámina bloqueada */
+  var zona = function(){ return document.getElementById("lamina") || document.querySelector("main") || document.getElementById("app") || document.body; };
+  var firma = function(){ var z = zona(); return z ? z.innerHTML.length + ":" + z.innerHTML.slice(0, 4000) + location.hash : ""; };
+  function esSiguiente(el){
+    if (!el || el.closest("#vp-cinta, #vp-fin, #vp-lado")) return false;
+    var b = el.closest("button, a, [role=button]"); if (!b) return false;
+    var id = (b.id || "") + " " + (b.getAttribute("data-accion") || "") + " " + (b.getAttribute("aria-label") || "") + " " + (b.getAttribute("title") || "");
+    var txt = (b.textContent || "").trim();
+    return /(^|\s)(bSig|bSiguiente|sig|siguiente|next)(\s|$)/i.test(id) || /^siguiente\b/i.test(id.trim()) || /^(siguiente|next|próximo)\b/i.test(txt);
+  }
+  function vigila(){
+    var antes = firma();
+    setTimeout(function(){ if (!dlg.open && firma() === antes) abrir(); }, 220);
+  }
+  document.addEventListener("click", function(e){ if (esSiguiente(e.target)) vigila(); }, true);
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "ArrowRight" || e.altKey || e.ctrlKey || e.metaKey || dlg.open) return;
+    var a = document.activeElement; if (a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable)) return;
+    vigila();
+  }, true);
+  /* si el tablero apaga «Siguiente» en la última pantalla, se deja encendido para llegar a la lámina final */
+  function encender(){
+    document.querySelectorAll("button[disabled], [aria-disabled=true]").forEach(function(b){
+      if (esSiguiente(b)) { b.disabled = false; b.removeAttribute("aria-disabled"); }
+    });
+  }
+  new MutationObserver(encender).observe(document.body, { attributes: true, subtree: true, attributeFilter: ["disabled", "aria-disabled"] });
+  encender();
+})();
+</script>
+</body></html>

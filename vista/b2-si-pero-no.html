@@ -1,0 +1,1086 @@
+<!doctype html><html><head>
+<script>/* Vista previa: sin sala en vivo. El tablero funciona solo en esta pantalla. */window.claude={use:async function(){return null}};window.LA_VISTA_PREVIA=true;</script>
+<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="robots" content="noindex, nofollow">
+<title>Vista previa · Sí, pero no</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Lámina de aula: barra de visor arriba, mapa de ruta a la izquierda y una sola lámina con pestañas y páginas.
+   Identidad de esta clase: el edificio de noche (pizarra del portal, ladrillo de la fachada, teal y rojo de la marca,
+   ámbar de las ventanas encendidas). Tres colores con función: verde = conceder · ámbar = discrepar suave · azul = matizar.
+   Aspecto único (claro) a propósito: se comparte por videollamada. */
+:root{
+  --tinta:#1E2B3A; --noche:#18232F; --noche2:#0F1820; --teal:#0F766E; --teal2:#14A096; --agua:#E4E9EC;
+  --papel:#FFFFFF; --gris:#EEF1F3; --linea:#CBD4DB; --rojo:#D8382C; --sol:#E8A93B; --coral:#B5532B;
+  --indigo:#4F5BA8; --hoja:#2E8B57; --ambar:#A56C06; --ayuda:#51606D;
+  --ok:#1B8F52; --mal:#CF3527; --okf:#DDF3E6; --malf:#FBE2DE;
+  --f1:#DCEFD8; --f2:#FBE6BF; --f3:#D9E6F7;            /* conceder · discrepar suave · matizar */
+  --esc:#2A6B27; --mid:#8A5600; --acc:#234E90;
+  --display:'Sora','Trebuchet MS',system-ui,sans-serif;
+  --texto:'Source Sans 3','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --ease-out:cubic-bezier(0.23,1,0.32,1); --ease-in-out:cubic-bezier(0.77,0,0.175,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+html,body{height:100%}
+body{margin:0;background:var(--agua);color:var(--tinta);font:400 18px/1.45 var(--texto);overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .12s var(--ease-out)}
+button:active:not(:disabled){transform:scale(.97)}
+a{touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--sol);outline-offset:2px}
+.es{color:var(--tinta);font-weight:700}
+.en{color:var(--ayuda);font-size:.86em;font-weight:400}
+.mono{font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase;font-size:12px}
+
+#app{height:100%;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+
+/* ---- barra del visor ---- */
+#top{grid-column:1/-1;height:54px;display:flex;align-items:center;gap:10px;background:var(--tinta);color:#fff;padding-right:12px}
+#top button{color:#fff}
+.tmenu{height:54px;width:272px;flex:none;display:flex;align-items:center;gap:10px;padding:0 14px!important;background:var(--teal);font:700 17px var(--display)}
+.plegado .tmenu{width:60px;justify-content:center;padding:0!important}
+.plegado .tmenu span{display:none}
+.tmenu svg{display:block;flex:none}
+.tnav{display:flex;align-items:center;gap:4px;margin-left:6px}
+.tnav button{height:40px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:20px;font:700 16px var(--display)}
+.tnav button:disabled{opacity:.4;cursor:default}
+.tnav i{width:28px;height:28px;border-radius:50%;background:var(--teal2);display:grid;place-items:center;font-style:normal;line-height:1;font-size:13px}
+.tprog{flex:1;min-width:0;display:flex;justify-content:center;gap:3px;overflow:hidden}
+.tprog svg{flex:none}
+.crono{font:700 16px var(--mono);height:36px;padding:0 12px!important;border-radius:8px;background:#ffffff1a;min-width:78px;font-variant-numeric:tabular-nums}
+.crono.va{background:var(--teal2)}
+.crono.pasado{background:var(--rojo)}
+.guard{font:400 11px var(--mono);letter-spacing:.04em;opacity:.8;white-space:nowrap}
+.guard.ok{color:#9BE8BF;opacity:1}
+.tedit{height:36px;padding:0 14px!important;border-radius:8px;background:var(--sol);color:var(--tinta)!important;font:800 15px var(--display);white-space:nowrap}
+.editando .tedit{background:#fff}
+
+/* ---- mapa lateral ---- */
+#lado{background:var(--noche);color:#fff;width:272px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column}
+.plegado #lado{width:60px}
+.ficha{padding:14px 16px 10px;border-bottom:1px solid #ffffff22;font-size:14.5px;line-height:1.4}
+.ficha b{display:block;font:800 23px/1.1 var(--display)}
+.ficha span{display:block;color:#BFCBD6}
+.plegado .ficha{display:none}
+.indice{position:relative;padding:10px 0;flex:1}
+.indice::before{content:"";position:absolute;left:29px;top:26px;bottom:26px;border-left:3px dashed #ffffff3a}
+.it{position:relative;display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:5px 12px;color:#fff}
+.it .pt2{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;line-height:1;background:var(--noche2);border:3px solid var(--mcol);font:800 15px var(--display)}
+.it .tx{min-width:0;font:600 15.5px/1.15 var(--texto)}
+.it .tx small{display:block;font:400 10px var(--mono);letter-spacing:.06em;color:#A9B7C4}
+.it.on{background:#ffffff1c}
+.it.on .pt2{background:var(--mcol);color:#fff}
+.it.ok .pt2{background:var(--ok);border-color:var(--ok)}
+.plegado .it{width:60px;height:46px;padding:0;display:grid;place-items:center}
+.plegado .it .tx{display:none}
+.vaciar{margin:8px 12px 14px;padding:8px 10px!important;border:1px solid #ffffff55!important;border-radius:8px;font:400 12px var(--mono);letter-spacing:.04em;color:#fff}
+.vaciar.arma{background:var(--rojo);border-color:var(--rojo)!important}
+.plegado .vaciar{display:none}
+
+/* ---- lámina ---- */
+#escena{overflow:auto;padding:12px 16px}
+.lamina{--mcol:var(--teal);max-width:1140px;min-height:100%;margin:0 auto;display:flex;flex-direction:column;background:var(--gris);border-radius:14px;overflow:hidden;box-shadow:0 6px 22px #1e2b3a22}
+.cab{display:flex;align-items:stretch;min-height:54px;background:var(--tinta);color:#fff;flex:none}
+.cab .icono{width:86px;flex:none;background:var(--mcol);display:grid;place-items:center;clip-path:polygon(0 0,84% 0,100% 50%,84% 100%,0 100%)}
+.cab h1{margin:0;padding:6px 14px;align-self:center;font:700 clamp(18px,2.2vw,25px)/1.1 var(--display);letter-spacing:.01em;text-wrap:balance}
+.tagrow{display:flex;align-items:flex-end;flex-wrap:wrap;gap:6px 14px;padding:10px 14px 0 0}
+.tag{display:flex;align-items:center;gap:8px;background:var(--mcol);color:#fff;font:700 13px var(--mono);letter-spacing:.08em;padding:6px 22px 6px 16px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%)}
+.tag i{font-style:normal;background:#ffffff40;border-radius:4px;padding:0 7px}
+.sub{font:700 19px var(--display);color:var(--mcol);filter:brightness(.8);min-width:0;overflow-wrap:anywhere}
+.min{font:400 12px var(--mono);letter-spacing:.06em;color:var(--ayuda);padding-bottom:3px}
+.tabs{margin-left:auto;display:flex;gap:4px;align-self:flex-end;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;min-width:50px;height:36px;padding:0 12px;border-radius:10px 10px 0 0;background:#5F6C7A;color:#fff;font:800 18px var(--display);display:grid;place-items:center;line-height:1}
+.tabs button[aria-selected="true"]{background:var(--papel);color:var(--tinta);height:40px}
+.tabs button.extra{background:var(--teal)}
+.tabs button.extra[aria-selected="true"]{background:var(--papel);color:var(--teal)}
+.instr{display:flex;align-items:center;gap:8px;padding:5px 16px 7px;font:italic 400 17px var(--texto);color:var(--tinta)}
+.instr svg{flex:none}
+.panel{position:relative;flex:1;margin:0 12px;background:var(--papel);border-radius:10px;padding:18px clamp(14px,3vw,32px);min-height:300px;min-width:0}
+.pie{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px 12px}
+.hecha{margin-left:auto;height:44px;padding:0 20px!important;border-radius:22px;background:var(--tinta);color:#fff!important;font:800 17px var(--display);display:flex;align-items:center;gap:8px}
+.hecha.si{background:var(--ok)}
+.editbar{display:none;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px}
+.editando .editbar{display:flex}
+.editbar b{font:400 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ayuda)}
+.chipadd{height:38px;padding:0 14px!important;border-radius:19px;border:2px dashed var(--teal)!important;color:var(--teal)!important;font:700 15px var(--texto);background:#fff!important}
+
+/* ---- piezas comunes ---- */
+.btn{min-height:46px;padding:0 22px;border-radius:23px;background:var(--teal);color:#fff;font:800 18px var(--display)}
+.btn.sol{background:var(--sol);color:var(--tinta)}
+.mini{min-height:38px;padding:0 14px;border-radius:19px;border:2px solid var(--linea);font:600 15px var(--texto);color:var(--ayuda);background:#fff}
+.fila{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+.hueco{flex:1}
+.fb{min-height:34px;margin-top:12px;padding:7px 14px;border-radius:10px;font-weight:700;font-size:17px;overflow-wrap:anywhere}
+.fb:empty{padding:0}
+.fb.ok{background:var(--okf);color:#0D5F35}
+.fb.mal{background:var(--malf);color:#96241A}
+.pts{font:800 18px var(--display);color:var(--tinta);font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:6px}
+h2.t{margin:0 0 6px;font:800 clamp(22px,2.7vw,31px)/1.12 var(--display);text-wrap:balance;overflow-wrap:anywhere}
+p.lead{margin:0 0 14px;max-width:62ch;overflow-wrap:anywhere}
+.rutas{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.ruta{padding:6px 14px;border-radius:10px;background:#EEF4F3;border:2px solid var(--linea);font:700 18px var(--texto);overflow-wrap:anywhere;min-width:0}
+.ayudabtn{min-height:38px;padding:0 14px;border-radius:19px;border:2px dashed var(--linea);font:600 15px var(--texto);color:var(--ayuda);background:#fff;margin-top:8px}
+.dicho{margin:6px 0 0;font:700 clamp(20px,2.4vw,25px)/1.3 var(--display);overflow-wrap:anywhere}
+@keyframes tiembla{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.tiembla{animation:tiembla .2s 2}
+.fam{display:inline-block;padding:1px 10px;border-radius:8px;font-weight:700}
+.fam.f1,.f1{background:var(--f1)} .fam.f2,.f2{background:var(--f2)} .fam.f3,.f3{background:var(--f3)}
+.ej .fam.f1{color:var(--esc)} .ej .fam.f2{color:var(--mid)} .ej .fam.f3{color:var(--acc)}
+
+/* tarjetas que giran */
+.cartas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tarjeta{display:block;perspective:900px;height:146px;width:100%}
+.tarjeta:active:not(:disabled){transform:none}
+.cara{display:block;position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .42s var(--ease-in-out)}
+.tarjeta.vuelta .cara{transform:rotateY(180deg)}
+.frente,.dorso{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:absolute;top:0;right:0;bottom:0;left:0;border-radius:14px;padding:8px 10px;backface-visibility:hidden;-webkit-backface-visibility:hidden;text-align:center;transition:opacity .2s .1s}
+.frente{background:var(--tinta);color:#fff;border-bottom:8px solid var(--fc)}
+.frente b{font:700 clamp(16px,1.75vw,20px)/1.15 var(--display)}
+.frente i{font:400 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;font-style:normal;color:#BFCBD6}
+.frente em{font-style:normal;font-size:22px;line-height:1}
+.dorso{background:#fff;border:3px solid var(--fc);transform:rotateY(180deg);opacity:0}
+.dorso b{font:700 16px/1.1 var(--texto);color:var(--ayuda)}
+.dorso i{font:400 10.5px/1.25 var(--mono);color:var(--ayuda);font-style:normal}
+.dorso span{font:700 15px/1.2 var(--texto)}
+.tarjeta.vuelta .dorso{opacity:1}
+.tarjeta.vuelta .frente{opacity:0}
+.leyenda{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:15px}
+
+/* presentación por páginas */
+.pager{position:relative;padding:0 58px;min-height:300px;display:flex;flex-direction:column;justify-content:center}
+.pg{display:none}.pg.on{display:block}
+.flecha{position:absolute;top:50%;margin-top:-23px;width:46px;height:46px;border-radius:10px;background:var(--gris)!important;border:2px solid var(--linea)!important;font:800 22px var(--display);display:grid;place-items:center;line-height:1}
+.flecha.izq{left:0}.flecha.der{right:0}
+.flecha:disabled{opacity:.3;cursor:default}
+.npag{text-align:center;font:400 12px var(--mono);color:var(--ayuda);margin-top:10px}
+.par2{display:grid;gap:8px;margin:8px 0}
+.nw{white-space:nowrap}
+.ej{padding:8px 16px;border-radius:12px;background:#F3F6F8;border-left:6px solid var(--bc,var(--teal))}
+.ej .es{font-size:clamp(18px,2.1vw,22px);display:block;line-height:1.3}
+.ej .en{display:block;font-size:16px}
+.capas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+.capa{border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;min-width:0}
+.capa svg{flex:none}
+.capa>div{min-width:0}
+.capa small{display:block;font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.capa b{display:block;font:800 clamp(19px,2.2vw,24px)/1.1 var(--display)}
+.capa span{display:block;font-size:16px;line-height:1.3;margin-top:3px}
+.capa.e{background:var(--f1)} .capa.e small,.capa.e b{color:var(--esc)}
+.capa.a{background:var(--f3)} .capa.a small,.capa.a b{color:var(--acc)}
+.formas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.formas>div{border-radius:14px;padding:10px 14px;min-width:0}
+.formas h3{margin:0 0 4px;font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.formas p{margin:0 0 4px;font:700 17px/1.35 var(--texto);overflow-wrap:anywhere}
+.formas p small{font:400 14px var(--texto);color:var(--ayuda)}
+
+/* huecos y elección */
+.frase{font:700 clamp(20px,2.6vw,28px)/1.3 var(--display);margin:6px 0 14px;overflow-wrap:anywhere}
+.frase u{text-decoration:none;display:inline-block;min-width:110px;border-bottom:5px solid var(--tinta);text-align:center;color:var(--teal)}
+.frase small{display:block;font:400 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ayuda);margin-bottom:4px}
+.ops{display:flex;flex-wrap:wrap;gap:10px}
+.ops.col{flex-direction:column;align-items:stretch;max-width:720px}
+.op{min-height:52px;padding:8px 20px;border-radius:14px;border:3px solid var(--linea);background:#fff;font:700 clamp(17px,1.9vw,20px)/1.2 var(--display);text-align:left;overflow-wrap:anywhere;min-width:0}
+.op.txt{font:600 18px/1.25 var(--texto)}
+.op.ok{border-color:var(--ok);background:var(--okf)}
+.op.mal{border-color:var(--mal);background:var(--malf)}
+.op.cazado{border-color:var(--mal);background:var(--malf);text-decoration:line-through;text-decoration-color:var(--mal);text-decoration-thickness:3px}
+
+/* introducción */
+.banner{border-radius:14px;overflow:hidden;background:#DCE6EC;max-height:23vh;min-height:110px;aspect-ratio:800/210;width:100%}
+.banner svg{display:block;width:100%;height:100%}
+.pasa{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.pasa button{min-height:58px;min-width:0;padding:6px 10px;border-radius:12px;border:3px solid var(--linea);background:#fff;display:flex;align-items:center;gap:8px;text-align:left;font:600 16.5px/1.15 var(--texto);overflow-wrap:anywhere}
+.pasa button span{font-size:24px;line-height:1;flex:none}
+.pasa button.ya{border-color:var(--sol);background:#FFF5D8}
+.cuenta{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:10px}
+.cuenta b{font:800 40px/1 var(--display);color:var(--rojo);min-width:30px;font-variant-numeric:tabular-nums}
+.glosas{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.glosabtn{min-height:40px;padding:0 16px;border-radius:20px;background:var(--tinta);color:#fff;font:700 17px var(--display)}
+.metas{display:grid;gap:10px;margin:10px 0}
+.meta{display:block;width:100%;text-align:left;border-radius:12px;background:#F3F6F8;border-left:6px solid var(--bc);padding:10px 16px}
+.meta b{display:block;font:700 19px/1.25 var(--texto)}
+.meta span{display:none;margin-top:4px;font:700 clamp(18px,2.2vw,23px)/1.2 var(--display);color:var(--teal)}
+.meta.abierta span{display:block}
+.meta small{font:400 11.5px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ayuda)}
+.meta.abierta small{display:none}
+
+/* trampas del inglés */
+.trampas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.trampa{min-height:92px;border-radius:14px;border:3px solid var(--linea);background:#fff;padding:8px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;min-width:0}
+.trampa small{font:400 11px var(--mono);letter-spacing:.05em;color:var(--ayuda)}
+.trampa b{font:600 19px/1.15 var(--texto);color:var(--ayuda);font-style:italic;overflow-wrap:anywhere}
+.trampa.visto{border-color:var(--teal);background:#EFF8F7}
+.contraste{display:grid;gap:8px;margin-top:6px}
+.contraste div{padding:8px 14px;border-radius:10px;font:700 20px/1.25 var(--texto);overflow-wrap:anywhere}
+.contraste .no{background:var(--malf);text-decoration:line-through;text-decoration-color:var(--mal)}
+.contraste .si{background:var(--okf)}
+.contraste small{display:inline-block;width:100%;font:400 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ayuda);text-decoration:none}
+
+/* línea del tiempo */
+.sec2{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
+.tira{margin:0;padding:10px 12px 10px 46px;min-height:120px;border-radius:14px;background:var(--tinta);color:#fff;display:grid;gap:6px;align-content:start;counter-reset:t;list-style:none;position:relative}
+.tira::before{content:"";position:absolute;left:14px;top:10px;bottom:10px;width:14px;background:repeating-linear-gradient(#ffffff55 0 8px,transparent 8px 16px);border-radius:3px}
+.tira:empty::after{content:"Aquí va la historia, en orden.";color:#BFCBD6;font-style:italic;font-size:16px}
+.tira li{counter-increment:t;background:#fff;color:var(--tinta);border-radius:9px;padding:6px 12px 6px 40px;font:600 17px/1.25 var(--texto);position:relative;overflow-wrap:anywhere}
+.tira li::before{content:counter(t);position:absolute;left:8px;top:50%;margin-top:-12px;width:24px;height:24px;border-radius:50%;background:var(--f3);color:var(--acc);font:800 14px/24px var(--display);text-align:center}
+.banco2{display:grid;gap:6px}
+.hecho{min-height:46px;padding:6px 14px;border-radius:12px;border:3px solid var(--linea);background:#fff;font:600 17px/1.25 var(--texto);text-align:left;overflow-wrap:anywhere}
+
+/* imagen + dado */
+.imgdesc{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;align-items:start}
+.imgdesc>div{min-width:0}
+.imgdesc .marco{border-radius:14px;overflow:hidden;background:var(--gris);border:3px solid var(--linea)}
+.imgdesc .marco svg,.imgdesc .marco img{display:block;width:100%;height:auto;max-height:54vh;object-fit:contain}
+.orden{display:flex;align-items:center;gap:14px}
+.orden>div{min-width:0}
+.dado{flex:none;width:84px;height:84px;border-radius:18px;background:var(--rojo)!important;color:#fff!important;font:800 48px/1 var(--display);display:grid;place-items:center;box-shadow:inset 0 -8px 0 #0000002e}
+@keyframes rueda{from{transform:rotate(-200deg) scale(.9)}to{transform:none}}
+.dado.gira{animation:rueda .4s var(--ease-out)}
+.preg{font:800 clamp(21px,2.6vw,27px)/1.15 var(--display);margin-top:4px;min-height:2.3em;overflow-wrap:anywhere}
+
+/* libro */
+.libro{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);border-radius:16px;overflow:hidden;border:3px solid #D5DCE2;background:#FAFBFC;min-height:300px}
+.libro.solo{grid-template-columns:1fr}
+.libro .ilu{background:#DCE6EC;display:grid;place-items:end center;border-right:3px solid #D5DCE2}
+.libro .ilu svg{display:block;width:100%;height:auto}
+.libro .hoja{position:relative;padding:20px clamp(16px,3vw,34px) 58px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.libro .tit{font:800 clamp(26px,3.3vw,38px)/1.1 var(--display);margin:0;overflow-wrap:anywhere;text-wrap:balance}
+.libro .aut{font:400 13px var(--mono);letter-spacing:.03em;color:var(--ayuda);margin:6px 0 0;overflow-wrap:anywhere}
+.libro .txt p{margin:0 0 .55em;font:400 var(--fs,22px)/1.5 var(--texto);overflow-wrap:anywhere}
+.libro .nav{position:absolute;left:0;right:0;bottom:8px;display:flex;align-items:center;justify-content:center;gap:16px}
+.libro .nav button{width:44px;height:44px;border-radius:50%;background:var(--tinta);color:#fff;font:800 19px var(--display);display:grid;place-items:center;line-height:1}
+.libro .nav button:disabled{opacity:.25;cursor:default}
+.libro .nav span{font:400 13px var(--mono);color:var(--ayuda);min-width:54px;text-align:center}
+@keyframes hoja{from{opacity:.25}to{opacity:1}}
+.libro .txt.pasa2{animation:hoja .16s ease-out}
+.leer{max-width:74ch}
+.leer p{margin:0 0 .4em;font:400 18px/1.62 var(--texto)}
+.leer button{font:inherit;font-weight:700;border-bottom:4px solid var(--sol);padding:0 2px;border-radius:4px 4px 0 0;user-select:text;-webkit-user-select:text}
+.leer button.fr{border-bottom-color:var(--teal2)}
+.leer button.listo{background:var(--okf);border-bottom-color:var(--ok)}
+.cajas{display:grid;gap:10px}
+.caja{border-radius:14px;border:3px solid var(--linea);overflow:hidden}
+.caja>button{width:100%;text-align:left;padding:11px 16px;font:800 19px var(--display);display:flex;gap:10px;align-items:center}
+.caja>button:active{transform:none}
+.caja>button i{font-style:normal;width:34px;height:34px;border-radius:50%;background:var(--sol);display:grid;place-items:center;flex:none;line-height:1}
+.caja>button small{margin-left:auto;font:400 11.5px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ayuda)}
+.caja .den{display:none;padding:0 16px 14px}
+.caja.abierta .den{display:block}
+.caja.abierta{border-color:var(--sol);background:#FFFBEF}
+
+/* juego */
+.marcador{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:stretch}
+.jug{flex:1;min-width:130px;border-radius:14px;border:3px solid var(--linea);padding:5px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;font:800 19px var(--display)}
+.jug b{font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.jug.turno{border-color:var(--sol);background:#FFF5D8}
+.jug.P.turno{border-color:var(--teal);background:#E6F4F3}
+.sit{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-radius:12px;background:var(--tinta);color:#fff;padding:8px 14px;margin-bottom:10px}
+.sit small{font:400 11px var(--mono);letter-spacing:.06em;color:var(--sol)}
+.sit b{font:700 clamp(18px,2.2vw,23px)/1.15 var(--display);flex:1;min-width:180px}
+.sit .mini{border-color:#ffffff66;background:transparent;color:#fff}
+.bingo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.casilla{min-height:64px;border-radius:12px;border:3px solid transparent;background:var(--fc);font:800 clamp(16px,1.9vw,20px)/1.1 var(--display);padding:4px 8px;display:grid;place-items:center;text-align:center;min-width:0;overflow-wrap:anywhere}
+.casilla i{display:block;font:700 10.5px var(--mono);letter-spacing:.06em;font-style:normal;color:var(--tc);margin-bottom:2px}
+.casilla.ab{background:#FFF5D8;border-color:var(--sol);cursor:default}
+.casilla.ab.P{background:#E6F4F3;border-color:var(--teal)}
+.casilla small{display:block;font:400 11px/1.25 var(--mono);color:var(--ayuda)}
+.final{margin-top:12px;padding:12px 16px;border-radius:14px;background:#FFF5D8;border:3px solid var(--sol)}
+
+/* tarea final */
+.plan{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.plan>div{min-width:0}
+.plan h3{margin:8px 0 5px;font:400 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ayuda)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{min-height:38px;padding:0 13px;border-radius:19px;border:2px solid var(--linea);background:#fff;font:600 16px var(--texto)}
+.chip.sel{border-color:var(--tinta);background:var(--tinta);color:#fff}
+.chip.u{background:var(--fc);border-color:transparent}
+.chip.u.sel{background:var(--ok);border-color:var(--ok);color:#fff}
+.chip:disabled,.btn:disabled{opacity:.45;cursor:default}
+.guion{border-radius:14px;background:#F3F6F8;padding:12px 16px;display:grid;gap:5px}
+.guion p{margin:0;font:600 19px/1.3 var(--texto)}
+.guion p b{font-family:var(--display);font-weight:800}
+.reloj{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.reloj b{font:800 44px/1 var(--display);font-variant-numeric:tabular-nums;min-width:96px}
+.reloj b.fin{color:var(--rojo)}
+
+/* clasificar */
+.fichas{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;min-height:46px}
+.tok{min-height:42px;padding:0 14px;border-radius:12px;background:#E3E8EC;font:800 clamp(16px,1.9vw,20px) var(--display);line-height:1.1}
+.fichas .tok.sel{outline:4px solid var(--sol)}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.colu{border-radius:14px;background:var(--fc);min-height:130px;padding:8px;display:flex;flex-direction:row;flex-wrap:wrap;gap:6px;text-align:center;border:3px solid transparent;align-items:flex-start;align-content:flex-start;justify-content:center}
+.colu:active{transform:none}
+.colu h3{margin:0 0 4px;font:800 19px var(--display);width:100%;color:var(--tc)}
+.colu h3 small{display:block;font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.colu span{background:#fff;border-radius:9px;padding:3px 10px;font:800 17px var(--display)}
+.aprendi{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:4px}
+.aprendi li{padding-left:28px;position:relative}
+.aprendi li::before{content:"";position:absolute;left:4px;top:.5em;width:12px;height:12px;background:var(--indigo);transform:rotate(45deg)}
+
+/* pasos */
+.pasos{display:grid;gap:10px}
+.pasoq{display:flex;gap:12px;align-items:flex-start}
+.pasoq>button{flex:none;width:50px;height:50px;border-radius:50%;background:var(--hoja);color:#fff;font:800 24px/1 var(--display);display:grid;place-items:center}
+.pasoq>div{flex:1;min-width:0;border-radius:14px;background:#EEF6F1;padding:10px 16px;visibility:hidden;overflow-wrap:anywhere}
+.pasoq.visto>div{visibility:visible}
+
+/* tres pasos */
+.pasos3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0}
+.pasos3 div{border-radius:14px;padding:10px 14px;min-width:0}
+.pasos3 small{display:block;font:700 11px var(--mono);letter-spacing:.05em;text-transform:uppercase}
+.pasos3 b{display:block;font:700 clamp(16px,1.8vw,20px)/1.2 var(--display);overflow-wrap:anywhere}
+.pasos3 .f1 small,.pasos3 .f1 b{color:var(--esc)} .pasos3 .f2 small,.pasos3 .f2 b{color:var(--mid)} .pasos3 .f3 small,.pasos3 .f3 b{color:var(--acc)}
+.duelo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:8px 0}
+.duelo>div{border-radius:14px;padding:10px 14px;min-width:0}
+.duelo h3{margin:0 0 6px;font:700 11px var(--mono);letter-spacing:.05em;text-transform:uppercase}
+.duelo p{margin:0 0 4px;font:700 19px/1.3 var(--texto);overflow-wrap:anywhere}
+.duelo .no{background:var(--malf)} .duelo .no h3{color:#96241A} .duelo .si{background:var(--okf)} .duelo .si h3{color:#0D5F35}
+/* ordenar la frase */
+.dice2{border-radius:12px;background:var(--tinta);color:#fff;padding:8px 14px;margin-bottom:10px;font:700 clamp(17px,2vw,21px)/1.25 var(--display);overflow-wrap:anywhere}
+.dice2 small{display:block;font:400 11px var(--mono);letter-spacing:.05em;color:var(--sol);text-transform:uppercase}
+.linea{min-height:58px;border-bottom:4px solid var(--tinta);display:flex;flex-wrap:wrap;gap:8px;padding:6px 0;margin-bottom:14px}
+.banco{display:flex;flex-wrap:wrap;gap:8px;min-height:50px}
+.tok2{min-height:44px;padding:0 14px;border-radius:12px;background:#E3E8EC;font:700 clamp(16px,1.8vw,19px) var(--display);line-height:1.1}
+.linea .tok2{background:var(--f2)}
+/* juego: la moneda */
+.mesa{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.lado{min-height:46px;padding:0 18px;border-radius:12px;display:inline-flex;align-items:center;font:800 clamp(18px,2.2vw,24px) var(--display);background:var(--gris);color:var(--ayuda)}
+.lado.fav{background:var(--okf);color:#0D5F35} .lado.con{background:var(--malf);color:#96241A}
+@keyframes cae{from{transform:translateY(-8px) scale(.96);opacity:.3}to{transform:none;opacity:1}}
+.lado.cae{animation:cae .2s var(--ease-out)}
+.exps{display:flex;flex-wrap:wrap;gap:6px}
+.cols.tres{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+/* video y bloques añadidos */
+.video{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.video>div{min-width:0}
+.poster{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:16px;background:linear-gradient(135deg,#1E2B3A,#0F766E);display:grid;place-items:center;color:#fff;text-decoration:none;overflow:hidden}
+.poster::before{content:"";width:86px;height:86px;border-radius:50%;background:var(--rojo);box-shadow:0 0 0 10px #ffffff2e}
+.poster::after{content:"";position:absolute;border:19px solid transparent;border-left:30px solid #fff;border-right:0;margin-left:8px}
+.poster em{position:absolute;left:12px;bottom:10px;font:400 12px var(--mono);font-style:normal;background:#000000a0;padding:2px 8px;border-radius:6px}
+.poster:active{transform:scale(.99)}
+.video .tiempos{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.video .tiempos span{font:700 14px var(--mono);padding:4px 10px;border-radius:8px;background:var(--gris)}
+.video a.btn{display:inline-flex;align-items:center;text-decoration:none}
+.video .cred{font:400 12px var(--mono);letter-spacing:.03em;color:var(--ayuda);margin:0 0 4px}
+.vacio{border:3px dashed var(--linea);border-radius:16px;padding:26px;text-align:center;color:var(--ayuda);overflow-wrap:anywhere}
+.herr{display:none;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.editando .herr{display:flex}
+
+/* ventana */
+#velo{position:fixed;inset:0;background:#1E2B3Acc;display:grid;place-items:center;padding:16px;z-index:20}
+@keyframes abre{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+.popup{position:relative;background:#fff;border-radius:18px;max-width:580px;width:100%;max-height:92%;overflow:auto;overscroll-behavior:contain;padding:24px 24px 20px;box-shadow:0 20px 60px #0006;animation:abre .2s var(--ease-out)}
+.popup .x{position:absolute;right:10px;top:10px;width:40px;height:40px;border-radius:50%;background:var(--rojo);color:#fff;font:800 19px/1 var(--display);display:grid;place-items:center}
+.popup h3{margin:0 40px 10px 0;font:800 25px/1.1 var(--display);overflow-wrap:anywhere}
+.popup label{display:block;font:700 15px var(--texto);margin:10px 0 3px}
+.popup label small{font-weight:400;color:var(--ayuda)}
+.popup input[type=text],.popup textarea,.popup select{width:100%;font:400 17px var(--texto);padding:9px 12px;border:2px solid var(--linea);border-radius:10px;background:#fff;color:var(--tinta)}
+.popup input[type=file]{font-size:16px;max-width:100%}
+.popup textarea{min-height:120px;resize:vertical}
+.popup .dos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.popup .err{color:var(--mal);font-weight:700;font-size:15px;min-height:20px;margin-top:6px}
+.glosa-pop{display:flex;gap:16px;align-items:center}
+.glosa-pop>svg,.glosa-pop>span{flex:none}
+.glosa-pop>div{min-width:0}
+.glosa-pop b{font:800 30px/1.1 var(--display);display:block;overflow-wrap:anywhere}
+
+@media (hover:hover) and (pointer:fine){
+  .tnav button:hover:not(:disabled){background:#ffffff1f}
+  .chipadd:hover{background:#EFF8F7!important}
+  .colu:hover{border-color:var(--sol)}
+  .op:not(.ok):not(.mal):not(.cazado):hover,.pasa button:not(.ya):hover,.trampa:not(.visto):hover,.hecho:hover{border-color:#9FAEBB}
+  .it:hover{background:#ffffff12}
+  button.casilla:hover{border-color:var(--tinta)}
+}
+@media (max-width:1180px){
+  .cartas{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  body{font-size:17px}
+  .tmenu{width:60px;justify-content:center;padding:0!important}.tmenu span{display:none}
+  .tnav span,.guard,.tedit span{display:none}
+  .tprog{display:none}
+  #top{gap:6px}
+  .crono{margin-left:auto}
+  .imgdesc,.libro,.plan,.video,.sec2{grid-template-columns:1fr}
+  .libro .ilu{border-right:0;border-bottom:3px solid #D5DCE2;max-height:150px;overflow:hidden}
+  .pager{padding:0 0 60px}
+  .flecha{top:auto;bottom:0;margin-top:0}
+  .cartas{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tarjeta{height:150px}
+  .pasa,.trampas{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bingo{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .pasos3,.duelo,.cols.tres{grid-template-columns:1fr}
+  .cab .icono{width:60px}
+  #escena{padding:8px}
+  .popup .dos{grid-template-columns:1fr}
+  .banner{max-height:none;min-height:0}
+}
+@media (max-width:600px){
+  .pasa{grid-template-columns:1fr}
+  .pasa button{min-height:46px}
+  .capas,.formas,.cols{grid-template-columns:1fr}
+  .cartas{grid-template-columns:1fr}
+  .tarjeta{height:138px}
+  .colu{min-height:84px}
+  .bingo{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app">
+  <header id="top">
+    <button id="bMenu" class="tmenu" title="Mostrar u ocultar el menú (tecla S)" aria-label="Mostrar u ocultar el menú">
+      <svg width="30" height="30" viewBox="0 0 732 732" aria-hidden="true" focusable="false"><circle cx="366" cy="366" r="338" fill="#F8F8F8"/><circle cx="366" cy="366" r="338" fill="none" stroke="#6FC0AB" stroke-width="40"/><g transform="translate(338 382) scale(1.1) translate(-366 -380)"><path d="M186 452 C158 404, 154 350, 178 302 C212 236, 286 190, 368 184 C408 181, 446 189, 472 199" fill="none" stroke="#1A6FAF" stroke-width="30" stroke-linecap="round"/><path d="M470 212 C420 194, 366 188, 322 196 C238 212, 176 268, 165 348 C158 402, 176 454, 212 488 C221 497, 223 506, 217 519 C207 543, 192 562, 185 572 C178 581, 184 590, 194 585 C233 570, 269 558, 303 556 L470 556 Z" fill="#14C49B"/><path d="M462 206 L628 322 L462 438 Z" fill="#F52323" stroke="#F52323" stroke-width="10" stroke-linejoin="round"/><circle cx="398" cy="282" r="25" fill="#111"/><circle cx="406" cy="274" r="7" fill="#fff"/></g></svg>
+      <span id="lMenu">Ocultar el menú</span>
+    </button>
+    <nav class="tnav" aria-label="Navegación">
+      <button id="bAnt" title="Anterior (←)"><i>◀</i><span>Anterior</span></button>
+      <button id="bInicio" title="Ir al inicio" aria-label="Ir al inicio"><i>⌂</i></button>
+      <button id="bSig" title="Siguiente (→)"><span>Siguiente</span><i>▶</i></button>
+    </nav>
+    <div class="tprog" id="prog" title="Secciones hechas"></div>
+    <button id="crono" class="crono" title="Cronómetro: clic para iniciar o pausar">5:00</button>
+    <span id="guard" class="guard">CONECTANDO…</span>
+    <button id="bEditar" class="tedit" title="Añadir video, imagen, cuento o pregunta">＋ <span>Añadir</span></button>
+  </header>
+  <aside id="lado" aria-label="Mapa de la clase">
+    <div class="ficha">
+      <b>Sí, pero no</b>
+      <span>Deutsch · B1+ → B2 · 50 min</span>
+      <span>Discrepar con cortesía · la convivencia</span>
+    </div>
+    <div class="indice" id="indice"></div>
+    <button class="vaciar" id="bVaciar">VACIAR LA SESIÓN</button>
+  </aside>
+  <main id="escena"><div class="lamina" id="lamina"></div></main>
+</div>
+<div id="velo" hidden><div class="popup" role="dialog" aria-modal="true"><button class="x" id="popX" aria-label="Cerrar">✕</button><div id="popC"></div></div></div>
+<script>
+(()=>{
+'use strict';
+/* ================= utilidades ================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const baraja=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const TITULO='Sí, pero no';
+
+/* ventana: la pieza de progreso de esta clase. Cada sección hecha enciende una ventana del edificio. */
+const foto=(lleno,s=24,c='#E8A93B')=>lleno
+ ?`<svg width="${s}" height="${s}" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="3" width="24" height="26" rx="3" fill="${c}"/><path d="M16 3v26M4 16h24" stroke="${c==='#fff'||c==='#E8A93B'?'#1E2B3A':'#fff'}" stroke-width="2.4" opacity=".8"/><rect x="2" y="27" width="28" height="3.5" rx="1.5" fill="${c==='#fff'||c==='#E8A93B'?'#1E2B3A':c}"/></svg>`
+ :`<svg width="${s}" height="${s}" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="3" width="24" height="26" rx="3" fill="none" stroke="#ffffff66" stroke-width="2"/><path d="M16 3v26M4 16h24" stroke="#ffffff44" stroke-width="2"/></svg>`;
+const MANO='<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="#0F766E" stroke-width="2" stroke-dasharray="3 3"/><path d="M9 9l11 4-4.5 2.2L13 20z" fill="#1E2B3A"/></svg>';
+const IC={
+ intro:'<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 6h24v16H14l-7 6v-6H4z" fill="#fff"/><path d="M13 12a3 3 0 1 1 4.5 2.6c-1 .6-1.5 1.1-1.5 2.4M16 19.5v.5" fill="none" stroke="#D8553F" stroke-width="2.4" stroke-linecap="round"/></svg>',
+ obj:'<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="#fff" stroke-width="3"/><circle cx="16" cy="16" r="6" fill="none" stroke="#fff" stroke-width="3"/><circle cx="16" cy="16" r="2" fill="#fff"/></svg>',
+ cont:'<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 7c5-2 9-1 13 2 4-3 8-4 13-2v17c-5-2-9-1-13 2-4-3-8-4-13-2z" fill="#fff"/><path d="M16 9v17" stroke="#0F766E" stroke-width="2"/></svg>',
+ res:'<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="6" y="5" width="20" height="24" rx="3" fill="#fff"/><rect x="11" y="2" width="10" height="6" rx="2" fill="#fff" stroke="#5B55A6" stroke-width="1.5"/><path d="M10 14h12M10 19h12M10 24h8" stroke="#5B55A6" stroke-width="2.2" stroke-linecap="round"/></svg>',
+ tarea:'<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 15L16 4l12 11v13H4z" fill="#fff"/><rect x="13" y="18" width="6" height="10" fill="#2E8B57"/></svg>'
+};
+const MOM={intro:{n:'INTRODUCCIÓN',c:'var(--coral)'},obj:{n:'OBJETIVOS',c:'var(--ambar)'},cont:{n:'ACTIVIDAD',c:'var(--teal)'},res:{n:'RESUMEN',c:'var(--indigo)'},tarea:{n:'TAREA',c:'var(--hoja)'}};
+/* textos de los bloques que añade el profesor, en la lengua de las consignas de esta estudiante (B1: español) */
+const TXT={video:'Mira el fragmento con tu profe.',imagen:'Lanza el dado y habla sobre la imagen.',cuento:'Lee con tu profe. Usa las flechas para pasar la página.',pregunta:'Escucha, piensa y responde en voz alta.',
+  abrir:'Abrir el video',verdesde:'Empieza en',verhasta:'Para en',dado:'Lanza el dado',estrella:'¡Lo dije!',hablar:'Para conversar',ayuda:'¿Necesitas ayuda?'};
+
+/* ================= estado ================= */
+const nuevoEstado=()=>({pantalla:0,tab:0,hechas:[],juego:null,final:{},actualizado:0});
+let estado=nuevoEstado();
+let contenido={extras:{},fijos:{},actualizado:0};
+const mediaMem=new Map();
+let db=null,aplicando=false,editando=false;
+const cache=new Map();
+const guard=$('#guard');
+const marca=(t,c)=>{guard.textContent=t;guard.className='guard '+(c||'')};
+function escritor(ruta,datos){let t=null,ocupado=false,sucio=false;
+  async function ya(){if(ocupado){sucio=true;return}ocupado=true;
+    try{await db.doc(ruta).set(JSON.parse(JSON.stringify(datos())));marca('GUARDADO','ok')}catch(e){marca('SOLO ESTA SESIÓN')}
+    ocupado=false;if(sucio){sucio=false;ya()}}
+  return()=>{if(aplicando)return;if(!db){marca('SOLO ESTA SESIÓN');return}marca('GUARDANDO…');clearTimeout(t);t=setTimeout(ya,500)}}
+const _gE=escritor('sesion/estado',()=>estado),_gC=escritor('sesion/contenido',()=>contenido);
+const guardar=()=>{if(aplicando)return;estado.actualizado=Date.now();_gE()};
+const guardarContenido=()=>{contenido.actualizado=Date.now();_gC()};
+async function guardarMedia(id,d){mediaMem.set(id,d);if(db){try{await db.doc('media/'+id).set({d})}catch(e){marca('SOLO ESTA SESIÓN')}}}
+async function leerMedia(id){if(!id)return null;if(mediaMem.has(id))return mediaMem.get(id);if(!db)return null;
+  try{const s=await db.doc('media/'+id).get();if(s.exists){const d=s.data().d;mediaMem.set(id,d);return d}}catch(e){}return null}
+async function conectar(){
+  try{db=window.claude&&window.claude.use?await window.claude.use('db'):null}catch(e){db=null}
+  if(!db){marca('SOLO ESTA SESIÓN');return}
+  marca('GUARDADO','ok');
+  db.doc('sesion/estado').onSnapshot(s=>{if(!s.exists||s.metadata.hasPendingWrites)return;const d=s.data();
+    if(!d||!(d.actualizado>estado.actualizado))return;
+    const antes=estado.pantalla;aplicando=true;estado=Object.assign(nuevoEstado(),JSON.parse(JSON.stringify(d)));
+    if(!Array.isArray(estado.hechas))estado.hechas=[];if(!estado.final||typeof estado.final!=='object')estado.final={};
+    [...cache.keys()].filter(k=>/^a5\//.test(k)).forEach(k=>cache.delete(k));
+    if(estado.pantalla!==antes)reiniciaCrono();pintar();aplicando=false},()=>marca('SOLO ESTA SESIÓN'));
+  db.doc('sesion/contenido').onSnapshot(s=>{if(!s.exists||s.metadata.hasPendingWrites)return;const d=s.data();
+    if(!d||!(d.actualizado>contenido.actualizado))return;
+    contenido=Object.assign({extras:{},fijos:{}},JSON.parse(JSON.stringify(d)));
+    if(!contenido.extras||typeof contenido.extras!=='object')contenido.extras={};if(!contenido.fijos||typeof contenido.fijos!=='object')contenido.fijos={};
+    cache.clear();pintar()},()=>{});
+}
+
+/* ================= ventana ================= */
+const velo=$('#velo'),popC=$('#popC');let antesFoco=null;
+function abrir(html){antesFoco=document.activeElement;popC.innerHTML=html;popC.onpaste=null;velo.hidden=false;const f=$('input,textarea,button:not(.x)',popC);(f||$('#popX')).focus()}
+function cerrar(){velo.hidden=true;popC.innerHTML='';if(antesFoco&&document.contains(antesFoco))antesFoco.focus()}
+$('#popX').onclick=cerrar;velo.addEventListener('click',e=>{if(e.target===velo)cerrar()});
+
+/* ================= secciones ================= */
+const SECS=[];   // se llena al final
+const extrasDe=id=>Array.isArray(contenido.extras[id])?contenido.extras[id]:[];
+const ICX={video:'▶',imagen:'▣',cuento:'❡',pregunta:'?'};
+function tabsDe(s){
+  const base=s.tabs.filter(t=>!t.si||t.si());
+  const ex=extrasDe(s.id).filter(b=>b&&FORM[b.tipo]).map(b=>({k:'x'+b.id,lab:ICX[b.tipo],extra:b,instr:TXT[b.tipo],r:(el,api)=>rExtra(el,api,b,s)}));
+  return base.concat(ex)}
+const hecha=id=>estado.hechas.includes(id);
+const lam=$('#lamina');
+function pintar(){
+  if(!(estado.pantalla>=0&&estado.pantalla<SECS.length))estado.pantalla=0;
+  const s=SECS[estado.pantalla],tabs=tabsDe(s);
+  if(!(estado.tab>=0&&estado.tab<tabs.length))estado.tab=0;
+  const t=tabs[estado.tab],m=MOM[s.m];
+  lam.style.setProperty('--mcol',m.c);
+  lam.innerHTML=`<header class="cab"><div class="icono">${IC[s.m]}</div><h1>${TITULO}</h1></header>
+   <div class="tagrow"><div class="tag">${m.n}${s.n?`<i>${s.n}</i>`:''}</div><div class="sub">${s.t}</div><div class="min">${s.min} MIN</div>
+     <div class="tabs" role="tablist">${tabs.length>1?tabs.map((x,i)=>`<button role="tab" class="${x.extra?'extra':''}" aria-selected="${i===estado.tab}" data-t="${i}">${x.lab||i+1}</button>`).join(''):''}</div></div>
+   <div class="instr">${MANO}<span>${t.instr||s.instr||''}</span></div>
+   <div class="panel" id="panel"></div>
+   <div class="pie"><div class="editbar"><b>Añadir aquí</b>
+       <button class="chipadd" data-add="video">▶ Video de YouTube</button><button class="chipadd" data-add="imagen">▣ Imagen para describir</button>
+       <button class="chipadd" data-add="cuento">❡ Cuento</button><button class="chipadd" data-add="pregunta">? Pregunta</button></div>
+     <button class="hecha ${hecha(s.id)?'si':''}" id="bHecha">${hecha(s.id)?'Hecha '+foto(true,22,'#fff'):'Marcar hecha '+foto(true,22)}</button></div>`;
+  const clave=s.id+'/'+t.k;let nodo=cache.get(clave);
+  if(!nodo){nodo=document.createElement('div');cache.set(clave,nodo);t.r(nodo,{pager:p=>nodo._pager=p,sec:s})}
+  $('#panel').appendChild(nodo);
+  $$('.tabs button',lam).forEach(b=>b.onclick=()=>{estado.tab=+b.dataset.t;pintar();guardar()});
+  const sel=$('.tabs button[aria-selected="true"]',lam);if(sel&&sel.scrollIntoView)sel.scrollIntoView({block:'nearest',inline:'nearest'});
+  $$('[data-add]',lam).forEach(b=>b.onclick=()=>editarBloque(s,{tipo:b.dataset.add},true));
+  $('#bHecha').onclick=()=>{const i=estado.hechas.indexOf(s.id);i<0?estado.hechas.push(s.id):estado.hechas.splice(i,1);pintar();guardar()};
+  pintarIndice();pintarProg();
+  $('#bAnt').disabled=estado.pantalla===0&&estado.tab===0;
+}
+const corto=s=>s.m==='intro'?'¿?':s.m==='obj'?'◎':s.m==='res'?'≡':s.m==='tarea'?'⌂':s.n;
+function pintarIndice(){
+  $('#indice').innerHTML=SECS.map((s,i)=>`<button class="it ${i===estado.pantalla?'on':''} ${hecha(s.id)?'ok':''}" data-i="${i}" style="--mcol:${MOM[s.m].c}" title="${esc(s.t)}"><span class="pt2">${hecha(s.id)?'✓':corto(s)}</span><span class="tx"><small>${MOM[s.m].n}${s.n?' '+s.n:''} · ${s.min} MIN</small>${s.t}</span></button>`).join('');
+  $$('#indice .it').forEach(b=>b.onclick=()=>irA(+b.dataset.i,0));
+}
+function pintarProg(){$('#prog').innerHTML=SECS.map(s=>foto(hecha(s.id),26)).join('')}
+function irA(i,tab){estado.pantalla=i;estado.tab=tab==='ultima'?tabsDe(SECS[i]).length-1:(tab||0);reiniciaCrono();pintar();$('#escena').scrollTop=0;guardar()}
+function avanzar(d){
+  const s=SECS[estado.pantalla],tabs=tabsDe(s),nodo=cache.get(s.id+'/'+(tabs[estado.tab]||{}).k);
+  if(nodo&&nodo._pager&&nodo._pager.mover(d))return;
+  const nt=estado.tab+d;if(nt>=0&&nt<tabs.length){estado.tab=nt;pintar();$('#escena').scrollTop=0;guardar();return}
+  const np=estado.pantalla+d;if(np>=0&&np<SECS.length)irA(np,d<0?'ultima':0)}
+$('#bAnt').onclick=()=>avanzar(-1);$('#bSig').onclick=()=>avanzar(1);$('#bInicio').onclick=()=>irA(0,0);
+
+/* menú, edición, vaciar, teclado */
+const app=$('#app');
+function plegar(v){app.classList.toggle('plegado',v);$('#lMenu').textContent=v?'Mostrar el menú':'Ocultar el menú'}
+$('#bMenu').onclick=()=>plegar(!app.classList.contains('plegado'));
+if(window.innerWidth<900)plegar(true);
+$('#bEditar').onclick=()=>{editando=!editando;document.body.classList.toggle('editando',editando);$('#bEditar').innerHTML=editando?'✓ <span>Listo</span>':'＋ <span>Añadir</span>'};
+let armado=null;const bV=$('#bVaciar');
+bV.onclick=()=>{if(!armado){bV.classList.add('arma');bV.textContent='¿SEGURO? PULSA OTRA VEZ';armado=setTimeout(()=>{armado=null;bV.classList.remove('arma');bV.textContent='VACIAR LA SESIÓN'},3500);return}
+  clearTimeout(armado);armado=null;bV.classList.remove('arma');bV.textContent='VACIAR LA SESIÓN';estado=nuevoEstado();cache.clear();reiniciaCrono();pintar();guardar()};
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&!velo.hidden){cerrar();return}
+  if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)||!velo.hidden||e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==='ArrowRight'){e.preventDefault();avanzar(1)}else if(e.key==='ArrowLeft'){e.preventDefault();avanzar(-1)}
+  else if(e.key==='s'||e.key==='S')plegar(!app.classList.contains('plegado'))});
+
+/* cronómetro */
+let resta=0,corre=false,tic=null;const cr=$('#crono');
+function pintaCrono(){const a=Math.abs(resta),m=a/60|0,s=String(a%60).padStart(2,'0');cr.textContent=(resta<0?'+':'')+m+':'+s;cr.classList.toggle('pasado',resta<0);cr.classList.toggle('va',corre&&resta>=0)}
+function reiniciaCrono(){clearInterval(tic);corre=false;resta=(SECS[estado.pantalla]||{min:0}).min*60;pintaCrono()}
+cr.onclick=()=>{corre=!corre;clearInterval(tic);if(corre)tic=setInterval(()=>{resta--;pintaCrono()},1000);pintaCrono()};
+
+/* ================= motores de ejercicio ================= */
+const temblar=b=>{b.classList.remove('tiembla');void b.offsetWidth;b.classList.add('tiembla')};
+const rutasHTML=(rs,oculto)=>oculto
+  ?`<button class="ayudabtn">${TXT.ayuda}</button><div class="rutas" hidden>${rs.map(r=>`<span class="ruta">${r}</span>`).join('')}</div>`
+  :`<div class="rutas">${rs.map(r=>`<span class="ruta">${r}</span>`).join('')}</div>`;
+const activaAyuda=root=>$$('.ayudabtn',root).forEach(b=>b.onclick=()=>{const r=b.nextElementSibling;r.hidden=!r.hidden});
+
+function serie(root,n,pinta,cierre){
+  let i=0,hechos=0;
+  root.innerHTML=`<div class="sitem"></div><div class="fb" aria-live="polite"></div><div class="fila"><span class="pts"></span><span class="hueco"></span><button class="mini re">↻ Empezar de nuevo</button><button class="btn sig" hidden>Siguiente ▸</button></div>`;
+  const item=$('.sitem',root),fbx=$('.fb',root),sig=$('.sig',root),pts=$('.pts',root);
+  const pp=()=>pts.innerHTML=foto(true,22,'#0F766E')+' '+hechos+' / '+n;
+  const api={bien(m){hechos++;fbx.className='fb ok';fbx.textContent=m;sig.hidden=false;sig.textContent=i<n-1?'Siguiente ▸':'Terminar ✓';pp()},mal(m){fbx.className='fb mal';fbx.textContent=m}};
+  function ver(){fbx.className='fb';fbx.textContent='';sig.hidden=true;
+    if(i>=n){item.innerHTML=`<h2 class="t">¡Listo! ${foto(true,30,'#0F766E')}</h2><p class="lead es" style="font-size:21px">${cierre||''}</p>`;return}
+    item.innerHTML='';pinta(item,i,api)}
+  sig.onclick=()=>{i++;ver()};
+  $('.re',root).onclick=()=>{i=0;hechos=0;pp();ver()};
+  pp();ver()}
+
+function rTarjetas(root,cartas,pie){
+  root.innerHTML=`<div class="cartas">${cartas.map(c=>`<button class="tarjeta" style="--fc:var(--f${c.f})" aria-label="${esc(c.es)}"><span class="cara"><span class="frente"><em aria-hidden="true">${c.e}</em><b>${c.es}</b><i>${c.fam}</i></span><span class="dorso"><b>${c.en}</b><i>${c.uso}</i><span>${c.ej}</span></span></span></button>`).join('')}</div>
+   <div class="fila"><span class="leyenda">${pie}</span><span class="hueco"></span><button class="mini re">↻ Girar todas</button></div>`;
+  $$('.tarjeta',root).forEach(t=>t.onclick=()=>t.classList.toggle('vuelta'));
+  $('.re',root).onclick=()=>$$('.tarjeta',root).forEach(t=>t.classList.remove('vuelta'))}
+
+function rPaginas(root,api,pags){
+  let i=0;
+  root.innerHTML=`<div class="pager"><button class="flecha izq" aria-label="Página anterior">←</button>${pags.map(p=>`<div class="pg">${p}</div>`).join('')}<button class="flecha der" aria-label="Página siguiente">→</button></div><div class="npag"></div>`;
+  const P=$$('.pg',root),iz=$('.izq',root),de=$('.der',root);
+  function ver(){P.forEach((p,k)=>p.classList.toggle('on',k===i));iz.disabled=i===0;de.disabled=i===P.length-1;$('.npag',root).textContent=(i+1)+' / '+P.length}
+  const mover=d=>{const n=i+d;if(n<0||n>=P.length)return false;i=n;ver();return true};
+  iz.onclick=()=>mover(-1);de.onclick=()=>mover(1);api.pager({mover});ver()}
+
+function rHuecos(root,items,cierre){
+  serie(root,items.length,(el,i,api)=>{
+    const it=items[i];let listo=false;const ops=baraja(it.o);
+    el.innerHTML=`<div class="frase">${it.f.replace('___','<u>&nbsp;</u>')}</div><div class="ops">${ops.map(o=>`<button class="op">${o}</button>`).join('')}</div>`;
+    $$('.op',el).forEach(b=>b.onclick=()=>{if(listo)return;
+      if(b.textContent===it.o[0]){listo=true;b.classList.add('ok');$('u',el).textContent=b.textContent;api.bien(it.p)}
+      else{b.classList.add('mal');temblar(b);api.mal(it.m)}})
+  },cierre)}
+
+
+
+
+/* dado de preguntas: sirve para cualquier imagen */
+const DADO=['¿Qué está pasando en esta reunión?','Elige a una persona: ¿qué opina y por qué?','¿Con quién no estás de acuerdo? Díselo con cortesía.','¿Qué pasó diez minutos antes?','¿Cómo va a terminar la reunión?','¿Te pasó algo parecido? Cuéntalo.'];
+const RUTAS_DADO=['Puede ser, pero…','Yo no lo veo así, porque…','No es que…, es que…','Depende de…'];
+function rDescribir(root,imgHTML,consigna){
+  let st=0;
+  root.innerHTML=`<div class="imgdesc"><div class="marco">${imgHTML}</div><div>
+     ${consigna?`<p class="lead es" style="font-size:20px">${esc(consigna)}</p>`:''}
+     <div class="orden"><button class="dado" aria-label="${TXT.dado}">?</button><div><span class="en">${TXT.dado} y responde.</span><div class="preg">&nbsp;</div></div></div>
+     ${rutasHTML(RUTAS_DADO,true)}
+     <div class="fila"><button class="btn sol dije">${TXT.estrella} +1</button><span class="pts"></span><button class="mini re" aria-label="Poner el contador en cero">↻</button></div></div></div>`;
+  const d=$('.dado',root),pts=$('.pts',root),pp=()=>pts.textContent=st+(st===1?' frase':' frases');
+  d.onclick=()=>{const k=Math.random()*6|0;d.classList.remove('gira');void d.offsetWidth;d.classList.add('gira');d.textContent=k+1;$('.preg',root).textContent=DADO[k]};
+  $('.dije',root).onclick=()=>{st++;pp()};$('.re',root).onclick=()=>{st=0;pp()};activaAyuda(root);pp()}
+
+/* libro por páginas */
+function paginar(texto,max){
+  const paras=String(texto).replace(/\r/g,'').split(/\n+/).map(s=>s.trim()).filter(Boolean),pags=[];let cur=[],len=0;
+  for(const p of paras){const fr=p.match(/[^.!?…]+[.!?…]+["»”’)]*\s*|[^.!?…]+$/g)||[p];let buf='';const tr=[];
+    for(let f of fr){while(f.length>max){if(buf.trim()){tr.push(buf.trim());buf=''}tr.push(f.slice(0,max));f=f.slice(max)}
+      if((buf+f).length>max&&buf){tr.push(buf.trim());buf=f}else buf+=f}
+    if(buf.trim())tr.push(buf.trim());
+    for(const t of tr){if(len+t.length>max&&cur.length){pags.push(cur);cur=[];len=0}cur.push(t);len+=t.length}}
+  if(cur.length)pags.push(cur);return pags.length?pags:[['']]}
+function rLibro(root,api,c,ilu){
+  const max={corta:140,media:340,larga:700}[c.pag||'media']||340,pags=paginar(c.texto,max);let i=-1;
+  root.innerHTML=`<div class="libro ${ilu?'':'solo'}" style="--fs:${max<200?24:max<500?21:19}px">${ilu?`<div class="ilu">${ilu}</div>`:''}<div class="hoja"><div class="txt"></div><div class="nav"><button class="a" aria-label="Página anterior">←</button><span></span><button class="s" aria-label="Página siguiente">→</button></div></div></div>`;
+  const tx=$('.txt',root),a=$('.a',root),s=$('.s',root);
+  function ver(){tx.classList.remove('pasa2');void tx.offsetWidth;tx.classList.add('pasa2');
+    tx.innerHTML=i<0?`<h2 class="tit">${esc(c.titulo||'Sin título')}</h2><p class="aut">${esc([c.autor,c.fuente].filter(Boolean).join(' · '))}</p>`:pags[i].map(p=>`<p>${esc(p)}</p>`).join('');
+    a.disabled=i<0;s.disabled=i===pags.length-1;$('.nav span',root).textContent=i<0?'':(i+1)+' / '+pags.length}
+  const mover=d=>{const n=i+d;if(n<-1||n>=pags.length)return false;i=n;ver();return true};
+  a.onclick=()=>mover(-1);s.onclick=()=>mover(1);api.pager({mover});ver()}
+function rCajas(root,items){
+  root.innerHTML=`<div class="cajas">${items.map((q,k)=>`<div class="caja"><button aria-expanded="false"><i>${k+1}</i><span>${q.t}</span>${q.quien?`<small>${q.quien}</small>`:''}</button><div class="den">${q.d}</div></div>`).join('')}</div>`;
+  $$('.caja>button',root).forEach(b=>b.onclick=()=>{const on=b.parentNode.classList.toggle('abierta');b.setAttribute('aria-expanded',on)});activaAyuda(root)}
+
+/* ================= video y bloques que añade el profesor ================= */
+function ytId(u){const m=String(u).match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([\w-]{11})/);return m?m[1]:null}
+function aSeg(t){t=String(t||'').trim();if(!t)return 0;const p=t.split(':').map(Number);if(p.some(x=>isNaN(x)||x<0))return 0;return Math.round(p.reduce((a,b)=>a*60+b,0))}
+const mmss=s=>(s/60|0)+':'+String(s%60).padStart(2,'0');
+function videoHTML(b,extra){
+  const id=ytId(b.url),ini=aSeg(b.ini),fin=aSeg(b.fin);
+  if(!id)return '<div class="vacio">No reconozco ese enlace de YouTube. Toca «Editar» y pégalo otra vez.</div>';
+  const href=`https://www.youtube.com/watch?v=${id}${ini?'&t='+ini+'s':''}`;
+  return `<div class="video"><a class="poster" href="${href}" target="_blank" rel="noopener" aria-label="${TXT.abrir}"><em>YouTube · se abre en otra pestaña</em></a>
+      <div>${b.cred?`<p class="cred">${esc(b.cred)}</p>`:''}<h2 class="t">${esc(b.titulo||'Video')}</h2><div class="tiempos"><span>${TXT.verdesde} ${mmss(ini)}</span>${fin>ini?`<span>${TXT.verhasta} ${mmss(fin)}</span><span>Dura ${mmss(fin-ini)}</span>`:''}</div>
+      ${b.consigna?`<p class="lead es" style="font-size:21px">${esc(b.consigna)}</p>`:''}<a class="btn" href="${href}" target="_blank" rel="noopener">${TXT.abrir} ▸</a>${extra||''}</div></div>`}
+function herr(root,s,b){
+  const h=document.createElement('div');h.className='herr';h.innerHTML='<button class="mini ed">Editar este bloque</button><button class="mini qu">Quitar</button>';
+  root.prepend(h);$('.ed',h).onclick=()=>editarBloque(s,b,false);
+  const q=$('.qu',h);let arm=false;q.onclick=()=>{if(!arm){arm=true;q.textContent='¿Quitar? Pulsa otra vez';setTimeout(()=>{arm=false;q.textContent='Quitar'},3000);return}
+    contenido.extras[s.id]=extrasDe(s.id).filter(x=>x.id!==b.id);cache.clear();estado.tab=0;pintar();guardarContenido()}}
+function rExtra(root,api,b,s){
+  if(b.tipo==='video'){root.innerHTML=videoHTML(b)}
+  else if(b.tipo==='imagen'){rDescribir(root,'<div class="vacio">…</div>',b.consigna);
+    leerMedia(b.media).then(d=>{$('.marco',root).innerHTML=d?`<img src="${d}" alt="${esc(b.titulo||'Imagen para describir')}">`:'<div class="vacio">La imagen no está disponible en este dispositivo.</div>'})}
+  else if(b.tipo==='cuento'){const qs=String(b.preguntas||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    const L=document.createElement('div'),Q=document.createElement('div');root.append(L,Q);rLibro(L,api,b,null);
+    if(qs.length){Q.style.marginTop='14px';rCajas(Q,qs.map(q=>({t:TXT.hablar,d:`<p class="dicho">${esc(q)}</p>`})))}}
+  else{const ru=String(b.rutas||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    root.innerHTML=`<h2 class="t" style="font-size:clamp(26px,4vw,42px)">${esc(b.texto||'')}</h2>${ru.length?`<div class="rutas">${ru.map(r=>`<span class="ruta">${esc(r)}</span>`).join('')}</div>`:''}`}
+  herr(root,s,b)}
+
+function comprimir(file){return new Promise((ok,ko)=>{const fr=new FileReader();fr.onerror=ko;fr.onload=()=>{const img=new Image();img.onerror=ko;img.onload=()=>{
+  let max=1280,q=.82,d='';for(let k=0;k<9;k++){const r=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*r));c.height=Math.max(1,Math.round(img.height*r));
+    const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);d=c.toDataURL('image/jpeg',q);if(d.length<230000)break;max=Math.round(max*.82);q=Math.max(.6,q-.05)}
+  d.length<250000?ok(d):ko(new Error('grande'))};img.src=fr.result};fr.readAsDataURL(file)})}
+
+const FORM={
+ video:{t:'Video de YouTube',c:`<label for="f_url">Enlace de YouTube</label><input type="text" id="f_url" inputmode="url" autocapitalize="none" autocorrect="off" placeholder="https://www.youtube.com/watch?v=…">
+   <div class="dos"><div><label for="f_ini">Empieza en <small>(min:seg)</small></label><input type="text" id="f_ini" placeholder="0:45"></div><div><label for="f_fin">Termina en <small>(opcional)</small></label><input type="text" id="f_fin" placeholder="1:30"></div></div>
+   <label for="f_titulo">Título</label><input type="text" id="f_titulo" maxlength="120"><label for="f_consigna">Consigna para el estudiante <small>(qué mirar o qué responder)</small></label><input type="text" id="f_consigna" maxlength="300">
+   <p class="en">El video se abre en una pestaña nueva, en el segundo exacto. El tablero no puede reproducirlo dentro.</p>`,k:['url','ini','fin','titulo','consigna']},
+ imagen:{t:'Imagen para describir',c:`<label for="f_file">Imagen <small>(elige un archivo o pégala con Ctrl+V)</small></label><input type="file" id="f_file" accept="image/*"><div id="f_prev" style="margin-top:8px"></div>
+   <label for="f_titulo">Título <small>(opcional)</small></label><input type="text" id="f_titulo" maxlength="120"><label for="f_consigna">Consigna para el estudiante <small>(opcional)</small></label><input type="text" id="f_consigna" maxlength="300">
+   <p class="en">Junto a la imagen aparece el dado de preguntas y las rutas de respuesta.</p>`,k:['titulo','consigna']},
+ cuento:{t:'Cuento',c:`<div class="dos"><div><label for="f_titulo">Título</label><input type="text" id="f_titulo" maxlength="160"></div><div><label for="f_autor">Autor</label><input type="text" id="f_autor" maxlength="120"></div></div>
+   <label for="f_fuente">Fuente <small>(libro, año o sitio)</small></label><input type="text" id="f_fuente" maxlength="200"><label for="f_texto">Texto <small>(pégalo aquí; se reparte en páginas solo)</small></label><textarea id="f_texto"></textarea>
+   <label for="f_pag">Tamaño de página</label><select id="f_pag"><option value="corta">Corta · principiantes</option><option value="media" selected>Media</option><option value="larga">Larga · niveles altos</option></select>
+   <label for="f_preguntas">Preguntas para conversar <small>(una por línea, opcional)</small></label><textarea id="f_preguntas" style="min-height:70px"></textarea>`,k:['titulo','autor','fuente','texto','pag','preguntas']},
+ pregunta:{t:'Pregunta o consigna',c:`<label for="f_texto">Pregunta <small>(se muestra en grande)</small></label><input type="text" id="f_texto" maxlength="300"><label for="f_rutas">Rutas de respuesta <small>(comienzos de frase, uno por línea)</small></label><textarea id="f_rutas" style="min-height:80px"></textarea>`,k:['texto','rutas']}
+};
+function editarBloque(s,b,nuevo,alGuardar){
+  const F=FORM[b.tipo];let dataImg=null,ocupado=false;
+  abrir(`<h3>${F.t}</h3>${F.c}<div class="err" id="f_err" aria-live="polite"></div><div class="fila"><span class="hueco"></span><button class="mini" id="f_no">Cancelar</button><button class="btn" id="f_ok">Guardar</button></div>`);
+  F.k.forEach(k=>{const e=$('#f_'+k);if(e&&b[k]!=null&&b[k]!=='')e.value=b[k]});
+  const err=m=>$('#f_err').textContent=m;
+  if(b.tipo==='imagen'){const pv=$('#f_prev');
+    const toma=async f=>{if(!f||!/^image\//.test(f.type)){err('Ese archivo no es una imagen.');return}err('Preparando la imagen…');ocupado=true;
+      try{dataImg=await comprimir(f);pv.innerHTML=`<img src="${dataImg}" alt="" style="max-height:150px;max-width:100%;border-radius:10px">`;err('')}catch(e){err('No pude preparar esa imagen. Prueba con un JPG o PNG más pequeño.')}ocupado=false};
+    $('#f_file').onchange=e=>toma(e.target.files[0]);
+    popC.onpaste=e=>{const f=[...(e.clipboardData&&e.clipboardData.files||[])][0];if(f){e.preventDefault();toma(f)}};
+    if(b.media)leerMedia(b.media).then(d=>{if(d&&!dataImg&&pv.isConnected)pv.innerHTML=`<img src="${d}" alt="" style="max-height:150px;max-width:100%;border-radius:10px">`})}
+  $('#f_no').onclick=cerrar;
+  $('#f_ok').onclick=async()=>{
+    if(ocupado)return err('Espera un momento: la imagen se está preparando.');
+    const v={};F.k.forEach(k=>v[k]=$('#f_'+k).value.trim());
+    if(b.tipo==='video'&&!ytId(v.url))return err('Pega un enlace de YouTube completo (youtube.com/watch?v=… o youtu.be/…).');
+    if(b.tipo==='imagen'&&!dataImg&&!b.media)return err('Elige una imagen primero.');
+    if(b.tipo==='cuento'&&!v.texto)return err('Pega el texto del cuento.');
+    if(b.tipo==='cuento'&&v.texto.length>60000)return err('Ese texto es demasiado largo para un solo bloque. Pártelo en dos cuentos.');
+    if(b.tipo==='pregunta'&&!v.texto)return err('Escribe la pregunta.');
+    if(JSON.stringify(contenido).length+JSON.stringify(v).length>230000)return err('Este tablero ya tiene mucho material añadido. Quita un bloque antes de guardar este.');
+    Object.assign(b,v);
+    if(dataImg){b.media=uid();await guardarMedia(b.media,dataImg)}
+    if(alGuardar){alGuardar(b)}
+    else{if(nuevo){b.id=uid();if(!Array.isArray(contenido.extras[s.id]))contenido.extras[s.id]=[];contenido.extras[s.id].push(b)}
+      cache.clear();if(nuevo)estado.tab=tabsDe(s).length-1}
+    cerrar();pintar();guardarContenido()}}
+/* huecos fijos: el profesor puede sustituir la muestra y volver a ella */
+
+/* ================= escenas (originales de este tablero) ================= */
+const perro=(x,y,k=1)=>`<g transform="translate(${x} ${y}) scale(${k})"><ellipse cx="0" cy="0" rx="40" ry="18" fill="#B9793F"/><path d="M-26 12v22M-12 14v22M14 14v22M28 12v22" stroke="#B9793F" stroke-width="8" stroke-linecap="round"/><path d="M-38 -6q-16-8-14-24" fill="none" stroke="#B9793F" stroke-width="7" stroke-linecap="round"/><circle cx="44" cy="-16" r="17" fill="#B9793F"/><ellipse cx="34" cy="-25" rx="6" ry="13" fill="#7C4A22"/><circle cx="49" cy="-20" r="2.6" fill="#1E2B3A"/><circle cx="60" cy="-13" r="3.6" fill="#1E2B3A"/></g>`;
+const ventanaG=(x,y,e,on)=>`<g transform="translate(${x} ${y})"><rect width="96" height="112" rx="6" fill="${on?'#F6D58A':'#33475A'}" stroke="#1E2B3A" stroke-width="5"/><path d="M48 0v112M0 56h96" stroke="#1E2B3A" stroke-width="3" opacity=".3"/><text x="48" y="74" text-anchor="middle" font-size="46">${e}</text><rect x="-8" y="112" width="112" height="9" rx="3" fill="#1E2B3A"/></g>`;
+const ESC_BANNER=`<svg viewBox="0 0 800 210" preserveAspectRatio="xMidYMid slice" role="img" aria-label="La fachada de un edificio con seis ventanas: en una hay música, en otra un perro, en otra alguien hace obras, en otra hay basura, en otra una bicicleta y en la última alguien intenta dormir">
+  <rect width="800" height="210" fill="#B5532B"/><path d="M0 26h800M0 52h800M0 78h800M0 104h800M0 130h800M0 156h800M0 182h800" stroke="#963F1E" stroke-width="2" opacity=".55"/>
+  ${[['🎵',1],['🐕',1],['🔨',1],['🗑️',1],['🚲',1],['💤',0]].map((v,i)=>ventanaG(40+i*124,44,v[0],v[1])).join('')}</svg>`;
+const ESC_CUENTO=`<svg viewBox="0 0 300 300" aria-hidden="true"><rect width="300" height="300" fill="#DCE6EC"/><rect y="250" width="300" height="50" fill="#C3CFD7"/>
+  <rect x="30" y="46" width="150" height="204" rx="6" fill="#51606D"/><rect x="40" y="58" width="64" height="192" fill="#B9C4CC"/><rect x="106" y="58" width="64" height="192" fill="#B9C4CC"/><path d="M105 58v192" stroke="#51606D" stroke-width="3"/>
+  <rect x="78" y="22" width="54" height="20" rx="5" fill="#1E2B3A"/><text x="105" y="37" text-anchor="middle" fill="#E8A93B" font-family="JetBrains Mono,monospace" font-size="13">▲ 3</text>
+  <rect x="188" y="130" width="12" height="34" rx="3" fill="#51606D"/><circle cx="194" cy="140" r="3" fill="#E8A93B"/><circle cx="194" cy="154" r="3" fill="#fff"/>
+  <rect x="210" y="64" width="72" height="92" rx="3" fill="#fff" stroke="#1E2B3A" stroke-width="2"/><circle cx="246" cy="70" r="5" fill="#D8382C"/><text x="246" y="94" text-anchor="middle" fill="#1E2B3A" font-family="JetBrains Mono,monospace" font-weight="700" font-size="12">NORMAS</text><path d="M220 106h52M220 118h52M220 130h52M220 142h34" stroke="#51606D" stroke-width="3" stroke-linecap="round"/>
+  ${perro(236,236,.62)}</svg>`;
+const emo=e=>`<span style="font-size:64px;line-height:1" aria-hidden="true">${e}</span>`;
+
+/* ================= contenido de esta clase ================= */
+const glosaPop=x=>abrir(`<div class="glosa-pop">${x[0]}<div><b>${x[1]}</b><span class="en" style="font-size:20px">${x[2]}</span><p class="es" style="margin:10px 0 2px;font-size:20px">${x[3]}</p><span class="en">${x[4]}</span></div></div>`);
+const FAM=['','Conceder','Discrepar suave','Matizar'];
+const CARTAS=[
+ {es:'Tienes razón en parte',e:'🤝',f:1,en:'Du hast teilweise recht',uso:'Das la razón… a medias.',ej:'Tienes razón en parte: lo del sábado fue demasiado.'},
+ {es:'Puede ser, pero…',e:'🤔',f:1,en:'Mag sein, aber…',uso:'Aceptas la idea y sigues con la tuya.',ej:'Puede ser, pero las normas ya existen.'},
+ {es:'Entiendo lo que dices, pero…',e:'👂',f:1,en:'Ich verstehe, was du meinst, aber…',uso:'Escuchas antes de discrepar.',ej:'Entiendo lo que dices, pero no lo veo tan grave.'},
+ {es:'Ya, pero…',e:'😏',f:1,en:'Ja, schon, aber…',uso:'Rápido y coloquial, entre conocidos.',ej:'Ya, pero nadie ha leído las normas.'},
+ {es:'Yo no lo veo así',e:'👀',f:2,en:'Ich sehe das anders',uso:'Tu opinión, sin atacar la del otro.',ej:'Yo no lo veo así: el problema no es la música.'},
+ {es:'No estoy del todo de acuerdo',e:'⚖️',f:2,en:'Ich bin nicht ganz einverstanden',uso:'«Del todo» suaviza el «no».',ej:'No estoy del todo de acuerdo con prohibir las fiestas.'},
+ {es:'No sé yo…',e:'🤨',f:2,en:'Na ja, ich weiß nicht…',uso:'Dudas en voz alta. Muy coloquial.',ej:'—Es culpa de los jóvenes. —No sé yo…'},
+ {es:'Yo no diría tanto',e:'✋',f:2,en:'So weit würde ich nicht gehen',uso:'El otro exagera y tú frenas.',ej:'—Aquí nadie respeta nada. —Yo no diría tanto.'},
+ {es:'No es que…, es que…',e:'🔧',f:3,en:'Nicht, dass…, sondern…',uso:'No es que + subjuntivo, es que + indicativo.',ej:'No es que no me guste la música, es que es muy tarde.'},
+ {es:'Depende',e:'🎚️',f:3,en:'Kommt drauf an',uso:'Depende de + cosa · depende de si…',ej:'Depende de la hora y del día.'},
+ {es:'hasta cierto punto',e:'📏',f:3,en:'bis zu einem gewissen Grad',uso:'Sí, pero con un límite.',ej:'Estoy de acuerdo hasta cierto punto.'},
+ {es:'llevar la contraria',e:'🙃',f:3,en:'(aus Prinzip) widersprechen',uso:'Para avisar: «No es por llevarte la contraria, pero…».',ej:'Mi hermano siempre me lleva la contraria.'}
+].map(c=>Object.assign(c,{fam:FAM[c.f]}));
+const EXPR=CARTAS.map(c=>({es:c.es,f:c.f}));
+const LEYENDA=`<span class="fam f1">Conceder</span><span class="fam f2">Discrepar suave</span><span class="fam f3">Matizar</span>`;
+const F=(n,t)=>`<span class="fam f${n}">${t}</span>`;
+
+function rIntro(root){
+  const COSAS=[['🎵','La música a las dos de la mañana'],['🐕','Un perro que hace ruido todo el día'],['🔨','Las obras el domingo por la mañana'],['🗑️','La basura en el pasillo'],['🚲','Las bicis en la entrada'],['👞','Los pasos del vecino de arriba'],['🚬','El humo en el balcón'],['🙄','El vecino que no saluda']];let n=0;
+  root.innerHTML=`<div class="banner">${ESC_BANNER}</div>
+   <div class="pasa">${COSAS.map(c=>`<button aria-pressed="false"><span aria-hidden="true">${c[0]}</span>${c[1]}</button>`).join('')}</div>
+   <div class="cuenta"><b>0</b><span class="en">de 8</span><span class="es msg"></span></div>
+   <div class="glosas"><span class="en">Palabras nuevas:</span><button class="glosabtn" data-g="0">la convivencia</button><button class="glosabtn" data-g="1">la junta de vecinos</button><span class="hueco"></span><button class="mini re" aria-label="Empezar de nuevo">↻</button></div>`;
+  const G=[[emo('🏘️'),'la convivencia','das Zusammenleben','La convivencia con los vecinos no siempre es fácil.','Convivir = vivir con otras personas.'],
+           [emo('🪑'),'la junta de vecinos','die Hausversammlung · die Eigentümerversammlung','Esta noche hay junta de vecinos.','También: la reunión de vecinos.']];
+  $$('.glosabtn',root).forEach(b=>b.onclick=()=>glosaPop(G[+b.dataset.g]));
+  const ver=()=>{$('.cuenta b',root).textContent=n;
+    $('.msg',root).textContent=n===0?'¿Qué te molesta de verdad de un vecino?':n<4?'Elige la peor y cuéntala: ¿te ha pasado?, ¿qué hiciste?':'¡Eres una vecina exigente! Elige la peor: ¿te ha pasado?, ¿qué hiciste?'};
+  $$('.pasa button',root).forEach(b=>b.onclick=()=>{const on=b.classList.toggle('ya');b.setAttribute('aria-pressed',on);n+=on?1:-1;ver()});
+  $('.re',root).onclick=()=>{n=0;$$('.pasa button',root).forEach(b=>{b.classList.remove('ya');b.setAttribute('aria-pressed','false')});ver()};ver()}
+
+/* repaso: lo que ya sabe hacer (clases «La sobremesa» y «Toco madera») */
+const OPINA=['Los vecinos alemanes son más silenciosos que los colombianos.','Vivir en un edificio es mejor que vivir en una casa.','El mejor vecino es el vecino invisible.','La música alta un sábado no es un problema.','Las mascotas mejoran la convivencia.','Es más fácil hablar con el vecino que dejarle una nota.'];
+const ARRANQUES=[['Está claro que…','indicativo'],['No creo que…','subjuntivo'],['Puede que…','subjuntivo'],['A lo mejor…','indicativo']];
+function rRepaso(root){
+  serie(root,OPINA.length,(el,i,api)=>{
+    let listo=false;
+    el.innerHTML=`<div class="frase"><small>Repaso · opinión ${i+1} de ${OPINA.length}</small>«${OPINA[i]}»</div><div class="ops">${ARRANQUES.map((a,k)=>`<button class="op" data-k="${k}">${a[0]}</button>`).join('')}</div>`;
+    $$('.op',el).forEach(b=>b.onclick=()=>{if(listo)return;listo=true;const a=ARRANQUES[+b.dataset.k];b.classList.add('ok');
+      api.bien(`«${a[0]}» va con ${a[1]}. Termina tu frase en voz alta.`)})
+  },'Seis opiniones sin ayuda: eso ya lo sabes hacer. Hoy das un paso más: llevar la contraria sin pelear.')}
+
+function rAdivina(root){
+  const O=[['🤝','Llevar la contraria sin pelear: discrepar con cortesía'],['🧾','Escribir una carta formal al banco'],['🧳','Contar un viaje en pasado']];
+  root.innerHTML=`<h2 class="t">¿Cuál es el objetivo de hoy?</h2><p class="lead en" style="font-size:17px">Piensa en la introducción. Después abre la pestaña 2.</p>
+   <div class="ops">${O.map((o,k)=>`<button class="op txt" data-k="${k}" style="display:flex;align-items:center;gap:12px;flex:1;min-width:230px;min-height:88px"><span style="font-size:36px;line-height:1" aria-hidden="true">${o[0]}</span><span>${o[1]}</span></button>`).join('')}</div><div class="fb" aria-live="polite"></div>`;
+  $$('.op',root).forEach(b=>b.onclick=()=>{const ok=b.dataset.k==='0',f=$('.fb',root);b.classList.add(ok?'ok':'mal');f.className='fb '+(ok?'ok':'mal');f.textContent=ok?'Sí. Hoy aprendes a decir que no… sin decir «no». Abre la pestaña 2 para ver cómo.':'Hoy no. Piensa en los vecinos de la introducción y elige otra vez.'})}
+function rMetas(root){
+  const M=[['dar la razón a medias antes de discrepar','Tienes razón en parte, pero…','var(--esc)'],['decir que no sin decir «no»','Yo no lo veo así. · Yo no diría tanto.','var(--mid)'],['explicar cuál es el problema de verdad','No es que no me guste, es que es muy tarde.','var(--acc)']];
+  root.innerHTML=`<h2 class="t">Al final de esta clase podrás…</h2>
+   <div class="metas">${M.map(m=>`<button class="meta" style="--bc:${m[2]}" aria-expanded="false"><b>${m[0]}</b><small>Toca para ver el ejemplo</small><span>${m[1]}</span></button>`).join('')}</div>
+   <p class="lead"><b>Tu reto final:</b> defender tu postura en una junta de vecinos durante dos minutos, con tu profe en contra.</p>`;
+  $$('.meta',root).forEach(b=>b.onclick=()=>{const on=b.classList.toggle('abierta');b.setAttribute('aria-expanded',on)})}
+
+const ej=(es,de,c)=>`<div class="ej" style="--bc:${c||'var(--teal)'}"><span class="es">${es}</span><span class="en">${de}</span></div>`;
+const P_MUESTRA=[
+ `<h2 class="t">Decir que no, en tres pasos</h2>
+  <div class="pasos3"><div class="f1"><small>1 · Concede</small><b>Tienes razón en parte…</b></div><div class="f2"><small>2 · Discrepa suave</small><b>…pero yo no diría tanto.</b></div><div class="f3"><small>3 · Matiza</small><b>No es que…, es que…</b></div></div>
+  ${ej(`—Hay que prohibir las fiestas.<br>—${F(1,'Tienes razón en parte')}, pero ${F(2,'yo no diría tanto')}: ${F(3,'no es que')} las fiestas sean el problema, ${F(3,'es que')} terminan muy tarde.`,'„Du hast teilweise recht, aber so weit würde ich nicht gehen: Nicht, dass die Partys das Problem wären – sie enden nur zu spät.“')}`,
+ `<h2 class="t">Paso 1 · Concede</h2><p class="lead en" style="font-size:17px">Primero das algo. Después llega tu «pero».</p><div class="par2">
+  ${ej(`${F(1,'Puede ser, pero')} las normas ya existen.`,'Mag sein, aber die Regeln gibt es schon.','var(--esc)')}
+  ${ej(`${F(1,'Entiendo lo que dices, pero')} no lo veo tan grave.`,'Ich verstehe, was du meinst, aber ich finde es nicht so schlimm.','var(--esc)')}
+  ${ej(`${F(1,'Ya, pero')} nadie las ha leído.`,'Ja, schon, aber niemand hat sie gelesen.','var(--esc)')}</div>`,
+ `<h2 class="t">Paso 2 · Discrepa sin pelear</h2><p class="lead en" style="font-size:17px">Hablas de ti («yo»), no del otro. El condicional suaviza: <b>yo diría</b>, <b>yo no estaría tan segura</b>.</p><div class="par2">
+  ${ej(`${F(2,'Yo no lo veo así')}.`,'Ich sehe das anders.','var(--mid)')}
+  ${ej(`${F(2,'No estoy del todo de acuerdo')}.`,'Ich bin nicht ganz einverstanden.','var(--mid)')}
+  ${ej(`—Aquí nadie respeta nada. —${F(2,'Yo no diría tanto')}.`,'– Hier respektiert niemand etwas. – So weit würde ich nicht gehen.','var(--mid)')}</div>`,
+ `<h2 class="t">Paso 3 · Matiza</h2><p class="lead en" style="font-size:17px"><b>No es que</b> + subjuntivo (la razón falsa), <b>es que</b> + indicativo (la razón de verdad).</p><div class="par2">
+  ${ej(`${F(3,'No es que')} no me <b>guste</b> la música, ${F(3,'es que')} <b>son</b> las dos de la mañana.`,'Nicht, dass ich die Musik nicht mag – es ist zwei Uhr morgens.','var(--acc)')}
+  ${ej(`${F(3,'No es que')} el perro <b>sea</b> malo, ${F(3,'es que')} <b>está</b> solo todo el día.`,'Nicht, dass der Hund böse wäre – er ist den ganzen Tag allein.','var(--acc)')}
+  ${ej(`${F(3,'Depende')} de la hora. · Estoy de acuerdo ${F(3,'hasta cierto punto')}.`,'Kommt auf die Uhrzeit an. · Ich bin bis zu einem gewissen Grad einverstanden.','var(--acc)')}</div>`,
+ `<h2 class="t">El mismo «no», dos efectos</h2>
+  <div class="duelo"><div class="no"><h3>Suena a pelea</h3><p>Eso no es verdad.</p><p>No tienes razón.</p><p>Eso es falso.</p></div><div class="si"><h3>Suena a conversación</h3><p>Yo no diría eso.</p><p>No sé yo…</p><p>Puede ser, pero…</p></div></div>
+  <p class="lead en" style="font-size:17px;margin-top:8px">Im Deutschen ist ein direktes „Das stimmt nicht“ ganz normal. Im Spanischen – besonders in Kolumbien – gibt man zuerst ein bisschen recht und widerspricht dann.</p>`];
+
+const H=(f,o,p,m)=>({f,o,p,m});   // la primera opción es la correcta
+const HUECOS=[
+ H('No es que no me ___ la música, es que son las dos de la mañana.',['guste','gusta','gustaría'],'Sí: «no es que» + subjuntivo → guste.','Después de «no es que» va el subjuntivo.'),
+ H('No es que el perro sea malo, es que ___ ruido toda la noche.',['hace','haga','haría'],'Sí: «es que» + indicativo. Es la razón de verdad.','Después de «es que» va el indicativo: es la razón de verdad.'),
+ H('—La basura se saca por la noche. —___, pero el camión pasa por la mañana.',['Puede ser','No tienes razón','Eso es falso'],'Sí: «Puede ser, pero…» concede primero y después discrepa.','Demasiado directo: en español suena a pelea. Primero concede.'),
+ H('—Aquí nadie respeta nada. —Hombre, yo no diría ___.',['tanto','mucho','tan'],'Sí: «Yo no diría tanto» frena al que exagera.','La expresión es fija: «yo no diría tanto».'),
+ H('No creo que el problema ___ el ruido. Creo que es la hora.',['sea','es','será'],'Sí: «no creo que» + subjuntivo → sea. Esto ya lo sabías.','Repaso: «no creo que» pide subjuntivo.'),
+ H('—Los niños no deberían jugar en el patio. —Tienes razón ___: a las tres, no; a las seis, sí.',['en parte','de parte','por parte'],'Sí: «Tienes razón en parte» = teilweise.','Se dice «en parte».'),
+ H('—¿Prohibimos las fiestas? —___: una al mes me parece bien; una cada sábado, no.',['Depende','Viene','Cuenta'],'Sí: «Depende» = Kommt drauf an.','Aquí no hay un sí ni un no claro. ¿Qué dices entonces?'),
+ H('Entiendo lo que ___, pero yo no lo veo así.',['dices','digas','dirías'],'Sí: «entiendo lo que dices» va en indicativo: lo dijo de verdad.','Tu vecino ya lo dijo: es un hecho → indicativo.'),
+ H('No ___ del todo de acuerdo con el vecino del tercero.',['estoy','soy','tengo'],'Sí: «estar de acuerdo», siempre con «estar».','El acuerdo va con otro verbo: «___ de acuerdo».'),
+ H('No es por ___ la contraria, pero las bicis no molestan a nadie.',['llevarte','hacerte','decirte'],'Sí: «llevar la contraria» = widersprechen.','La expresión es «llevar la contraria».')];
+
+/* interferencias del alemán */
+
+/* ordenar la respuesta */
+
+/* la junta: seis vecinos, seis frases demasiado directas */
+const VECINOS=[['Don Álvaro, del 501','Hay que prohibir las fiestas y punto.'],['Doña Carmen, del 302','Los perros no deberían subir en el ascensor.'],['El joven del 204','El ruido es normal: esto no es un hospital.'],['La administradora','Quien llegue tarde a la junta paga una multa.'],['La vecina nueva','En mi país esto no pasaría nunca.'],['El señor del 101','Las bicis en la entrada son un peligro.']]
+ .map(v=>({t:v[0],d:`<p class="dicho">«${v[1]}»</p><p class="en" style="margin:6px 0 0">Responde en tres pasos: concede, discrepa suave y matiza. Tu profe es el vecino.</p>${rutasHTML(['Puede ser, pero…','Yo no lo veo así, porque…','No es que…, es que…'],true)}`}));
+
+/* cuento de muestra (texto propio de Lingua's Academy) y sus ejercicios */
+const PAL=[{t:'junta',o:['reunión para decidir cosas del edificio','fiesta de bienvenida','pelea entre vecinos'],r:0},
+ {t:'hábil',o:['que habla mucho','que sabe hacer algo bien, con inteligencia','que tiene prisa'],r:1},
+ {t:'maleducados',o:['que no fueron a la escuela','que están enfermos','que no respetan a los demás'],r:2},
+ {t:'normas',o:['reglas','notas de música','costumbres raras'],r:0},
+ {t:'ascensor',o:['escalera de emergencia','aparato que sube y baja entre los pisos','puerta principal'],r:1},
+ {t:'ladra',o:['muerde','corre por el pasillo','hace el ruido típico de un perro'],r:2},
+ {t:'votamos',o:['decidimos entre todos, cada uno con su voto','nos fuimos a casa','discutimos a gritos'],r:0},
+ {t:'pidió la palabra',fr:1,o:['preguntó qué significaba una palabra','avisó de que quería hablar','empezó a gritar para que lo escucharan'],r:1},
+ {t:'y punto',fr:1,o:['y hay que escribirlo con un punto','y quien no esté de acuerdo se va del edificio','y no hay nada más que discutir'],r:2},
+ {t:'cae como una piedra',fr:1,o:['suena muy dura y sienta mal','hace que algo se caiga al suelo','es un insulto muy grave'],r:0},
+ {t:'puso mala cara',fr:1,o:['se puso una máscara','mostró con la cara que no le gustaba','se levantó furioso y se fue'],r:1}];
+const PARRAFOS=['El martes hubo {0} de vecinos en mi edificio. Llevo dos años en Bogotá y todavía no me acostumbro a que una reunión de una hora dure tres.',
+ 'El tema era el ruido. Don Álvaro, el del 501, {7}: —Aquí ya nadie respeta nada. Hay que prohibir las fiestas {8}.',
+ 'En Alemania yo diría: «Eso no es verdad». Pero ya aprendí que aquí esa frase {9}.',
+ 'Doña Carmen, la del 302, fue más {1}: —Don Álvaro, tiene razón en parte: lo del sábado fue demasiado. Pero yo no diría tanto. No es que los jóvenes sean {2}, es que nadie les ha explicado las {3}.',
+ '—Puede ser —dijo él, y {10}—, pero las normas ya existen. —Ya, pero nadie las ha leído —contestó ella con una sonrisa—. ¿Y si las ponemos en el {4}?',
+ 'Hubo un silencio. Entonces levanté la mano y dije mi primera frase de la noche: —No es por llevar la contraria, pero también hay un perro que {5} a las seis de la mañana. Todos me miraron. El perro es de don Álvaro.',
+ 'Al final {6}: fiestas hasta la una, normas en el ascensor y el perro… «depende». Salí cansada, pero con una idea nueva: en este país se puede decir que no sin decir «no».'];
+const CUENTO0={titulo:'La junta',autor:'Texto de muestra',fuente:"Lingua's Academy",pag:'media',texto:PARRAFOS.map(p=>p.replace(/\{(\d+)\}/g,(_,n)=>PAL[n].t)).join('\n')};
+const YTU=[['¿Cómo se dice «no» en Alemania y cómo se dice aquí? ¿Con cuál te sientes más cómoda?',['En Alemania solemos…','Hasta cierto punto prefiero…','No es que…, es que…']],
+           ['¿Alguna vez dijiste en español algo que «cayó como una piedra»? ¿Qué pasó?',['Una vez dije…','No es que quisiera…, es que…','Al final…']],
+           ['¿Qué norma pondrías tú en el ascensor de tu edificio? Tu profe no va a estar de acuerdo.',['Yo pondría…','Depende de…','Entiendo lo que dices, pero…']]]
+ .map((q,k)=>({t:'Pregunta '+(k+1),d:`<p class="dicho">${q[0]}</p>${rutasHTML(q[1],true)}`}));
+
+/* juego grande: la moneda decide el lado; quien escucha cuenta las expresiones */
+
+/* tarea final: la junta, dos minutos */
+
+
+
+SECS.push(
+ {id:'intro',m:'intro',t:'¿Qué te molesta de un vecino?',min:5,tabs:[
+   {k:'pasa',instr:'Toca lo que te molesta de verdad. Los botones oscuros abren las palabras nuevas.',r:rIntro},
+   {k:'repaso',instr:'Lee la opinión, toca un comienzo y termina la frase en voz alta. Tu profe también opina.',r:rRepaso}]},
+ {id:'obj',m:'obj',t:'Adivina el objetivo',min:2,tabs:[{k:'adivina',instr:'Toca tu respuesta.',r:rAdivina},{k:'metas',instr:'Toca cada objetivo para ver un ejemplo.',r:rMetas}]},
+ {id:'a1',m:'cont',n:'1',t:'Decir que no, en tres pasos',min:10,tabs:[
+   {k:'cartas',instr:'Toca una tarjeta para girarla. Lee el ejemplo en voz alta.',r:el=>rTarjetas(el,CARTAS,LEYENDA)},
+   {k:'muestra',instr:'Usa las flechas para pasar la página. Lee cada ejemplo en voz alta.',r:(el,api)=>rPaginas(el,api,P_MUESTRA)},
+   {k:'huecos',instr:'Lee la frase y toca lo que falta.',r:el=>rHuecos(el,HUECOS,'Ahora elige tres frases y dilas en voz alta, con tu tono más amable.')}]}
+);
+
+/* ================= arranque: primero se dibuja, después se conecta ================= */
+reiniciaCrono();pintar();conectar();
+})();
+</script>
+
+
+<!-- ═══ Vista previa · Lingua's Academy (generada por herramientas/vista_previa.mjs) ═══ -->
+<style id="vp-estilo">
+#vp-cinta{position:fixed;z-index:60;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  max-width:calc(100vw - 24px);padding:8px 8px 8px 10px;background:var(--hoja,#FFFDF9);color:var(--tinta,#17223D);border:2.5px solid var(--tinta,#17223D);border-radius:18px;box-shadow:5px 5px 0 var(--tinta,#17223D);
+  font:500 15px/1.3 "Instrument Sans",system-ui,sans-serif}
+#vp-cinta .vp-et{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:10px;background:var(--mostaza,#D6992A);color:var(--tinta,#17223D);font:500 13px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap}
+#vp-cinta .vp-txt{color:var(--tinta2,#2C3A5C)}
+.vp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:8px 16px;border-radius:14px;border:2.5px solid var(--tinta,#17223D);box-shadow:3px 3px 0 var(--tinta,#17223D);
+  font:600 15px/1.2 "Instrument Sans",system-ui,sans-serif;text-decoration:none;cursor:pointer;background:var(--hoja,#FFFDF9);color:var(--tinta,#17223D);transition:transform .12s,box-shadow .12s}
+.vp-btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--tinta,#17223D)}
+.vp-btn--pri{background:var(--terra,#C2533A);color:#fff}
+.vp-btn:focus-visible,#vp-lado button:focus-visible{outline:3px solid var(--mar,#1B7A88);outline-offset:3px}
+.vp-i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body.vp-con-cinta{padding-bottom:96px}
+#vp-lado{margin-top:14px;padding-top:12px;border-top:2px dashed var(--linea,#D9D2C4)}
+#vp-lado h3{display:flex;align-items:center;gap:6px;margin:0 0 8px;font:500 12px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ayuda,#5B6478)}
+#vp-lado ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+#vp-lado button{width:100%;display:flex;align-items:center;gap:8px;text-align:left;font:500 14px/1.3 "Instrument Sans",system-ui,sans-serif;color:var(--ayuda,#5B6478);
+  background:var(--papel,#F5F2EC);border:2px dashed var(--linea,#D9D2C4);border-radius:12px;padding:7px 10px;cursor:pointer}
+#vp-lado button:hover{border-color:var(--tinta2,#2C3A5C);color:var(--tinta,#17223D)}
+#vp-lado .vp-pt{width:9px;height:9px;border-radius:50%;flex:none;background:var(--c)}
+#vp-lado .vp-tt{flex:1;min-width:0;overflow-wrap:anywhere}
+#vp-lado .vp-min{font:500 12px/1 "JetBrains Mono",ui-monospace,monospace}
+#vp-fin{border:0;padding:0;background:transparent;max-width:min(640px,calc(100vw - 24px));width:100%;color:var(--tinta,#17223D)}
+#vp-fin::backdrop{background:rgba(23,34,61,.55)}
+#vp-fin .vp-lam{background:var(--hoja,#FFFDF9);border:2.5px solid var(--tinta,#17223D);border-radius:26px;box-shadow:5px 5px 0 var(--tinta,#17223D);overflow:hidden}
+#vp-fin .vp-cab{display:flex;align-items:center;gap:12px;background:var(--tinta,#17223D);color:var(--hoja,#FFFDF9);padding:16px 22px}
+#vp-fin .vp-cab .vp-i{width:28px;height:28px;stroke-width:1.75;color:var(--mostaza,#D6992A)}
+#vp-fin h2{margin:0;font:400 clamp(1.3rem,3.6vw,1.7rem)/1.2 "Young Serif",Georgia,serif}
+#vp-fin .vp-cuerpo{padding:20px 22px 22px;font:400 17px/1.5 "Instrument Sans",system-ui,sans-serif}
+#vp-fin .vp-cuerpo p{margin:0 0 14px}
+#vp-fin ol{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:6px;max-height:40vh;overflow:auto}
+#vp-fin li{display:flex;align-items:center;gap:10px;padding:8px 12px;border:2px dashed var(--linea,#D9D2C4);border-radius:12px;background:var(--papel,#F5F2EC);color:var(--tinta2,#2C3A5C)}
+#vp-fin li .vp-m{font:500 12px/1 "JetBrains Mono",ui-monospace,monospace;padding:4px 8px;border-radius:8px;background:var(--cf);color:var(--tinta,#17223D);white-space:nowrap}
+#vp-fin li .vp-tt{flex:1;min-width:0;overflow-wrap:anywhere}
+#vp-fin .vp-acc{display:flex;flex-wrap:wrap;gap:10px}
+@media (max-width:560px){#vp-cinta{flex-wrap:nowrap;gap:8px;padding:6px}#vp-cinta .vp-txt{display:none}#vp-cinta .vp-btn{padding:6px 12px;font-size:14px;white-space:nowrap}body.vp-con-cinta{padding-bottom:84px}}
+@media (prefers-reduced-motion:reduce){.vp-btn{transition:none}}
+@media print{#vp-cinta,#vp-fin{display:none}}
+</style>
+<div id="vp-cinta" role="region" aria-label="Vista previa">
+  <span class="vp-et"><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-vp="cinta">Vista previa</span></span>
+  <span class="vp-txt" data-vp="cintaTxt">Ves el principio de la clase.</span>
+  <button type="button" class="vp-btn vp-btn--pri" data-vp-abrir><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-vp="verResto">Ver el resto de la clase</span></button>
+</div>
+<dialog id="vp-fin" aria-labelledby="vp-fin-t">
+  <div class="vp-lam">
+    <div class="vp-cab"><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><h2 id="vp-fin-t" data-vp="finT">Hasta aquí la vista previa</h2></div>
+    <div class="vp-cuerpo">
+      <p data-vp="finTxt">El resto de la clase (actividades, lectura, juego, resumen y tarea) está disponible con la suscripción.</p>
+      <ol id="vp-fin-lista"></ol>
+      <div class="vp-acc">
+        <a class="vp-btn vp-btn--pri" id="vp-ir" href="../suscripcion.html"><span data-vp="suscribir">Desbloquear con la suscripción</span><svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <button type="button" class="vp-btn" data-vp-cerrar><span data-vp="seguir">Seguir en la vista previa</span></button>
+      </div>
+    </div>
+  </div>
+</dialog>
+<script id="vp-datos" type="application/json">{"bloqueadas":[{"m":"cont","t":"Cuidado con el alemán","min":6},{"m":"cont","t":"Con todo respeto…","min":9},{"m":"cont","t":"Lectura","min":8},{"m":"cont","t":"A favor o en contra","min":7},{"m":"res","t":"Cada expresión en su paso","min":2},{"m":"tarea","t":"Para la próxima clase","min":1}],"suscripcion":"../suscripcion.html","inicio":"../","nombre":"b2-si-pero-no"}</script>
+<script>
+/* Vista previa · Lingua's Academy. Iconos: Lucide, ISC */
+(function(){
+  "use strict";
+  var D = JSON.parse(document.getElementById("vp-datos").textContent);
+  var T = {
+    es:{cinta:"Vista previa",cintaTxt:"Ves el principio de la clase.",verResto:"Ver el resto de la clase",finT:"Hasta aquí la vista previa",
+      finTxt:"El resto de la clase (actividades, lectura, juego, resumen y tarea) está disponible con la suscripción.",suscribir:"Desbloquear con la suscripción",
+      seguir:"Seguir en la vista previa",lado:"En la clase completa",bloq:"Bloqueado: ",m:{intro:"Introducción",obj:"Objetivos",cont:"Contenido",res:"Resumen",tarea:"Tarea"}},
+    en:{cinta:"Preview",cintaTxt:"You're seeing the start of the lesson.",verResto:"See the rest of the lesson",finT:"This is where the preview ends",
+      finTxt:"The rest of the lesson (activities, reading, game, review and homework) is available with a subscription.",suscribir:"Unlock with a subscription",
+      seguir:"Keep exploring the preview",lado:"In the full lesson",bloq:"Locked: ",m:{intro:"Warm-up",obj:"Goals",cont:"Content",res:"Review",tarea:"Homework"}},
+    pt:{cinta:"Prévia",cintaTxt:"Você está vendo o começo da aula.",verResto:"Ver o resto da aula",finT:"A prévia termina aqui",
+      finTxt:"O resto da aula (atividades, leitura, jogo, resumo e tarefa) está disponível com a assinatura.",suscribir:"Desbloquear com a assinatura",
+      seguir:"Continuar na prévia",lado:"Na aula completa",bloq:"Bloqueado: ",m:{intro:"Introdução",obj:"Objetivos",cont:"Conteúdo",res:"Resumo",tarea:"Tarefa"}}
+  };
+  var L = "es";
+  try { L = new URLSearchParams(location.search).get("lang") || localStorage.getItem("la-lang") || ""; } catch (e) {}
+  if (!T[L]) { var nv = String(navigator.language || "").toLowerCase(); L = nv.indexOf("pt") === 0 ? "pt" : nv.indexOf("en") === 0 ? "en" : "es"; }
+  var t = T[L];
+  var COL = {intro:["--terra","#C2533A","--terraf","#F8E3DC"],obj:["--mostaza","#D6992A","--mostazaf","#FBEFD6"],cont:["--mar","#1B7A88","--marf","#DDEFF1"],res:["--ciruela","#6D4B80","--ciruelaf","#ECE3F2"],tarea:["--verde","#4A8656","--verdef","#E1F0E3"]};
+  var CANDADO = '<svg class="vp-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  function nombre(b){ return b.t || t.m[b.m]; }
+  document.querySelectorAll("[data-vp]").forEach(function(el){ var k = el.getAttribute("data-vp"); if (t[k]) el.textContent = t[k]; });
+  var cinta = document.getElementById("vp-cinta"); cinta.setAttribute("aria-label", t.cinta);
+  document.body.classList.add("vp-con-cinta");
+  var ir = document.getElementById("vp-ir");
+  ir.href = D.suscripcion + (L !== "es" ? "?lang=" + L : "");
+
+  /* la lámina final */
+  var dlg = document.getElementById("vp-fin"), lista = document.getElementById("vp-fin-lista");
+  D.bloqueadas.forEach(function(b){
+    var li = document.createElement("li"), c = COL[b.m] || COL.cont;
+    li.style.setProperty("--cf", "var(" + c[2] + "," + c[3] + ")");
+    li.innerHTML = CANDADO + '<span class="vp-m"></span><span class="vp-tt"></span>';
+    li.children[1].textContent = t.m[b.m]; li.children[2].textContent = nombre(b);
+    lista.appendChild(li);
+  });
+  function abrir(){
+    if (dlg.open) return;
+    if (typeof dlg.showModal === "function") { try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); } } else dlg.setAttribute("open", "");
+    ir.focus();
+  }
+  function cerrar(){ if (typeof dlg.close === "function" && dlg.open) dlg.close(); else dlg.removeAttribute("open"); }
+  window.LA_VISTA_PREVIA = { abrir: abrir, cerrar: cerrar };
+  cinta.querySelector("[data-vp-abrir]").addEventListener("click", abrir);
+  dlg.querySelector("[data-vp-cerrar]").addEventListener("click", cerrar);
+  dlg.addEventListener("click", function(e){ if (e.target === dlg) cerrar(); });
+
+  /* el menú lateral: las secciones bloqueadas, con candado */
+  function bloqueLado(){
+    var d = document.createElement("div"); d.id = "vp-lado";
+    d.innerHTML = '<h3>' + CANDADO + '<span></span></h3><ol></ol>';
+    d.querySelector("h3 span").textContent = t.lado;
+    var ol = d.querySelector("ol");
+    D.bloqueadas.forEach(function(b){
+      var li = document.createElement("li"), bt = document.createElement("button"), c = COL[b.m] || COL.cont;
+      bt.type = "button"; bt.style.setProperty("--c", "var(" + c[0] + "," + c[1] + ")");
+      bt.setAttribute("aria-label", t.bloq + t.m[b.m] + " · " + nombre(b));
+      bt.innerHTML = '<span class="vp-pt" aria-hidden="true"></span><span class="vp-tt"></span>' + (b.min ? '<span class="vp-min"></span>' : "") + CANDADO;
+      bt.querySelector(".vp-tt").textContent = nombre(b);
+      if (b.min) bt.querySelector(".vp-min").textContent = b.min + " min";
+      bt.addEventListener("click", abrir);
+      li.appendChild(bt); ol.appendChild(li);
+    });
+    return d;
+  }
+  var lado = document.getElementById("lado") || document.querySelector("aside, nav#mapa, #mapa, .mapa");
+  if (lado) {
+    var puesto = bloqueLado(); lado.appendChild(puesto);
+    new MutationObserver(function(){ if (!lado.contains(puesto)) { puesto = bloqueLado(); lado.appendChild(puesto); } }).observe(lado, { childList: true, subtree: true });
+  }
+
+  /* «Siguiente» al final de lo que se ve: en vez de no hacer nada, abre la lámina bloqueada */
+  var zona = function(){ return document.getElementById("lamina") || document.querySelector("main") || document.getElementById("app") || document.body; };
+  var firma = function(){ var z = zona(); return z ? z.innerHTML.length + ":" + z.innerHTML.slice(0, 4000) + location.hash : ""; };
+  function esSiguiente(el){
+    if (!el || el.closest("#vp-cinta, #vp-fin, #vp-lado")) return false;
+    var b = el.closest("button, a, [role=button]"); if (!b) return false;
+    var id = (b.id || "") + " " + (b.getAttribute("data-accion") || "") + " " + (b.getAttribute("aria-label") || "") + " " + (b.getAttribute("title") || "");
+    var txt = (b.textContent || "").trim();
+    return /(^|\s)(bSig|bSiguiente|sig|siguiente|next)(\s|$)/i.test(id) || /^siguiente\b/i.test(id.trim()) || /^(siguiente|next|próximo)\b/i.test(txt);
+  }
+  function vigila(){
+    var antes = firma();
+    setTimeout(function(){ if (!dlg.open && firma() === antes) abrir(); }, 220);
+  }
+  document.addEventListener("click", function(e){ if (esSiguiente(e.target)) vigila(); }, true);
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "ArrowRight" || e.altKey || e.ctrlKey || e.metaKey || dlg.open) return;
+    var a = document.activeElement; if (a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable)) return;
+    vigila();
+  }, true);
+  /* si el tablero apaga «Siguiente» en la última pantalla, se deja encendido para llegar a la lámina final */
+  function encender(){
+    document.querySelectorAll("button[disabled], [aria-disabled=true]").forEach(function(b){
+      if (esSiguiente(b)) { b.disabled = false; b.removeAttribute("aria-disabled"); }
+    });
+  }
+  new MutationObserver(encender).observe(document.body, { attributes: true, subtree: true, attributeFilter: ["disabled", "aria-disabled"] });
+  encender();
+})();
+</script>
+</body></html>
