@@ -152,7 +152,13 @@
 .muestra .tag { min-height: 24px; font-size: 12.5px; background: var(--card); }
 .muestra h3 { font: 500 24px/1.15 var(--f-display); }
 .muestra p { color: var(--ink-2); font-size: 15.5px; line-height: 1.5; }
-.muestra__cta { margin-top: auto; align-self: flex-start; }
+.muestra__acc { margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 4px; }
+.muestra__cta svg, .muestra__lock svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.muestra__pronto { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1.5px dashed var(--line-2); border-radius: var(--r-btn); color: var(--muted); font-size: 15px; font-weight: 600; }
+.muestra__lock { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 15px; font-weight: 600; color: var(--ink-2); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 4px; }
+.muestra__lock:hover { color: var(--ink); text-decoration-color: currentColor; }
+.muestra__lock svg { width: 16px; height: 16px; color: var(--lvl); }
+.muestras__pie { display: flex; justify-content: center; }
 
 /* preguntas */
 .preguntas .wrap { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px 64px; align-items: start; }
@@ -221,6 +227,7 @@
         <li><a href="#tableros" data-i18n="nav.tableros">Tableros</a></li>
         <li><a href="#en-vivo" data-i18n="nav.como">Cómo funciona</a></li>
         <li><a href="#preguntas" data-i18n="nav.preguntas">Preguntas</a></li>
+        <li><a href="suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a></li>
       </ul>
     </nav>
     <div class="nav__actions">
@@ -234,6 +241,7 @@
   <a href="#tableros" data-i18n="nav.tableros">Tableros</a>
   <a href="#en-vivo" data-i18n="nav.como">Cómo funciona</a>
   <a href="#preguntas" data-i18n="nav.preguntas">Preguntas</a>
+  <a href="suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a>
   <a class="sheet__sec" href="entrar.html" data-cuenta-link data-i18n="nav.entrar_largo">Entrar con mi cuenta</a>
 </nav>
 
@@ -245,7 +253,7 @@
         <h1 id="h1" data-i18n-html="hero.titulo">La clase de mañana <em>ya está lista.</em></h1>
         <p class="hero__lead" data-i18n="hero.lead">Abres un tablero, compartes un enlace y empieza la clase: 50 minutos con actividades, un juego y la tarea. Tú te quedas con lo mejor del oficio, que es conversar con tu estudiante.</p>
         <div class="hero__cta">
-          <a class="btn btn--primary btn--pill" href="#muestras"><span data-i18n="hero.cta">Probar una clase gratis</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a class="btn btn--primary btn--pill" href="#muestras"><span data-i18n="hero.cta">Ver una clase de muestra</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         </div>
       </div>
       <figure class="mesa">
@@ -343,9 +351,9 @@
       </div>
       <ul class="idiomas">
         <li>
-          <a class="idioma-card" href="#muestras" data-lang="es" data-idioma-es>
+          <a class="idioma-card" href="tableros.html?idioma=es" data-lang="es" data-idioma-es>
             <span class="cod" aria-hidden="true">ES</span>
-            <span class="idioma-card__body"><span class="idioma-card__title" data-i18n="idiomas.es">Español</span><span class="idioma-card__meta"><span>A1–C2</span><span data-cuenta="es" hidden> · <span data-cuenta-n></span> <span data-i18n="idiomas.tableros">tableros</span></span><span data-pronto-idioma="es"> · <span data-pronto-txt data-i18n="idiomas.c_pronto">C1 y C2, pronto</span></span></span></span>
+            <span class="idioma-card__body"><span class="idioma-card__title" data-i18n="idiomas.es">Español</span><span class="idioma-card__meta"><span>A1–C2</span><span data-pronto-idioma="es"> · <span data-pronto-txt data-i18n="idiomas.c_pronto">C1 y C2, pronto</span></span></span></span>
             <span class="idioma-card__chev" aria-hidden="true">›</span>
           </a>
         </li>
@@ -372,12 +380,12 @@
       <div class="sec-head" data-ver>
         <div>
           <p class="mano" data-i18n="muestras.mano">sin cuenta, desde aquí</p>
-          <h2 class="t2" id="h-muestras" data-i18n="muestras.titulo">Prueba una clase antes de entrar</h2>
+          <h2 class="t2" id="h-muestras" data-i18n="muestras.titulo">Mira una clase por dentro</h2>
         </div>
-        <p data-i18n="muestras.lead">Cada muestra abre una parte de un tablero real. Tócala como lo haría tu estudiante: voltea tarjetas, responde y escribe.</p>
+        <p data-i18n="muestras.lead">La vista previa abre un tablero real hasta su primera actividad. Tócalo como lo haría tu estudiante: voltea tarjetas, responde y escribe. El resto de la clase se desbloquea con la suscripción.</p>
       </div>
       <ul class="muestras__lista">
-        <li class="muestra" data-nivel="A2" data-ver>
+        <li class="muestra" data-vista="a2-a-como-esta-la-pina" data-nivel="A2" data-ver>
           <div class="muestra__foto">
             <img src="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, (max-width: 1099px) 46vw, 25vw" width="800" height="600" loading="lazy" alt="Vendedor junto a su puesto de frutas" data-i18n-alt="muestras.pina.alt" data-foto="a2-a-como-esta-la-pina">
           </div>
@@ -385,11 +393,15 @@
             <div class="muestra__meta"><span class="muestra__nivel">A2</span><span class="tag" data-i18n="muestras.pina.tag1">Adultos</span><span class="tag" data-i18n="muestras.pina.tag2">Consignas en portugués</span></div>
             <h3 data-i18n="muestras.pina.titulo">¿A cómo está la piña?</h3>
             <p data-i18n="muestras.pina.desc">En la plaza de mercado: preguntar precios, pedir rebaja y decir «me la llevo».</p>
-            <a class="btn btn--secondary btn--sm muestra__cta" href="muestra.html?t=a2-a-como-esta-la-pina"><span data-i18n="muestras.cta">Probar</span><span class="visually-hidden">: <span data-i18n="muestras.pina.titulo">¿A cómo está la piña?</span></span></a>
+            <div class="muestra__acc">
+              <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/a2-a-como-esta-la-pina.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.pina.titulo">¿A cómo está la piña?</span></span></a>
+              <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
+              <a class="muestra__lock" href="suscripcion.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="muestras.desbloquear">Desbloquear con suscripción</span><span class="visually-hidden">: <span data-i18n="muestras.pina.titulo">¿A cómo está la piña?</span></span></a>
+            </div>
             <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/man-sitting-beside-fruit-stand-XQ7LF574HhY" rel="noopener" target="_blank">Julian Florez</a> · Unsplash</p>
           </div>
         </li>
-        <li class="muestra" data-nivel="A1" data-ver>
+        <li class="muestra" data-vista="a1-un-cafe-por-favor" data-nivel="A1" data-ver>
           <div class="muestra__foto">
             <img src="https://images.unsplash.com/photo-1517701848373-805868efd0ac?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1517701848373-805868efd0ac?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1517701848373-805868efd0ac?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, (max-width: 1099px) 46vw, 25vw" width="800" height="600" loading="lazy" alt="Barista preparando un capuchino" data-i18n-alt="muestras.cafe.alt" data-foto="a1-un-cafe-por-favor">
           </div>
@@ -397,11 +409,15 @@
             <div class="muestra__meta"><span class="muestra__nivel">A1</span><span class="tag" data-i18n="muestras.cafe.tag1">Adultos</span><span class="tag" data-i18n="muestras.cafe.tag2">Consignas en inglés</span><span class="tag" data-i18n="muestras.cafe.tag3">Clase de prueba</span></div>
             <h3 data-i18n="muestras.cafe.titulo">Un café, por favor</h3>
             <p data-i18n="muestras.cafe.desc">Pedir algo en una cafetería con un, una y «quiero…». Sirve como primera clase.</p>
-            <a class="btn btn--secondary btn--sm muestra__cta" href="muestra.html?t=a1-un-cafe-por-favor"><span data-i18n="muestras.cta">Probar</span><span class="visually-hidden">: <span data-i18n="muestras.cafe.titulo">Un café, por favor</span></span></a>
+            <div class="muestra__acc">
+              <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/a1-un-cafe-por-favor.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.cafe.titulo">Un café, por favor</span></span></a>
+              <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
+              <a class="muestra__lock" href="suscripcion.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="muestras.desbloquear">Desbloquear con suscripción</span><span class="visually-hidden">: <span data-i18n="muestras.cafe.titulo">Un café, por favor</span></span></a>
+            </div>
             <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/man-in-gray-crew-neck-t-shirt-making-cappuccino-jRPxc8VGqco" rel="noopener" target="_blank">Nathan Dumlao</a> · Unsplash</p>
           </div>
         </li>
-        <li class="muestra" data-nivel="B1" data-ver>
+        <li class="muestra" data-vista="b1-que-harias-si" data-nivel="B1" data-ver>
           <div class="muestra__foto">
             <img src="https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, (max-width: 1099px) 46vw, 25vw" width="800" height="600" loading="lazy" alt="Mujer pensativa con una taza junto a la ventana" data-i18n-alt="muestras.harias.alt" data-foto="b1-que-harias-si">
           </div>
@@ -409,11 +425,15 @@
             <div class="muestra__meta"><span class="muestra__nivel">B1</span><span class="tag" data-i18n="muestras.harias.tag1">Adultos</span><span class="tag" data-i18n="muestras.harias.tag2">Consignas en portugués</span></div>
             <h3 data-i18n="muestras.harias.titulo">¿Qué harías si…?</h3>
             <p data-i18n="muestras.harias.desc">Vecinos con dilemas para practicar el condicional y si + imperfecto de subjuntivo.</p>
-            <a class="btn btn--secondary btn--sm muestra__cta" href="muestra.html?t=b1-que-harias-si"><span data-i18n="muestras.cta">Probar</span><span class="visually-hidden">: <span data-i18n="muestras.harias.titulo">¿Qué harías si…?</span></span></a>
+            <div class="muestra__acc">
+              <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/b1-que-harias-si.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.harias.titulo">¿Qué harías si…?</span></span></a>
+              <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
+              <a class="muestra__lock" href="suscripcion.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="muestras.desbloquear">Desbloquear con suscripción</span><span class="visually-hidden">: <span data-i18n="muestras.harias.titulo">¿Qué harías si…?</span></span></a>
+            </div>
             <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/woman-holding-teacup-while-standing-near-window-inside-room-during-daytime-3LbpZo8MG8A" rel="noopener" target="_blank">Daiga Ellaby</a> · Unsplash</p>
           </div>
         </li>
-        <li class="muestra" data-nivel="A1" data-ver>
+        <li class="muestra" data-vista="a1-monstruos-gigantes" data-nivel="A1" data-ver>
           <div class="muestra__foto">
             <img src="https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="(max-width: 639px) 92vw, (max-width: 1099px) 46vw, 25vw" width="800" height="600" loading="lazy" alt="Monstruo de peluche azul con ojos grandes" data-i18n-alt="muestras.monstruos.alt" data-foto="a1-monstruos-gigantes">
           </div>
@@ -421,11 +441,18 @@
             <div class="muestra__meta"><span class="muestra__nivel">A1</span><span class="tag" data-i18n="muestras.monstruos.tag1">Niños</span><span class="tag" data-i18n="muestras.monstruos.tag2">Consignas en inglés</span></div>
             <h3 data-i18n="muestras.monstruos.titulo">Monstruos gigantes</h3>
             <p data-i18n="muestras.monstruos.desc">Para niños: describir monstruos por su tamaño, sus colores y sus partes del cuerpo.</p>
-            <a class="btn btn--secondary btn--sm muestra__cta" href="muestra.html?t=a1-monstruos-gigantes"><span data-i18n="muestras.cta">Probar</span><span class="visually-hidden">: <span data-i18n="muestras.monstruos.titulo">Monstruos gigantes</span></span></a>
+            <div class="muestra__acc">
+              <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/a1-monstruos-gigantes.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.monstruos.titulo">Monstruos gigantes</span></span></a>
+              <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
+              <a class="muestra__lock" href="suscripcion.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="muestras.desbloquear">Desbloquear con suscripción</span><span class="visually-hidden">: <span data-i18n="muestras.monstruos.titulo">Monstruos gigantes</span></span></a>
+            </div>
             <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/blue-and-brown-plush-toy--usSqel0j5U" rel="noopener" target="_blank">Ashkan Forouzani</a> · Unsplash</p>
           </div>
         </li>
       </ul>
+      <div class="muestras__pie" data-ver>
+        <a class="btn btn--secondary btn--pill btn--sm" href="tableros.html"><span data-i18n="muestras.todos">Ver todos los tableros</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
     </div>
   </section>
 
@@ -481,7 +508,7 @@
       <div class="preguntas__head" data-ver>
         <p class="mano" data-i18n="faq.mano">lo que más nos preguntan</p>
         <h2 class="t2" id="h-preguntas" data-i18n="faq.titulo">Preguntas frecuentes</h2>
-        <p data-i18n="faq.lead">Si te queda otra duda, escríbela en la solicitud de acceso y te respondemos.</p>
+        <p data-i18n="faq.lead">Si te queda otra duda, escríbela en tu solicitud de suscripción y te respondemos.</p>
       </div>
       <div class="faq" data-ver>
         <details>
@@ -505,8 +532,8 @@
           <p data-i18n="faq.5.a">Sí. Con el botón «Añadir» pones en el tablero un video de YouTube, una imagen para describir, un cuento o una pregunta tuya, y tu estudiante lo ve enseguida en su pantalla.</p>
         </details>
         <details>
-          <summary data-i18n="faq.6.q">¿Cómo pido acceso?</summary>
-          <p data-i18n="faq.6.a">Entra con Google o con tu correo. La primera vez te pedimos tu nombre, el idioma que enseñas y dónde das clase. Revisamos cada solicitud a mano y, cuando la aprobamos, ya puedes abrir el catálogo completo.</p>
+          <summary data-i18n="faq.6.q">¿Cómo me suscribo?</summary>
+          <p data-i18n="faq.6.a">Entra con Google o con tu correo y solicita la suscripción. La primera vez te pedimos tu nombre, el idioma que enseñas y dónde das clase. Cuando la activamos, abres el catálogo completo. Mientras tanto, puedes ver la vista previa de los tableros sin cuenta.</p>
         </details>
       </div>
     </div>
@@ -514,11 +541,11 @@
 
   <section class="cierre pad" aria-labelledby="h-cierre">
     <div class="wrap">
-      <p class="mano" data-i18n="cierre.mano">¿te gustó lo que probaste?</p>
-      <h2 id="h-cierre" data-i18n="cierre.titulo">Pide tu acceso y usa todos los tableros.</h2>
-      <p class="lead" data-i18n="cierre.lead">Revisamos cada solicitud a mano. Cuando la aprobemos, entras y tienes el catálogo completo para tus clases.</p>
+      <p class="mano" data-i18n="cierre.mano">¿te gustó lo que viste?</p>
+      <h2 id="h-cierre" data-i18n="cierre.titulo">Suscríbete y usa cada tablero completo.</h2>
+      <p class="lead" data-i18n="cierre.lead">La vista previa muestra cómo empieza la clase. Con la suscripción abres los tableros enteros, con sala en vivo para tu estudiante.</p>
       <div class="cierre__cta">
-        <a class="btn btn--primary btn--pill" href="entrar.html" data-cuenta-cierre><span data-i18n="cierre.cta">Pide tu acceso</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a class="btn btn--primary btn--pill" href="suscripcion.html" data-cuenta-cierre><span data-i18n="cierre.cta">Ver la suscripción</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
     </div>
   </section>
@@ -532,6 +559,7 @@
 </footer>
 
 <script src="assets/catalogo.js" defer></script>
+<script src="vista/vistas.js" defer></script>
 <script src="assets/site.js"></script>
 <script src="assets/fb.js"></script>
 <script src="assets/auth.js"></script>
@@ -558,12 +586,6 @@
   function niveles() {
     const C = Array.isArray(window.CATALOGO) ? window.CATALOGO : null;
     if (!C || !I) return;
-    document.querySelectorAll('[data-cuenta]').forEach(el => {
-      const n = C.filter(t => t.idioma === el.dataset.cuenta).length;
-      if (!n) return;
-      el.querySelector('[data-cuenta-n]').textContent = n;
-      el.hidden = false;
-    });
     document.querySelectorAll('[data-pronto-idioma]').forEach(el => {
       const con = new Set(C.filter(t => t.idioma === el.dataset.prontoIdioma).map(t => t.nivel));
       if (!con.size) return;
@@ -583,6 +605,19 @@
     }
   }
   addEventListener('DOMContentLoaded', niveles);
+
+  /* Vistas previas: «Ver vista previa» si existe vista/<nombre>.html (lista en vista/vistas.js); si no, «Vista previa pronto».
+     Para destacar otro tablero aquí, cambia data-vista y data-vista-link de su tarjeta. */
+  function vistas() {
+    const V = new Set(Array.isArray(window.VISTAS) ? window.VISTAS : []);
+    document.querySelectorAll('[data-vista]').forEach(li => {
+      const hay = V.has(li.dataset.vista);
+      const a = li.querySelector('[data-vista-link]'), p = li.querySelector('[data-vista-pronto]');
+      if (a) { a.hidden = !hay; if (hay) a.href = a.dataset.vistaLink; else a.removeAttribute('href'); }
+      if (p) p.hidden = hay;
+    });
+  }
+  addEventListener('DOMContentLoaded', vistas);
   document.addEventListener('la:idioma', niveles);
 
   /* Video: empieza solo cuando entra en pantalla, salvo con «reducir movimiento» */

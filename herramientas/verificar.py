@@ -12,13 +12,21 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+# Páginas de la raíz que NO son tableros (lista explícita: cualquier otro .html
+# de la raíz se trata como el cargador de un tablero).
 NON_BOARD_HTML = {
     "index.html",
     "tableros.html",
     "entrar.html",
     "admin.html",
     "404.html",
+    "muestra.html",
+    "suscripcion.html",
 }
+BOARD_NAME_RE = re.compile(r"^(en-|pt-)?[abc][12]-[a-z0-9]+(-[a-z0-9]+)*$")
+# Un cargador es pequeño y solo carga assets/abrir.js; un tablero original pesa
+# decenas de KB. Si un .html de tablero no es un cargador, es un original en claro.
+LOADER_MAX_BYTES = 8000
 HTML_FILES_TO_CHECK = [
     "index.html",
     "tableros.html",
@@ -88,6 +96,82 @@ def check_catalog_parity() -> list[str]:
     else:
         print(f"[OK] Paridad 1:1 verificada: {len(catalog_stems)} tableros (catalogo.js, *.html, t/*.bin)")
 
+    return errors
+
+
+def check_loaders() -> list[str]:
+    """Cada <nombre>.html de tablero en la raíz debe ser un cargador, nunca el original."""
+    errors: list[str] = []
+    boards = [p for p in ROOT.glob("*.html") if p.name not in NON_BOARD_HTML]
+    for p in boards:
+        text = p.read_text(encoding="utf-8", errors="replace")
+        if not BOARD_NAME_RE.match(p.stem):
+            errors.append(f"{p.name}: nombre de tablero no válido (o falta en NON_BOARD_HTML de verificar.py si no es un tablero)")
+        if "assets/abrir.js" not in text or p.stat().st_size > LOADER_MAX_BYTES:
+            errors.append(f"{p.name} no es un cargador: parece un tablero original en claro. No lo subas; usa herramientas/tablero.py agregar")
+    if not errors:
+        print(f"[OK] {len(boards)} cargadores de tablero (ningún original en claro en la raíz)")
+    return errors
+
+
+def check_pending_and_previews() -> list[str]:
+    """pendientes/ (sellos y borrados para el workflow «Tableros») y vista/ (vistas previas públicas)."""
+    errors: list[str] = []
+    catalog_text = (ROOT / "assets" / "catalogo.js").read_text(encoding="utf-8")
+    catalog = {Path(f).stem for f in re.findall(r'"archivo"\s*:\s*"([^"]+)"', catalog_text)}
+
+    pub = ROOT / "herramientas" / "sello_publico.pem"
+    if not pub.is_file():
+        errors.append("Falta herramientas/sello_publico.pem (clave pública de sellado)")
+    elif "PRIVATE KEY" in pub.read_text(encoding="utf-8", errors="replace"):
+        errors.append("herramientas/sello_publico.pem contiene una clave PRIVADA. Bórrala del repositorio y cambia el par de claves")
+
+    pend = ROOT / "pendientes"
+    n_sellos = 0
+    borrar: list[str] = []
+    if pend.is_dir():
+        for p in sorted(pend.iterdir()):
+            if p.name in (".gitkeep", "borrar.txt"):
+                continue
+            if p.suffix == ".sello":
+                n_sellos += 1
+                stem = p.name[: -len(".sello")]
+                if not BOARD_NAME_RE.match(stem):
+                    errors.append(f"pendientes/{p.name}: nombre de tablero no válido")
+                elif not (ROOT / "t" / f"{stem}.bin").is_file():
+                    errors.append(f"pendientes/{p.name}: falta t/{stem}.bin")
+                try:
+                    data = json.loads(p.read_text(encoding="utf-8"))
+                    if data.get("nombre") != stem or data.get("alg") != "RSA-OAEP-256" or "clave" not in data:
+                        errors.append(f"pendientes/{p.name}: formato de sello inesperado")
+                except (json.JSONDecodeError, UnicodeDecodeError):
+                    errors.append(f"pendientes/{p.name}: no es JSON válido")
+            else:
+                errors.append(f"pendientes/{p.name}: archivo no permitido (solo <nombre>.sello, borrar.txt y .gitkeep). "
+                              "Nunca pongas aquí un original en claro")
+        if (pend / "borrar.txt").is_file():
+            borrar = [l.strip() for l in (pend / "borrar.txt").read_text(encoding="utf-8").splitlines()
+                      if l.strip() and not l.startswith("#")]
+            for b in borrar:
+                if not BOARD_NAME_RE.match(b):
+                    errors.append(f"pendientes/borrar.txt: nombre no válido {b!r}")
+                elif b in catalog:
+                    errors.append(f"pendientes/borrar.txt: {b} sigue en catalogo.js (no se puede borrar su clave)")
+
+    vista = ROOT / "vista"
+    n_vistas = 0
+    if vista.is_dir():
+        for p in sorted(vista.iterdir()):
+            if p.name.startswith("."):
+                continue
+            if p.suffix != ".html":
+                continue  # recursos de las vistas previas (imágenes, css), si el generador los crea
+            n_vistas += 1
+            if p.stem not in catalog:
+                errors.append(f"vista/{p.name}: vista previa de un tablero que no está en catalogo.js")
+
+    if not errors:
+        print(f"[OK] pendientes/ ({n_sellos} sellos, {len(borrar)} borrados) y vista/ ({n_vistas} vistas previas)")
     return errors
 
 
@@ -166,6 +250,8 @@ def check_html_refs() -> list[str]:
 def main() -> int:
     errors: list[str] = []
     errors.extend(check_catalog_parity())
+    errors.extend(check_loaders())
+    errors.extend(check_pending_and_previews())
     errors.extend(check_database_rules())
     errors.extend(check_js_syntax())
     errors.extend(check_html_refs())

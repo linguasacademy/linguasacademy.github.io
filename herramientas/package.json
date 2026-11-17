@@ -1,0 +1,17 @@
+{
+  "name": "linguasacademy-herramientas",
+  "private": true,
+  "description": "Herramientas del sitio de tableros: vista previa pública de un tablero (vista_previa.mjs).",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "vista-previa": "node vista_previa.mjs"
+  },
+  "dependencies": {
+    "acorn": "8.19.0",
+    "acorn-walk": "8.3.5",
+    "parse5": "8.1.1"
+  }
+}

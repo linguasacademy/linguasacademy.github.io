@@ -132,7 +132,10 @@
       } else if (!u) {
         u = (await auth.signInAnonymously()).user;
       }
-      clave = await leer2(dbSala.ref('salas/' + SALA + '/clave'));
+      const cerrada = await leer2(dbSala.ref('salas/' + SALA + '/cerrada')).catch(() => null);
+      if (cerrada === true) { decir('Esta sala ya cerró. Si quieres volver a entrar, pídele a tu profe un enlace nuevo.'); return; }
+      try { clave = await leer2(dbSala.ref('salas/' + SALA + '/clave')); }
+      catch (e) { if (!denegado(e)) throw e; clave = null; }
       if (!clave) {
         decir('Esta sala no existe o ya cerró. Pídele a tu profe un enlace nuevo.');
         return;

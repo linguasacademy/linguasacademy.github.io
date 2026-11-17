@@ -222,7 +222,7 @@ test('M1: Teacher in live room (?sala=sala1234) sees ← Catálogo and Cerrar sa
   const saleBtn = env.document.querySelector('#vivoChip button.sale');
   assert.ok(saleBtn, '.sale button must be present');
   assert.equal(saleBtn.textContent, 'Cerrar sala');
-  assert.equal(saleBtn.getAttribute('title'), 'Volver al tablero sin sala');
+  assert.equal(saleBtn.getAttribute('title'), 'Termina la clase: el estudiante sale y el enlace deja de funcionar');
 });
 
 test('M1: Anonymous student (?sala=sala1234) and ?como=estudiante hide #vivoChip and a.volver', async () => {

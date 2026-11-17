@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <script src="assets/i18n.js"></script>
 <title data-i18n="cat.meta.titulo">Catálogo de tableros · Lingua's Academy</title>
-<meta name="description" data-i18n-content="cat.meta.desc" content="Catálogo de tableros de clase de Lingua's Academy por idioma y nivel, solo para profesores.">
+<meta name="description" data-i18n-content="cat.meta.desc" content="Catálogo de tableros de clase de Lingua's Academy por idioma y nivel, con vista previa de cada clase.">
 <meta name="theme-color" content="#F6F3EC">
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -133,13 +133,17 @@
 }
 .t__accion svg { width: 18px; height: 18px; flex: none; }
 .t__accion--abrir { background: var(--lvl, var(--ink)); color: #fff; border: 1.5px solid var(--lvl, var(--ink)); }
-.t__accion--muestra { position: relative; z-index: 2; background: transparent; color: var(--lvl-ink, var(--ink)); border: 1.5px solid var(--line-2); }
-.t__accion--muestra:hover { border-color: var(--lvl, var(--ink)); background: var(--lvl-bg, var(--paper-2)); }
-/* toda la tarjeta abre el tablero; «Probar la muestra» y el crédito quedan por encima */
+.t__accion--sec { position: relative; z-index: 2; background: transparent; color: var(--lvl-ink, var(--ink)); border: 1.5px solid var(--line-2); }
+.t__accion--sec:hover { border-color: var(--lvl, var(--ink)); background: var(--lvl-bg, var(--paper-2)); }
+/* toda la tarjeta abre el tablero (o su vista previa); «Desbloquear» y el crédito quedan por encima */
+.t__accion--pronto { border: 1.5px dashed var(--line-2); color: var(--muted); cursor: default; }
+.t__accion--sec svg { width: 16px; height: 16px; }
+.app__head > .app__cta { grid-column: 9 / span 4; justify-self: end; align-self: end; display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 1023px) { .app__head > .app__cta { grid-column: 1 / -1; justify-self: start; } }
 .t__accion--abrir::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
 .t__accion--abrir:focus-visible { outline: none; }
 .t:has(.t__accion--abrir:focus-visible) { outline: 3px solid var(--en); outline-offset: 3px; }
-.t__accion--muestra:focus-visible, .t__credito a:focus-visible { outline: 3px solid var(--en); outline-offset: 2px; }
+.t__accion--sec:focus-visible, .t__credito a:focus-visible { outline: 3px solid var(--en); outline-offset: 2px; }
 
 @media (hover: hover) and (pointer: fine) {
   .t:hover { transform: translateY(-2px); border-color: var(--lvl, var(--ink)); border-top-color: var(--lvl, var(--ink)); box-shadow: 0 16px 32px -24px rgba(20,33,58,.45); }
@@ -147,10 +151,10 @@
   .t:hover .t__accion--abrir { background: var(--lvl-ink, var(--ink)); border-color: var(--lvl-ink, var(--ink)); }
 }
 .t:has(.t__accion--abrir:active) { transform: translateY(2px); box-shadow: none; transition-duration: 100ms; }
-.t__accion--muestra:active { transform: translateY(1px); transition: transform 100ms var(--ease-out); }
+.t__accion--sec:active { transform: translateY(1px); transition: transform 100ms var(--ease-out); }
 @media (prefers-reduced-motion: reduce) {
   .t, .t__portada img, .t__accion { transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease; }
-  .t:hover, .t:has(.t__accion--abrir:active), .t__accion--muestra:active { transform: none; }
+  .t:hover, .t:has(.t__accion--abrir:active), .t__accion--sec:active { transform: none; }
   .t:hover .t__portada img { transform: none; }
   .t:has(.t__accion--abrir:active) { opacity: .85; }
 }
@@ -199,12 +203,14 @@
       <ul class="nav__links">
         <li><a href="tableros.html" aria-current="page" data-i18n="nav.catalogo">Catálogo</a></li>
         <li data-solo-admin hidden><a href="admin.html" data-i18n="nav.solicitudes">Solicitudes</a></li>
+        <li data-solo-publico hidden><a href="suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a></li>
       </ul>
     </nav>
     <div class="nav__actions">
       <div class="nav__idioma" data-selector-idioma></div>
       <span class="nav__user" data-nombre></span>
-      <button class="btn btn--secondary btn--sm" type="button" data-salir data-i18n="nav.salir">Salir</button>
+      <a class="nav__entrar" href="entrar.html" data-entrar hidden data-i18n="cat.publico.entrar">Entrar</a>
+      <button class="btn btn--secondary btn--sm" type="button" data-salir hidden data-i18n="nav.salir">Salir</button>
       <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.abrirMenu" data-txt-abrir="Menú" data-txt-cerrar="Cerrar" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir="nav.menu" data-i18n-txt-cerrar="nav.cerrar" data-i18n-txt-abrir-aria="nav.abrirMenu" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><span data-i18n="nav.menu">Menú</span></button>
     </div>
   </div>
@@ -212,8 +218,10 @@
 <div class="sheet" id="menu" hidden>
   <a href="tableros.html" data-i18n="nav.catalogo">Catálogo</a>
   <a href="admin.html" data-solo-admin hidden data-i18n="nav.solicitudes">Solicitudes</a>
+  <a href="suscripcion.html" data-solo-publico hidden data-i18n="nav.suscripcion">Suscripción</a>
   <a href="./" data-i18n="nav.inicio">Inicio</a>
-  <button class="btn btn--secondary" type="button" data-salir data-i18n="nav.salir">Salir</button>
+  <a href="entrar.html" data-entrar hidden data-i18n="cat.publico.entrar">Entrar</a>
+  <button class="btn btn--secondary" type="button" data-salir hidden data-i18n="nav.salir">Salir</button>
 </div>
 
 <main id="top" class="app">
@@ -225,6 +233,9 @@
         <div>
           <h1 data-i18n="cat.titulo">Catálogo de tableros</h1>
           <p class="lead" data-saludo>Elige el idioma que enseñas y filtra por nivel.</p>
+        </div>
+        <div class="app__cta" data-solo-publico hidden>
+          <a class="btn btn--primary" href="suscripcion.html"><span data-i18n="cat.publico.cta">Ver la suscripción</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         </div>
       </div>
 
@@ -286,6 +297,7 @@
 </template>
 
 <script src="assets/catalogo.js"></script>
+<script src="vista/vistas.js"></script>
 <script src="assets/site.js"></script>
 <script src="assets/fb.js"></script>
 <script src="assets/auth.js"></script>
@@ -324,46 +336,50 @@
   /* ---------- acceso ---------- */
   document.querySelectorAll('[data-salir]').forEach(b => b.addEventListener('click', async () => { await LA.salir().catch(() => {}); location.replace('./'); }));
   const enlace = h => (window.LAi18n ? LAi18n.enlace(h) : h);
-  const aEntrar = () => { const u = enlace('entrar.html'); location.replace(u + (u.includes('?') ? '&' : '?') + 'volver=' + encodeURIComponent('tableros.html' + location.search)); };
 
-  let mostrado = false, nombrePila = '';
+  /* modo: 'profe' (suscripción activa: «Abrir») o 'publico' (visitantes: «Ver vista previa» y «Desbloquear») */
+  let mostrado = false, nombrePila = '', modo = null, haySesion = false;
   function saludar() {
     const s = $('[data-saludo]');
+    if (modo === 'publico') { s.textContent = tr('cat.publico.saludo', 'Mira cómo empieza cada clase en la vista previa. Los tableros completos se abren con la suscripción.'); return; }
     s.textContent = nombrePila
       ? fmt(tr('cat.saludoNombre', 'Hola, {nombre}. Elige el idioma que enseñas y filtra por nivel.'), { nombre: nombrePila })
       : tr('cat.saludo', 'Elige el idioma que enseñas y filtra por nivel.');
+  }
+  function ponerModo(m) {
+    const cambia = m !== modo;
+    modo = m;
+    document.querySelectorAll('[data-solo-publico]').forEach(el => { el.hidden = m !== 'publico'; });
+    document.querySelectorAll('[data-salir]').forEach(el => { el.hidden = !(m === 'profe' || haySesion); });
+    document.querySelectorAll('[data-entrar]').forEach(el => { el.hidden = m === 'profe' || haySesion; });
+    if (m === 'publico') { $('[data-nombre]').textContent = ''; document.querySelectorAll('[data-solo-admin]').forEach(el => { el.hidden = true; }); }
+    saludar();
+    if (!mostrado) { mostrado = true; $('[data-cargando]').hidden = true; $('[data-contenido]').hidden = false; pintar(); }
+    else if (cambia) pintar();
   }
   function mostrar(perfil, usuario) {
     const nombre = (perfil.nombre || (usuario && (usuario.displayName || usuario.email)) || perfil.correo || '').trim();
     $('[data-nombre]').textContent = nombre;
     nombrePila = nombre ? nombre.split(' ')[0] : '';
-    saludar();
+    if (usuario) haySesion = true;
+    ponerModo('profe');
     document.querySelectorAll('[data-solo-admin]').forEach(el => { el.hidden = !perfil.admin; });
-    if (mostrado) return;
-    mostrado = true;
-    $('[data-cargando]').hidden = true;
-    $('[data-contenido]').hidden = false;
-    pintar();
   }
   const conAcceso = p => !!p && (p.estado === 'aprobado' || p.admin === true);
-  /* Si este navegador ya entró antes, el catálogo se pinta de una vez y la sesión se confirma por detrás */
+  /* Si este navegador ya entró antes, el catálogo completo se pinta de una vez y la sesión se confirma por detrás;
+     si no, se pinta enseguida el catálogo público (no hace falta esperar a Firebase) */
   Promise.resolve().then(() => {
     let c = null; try { c = JSON.parse(localStorage.getItem('la-perfil') || 'null'); } catch (e) {}
-    if (conAcceso(c)) mostrar(c, null);
+    if (conAcceso(c)) mostrar(c, null); else ponerModo('publico');
   });
   function comprobar() {
     LA.estado().then(({ usuario, perfil }) => {
-      if (!usuario || !conAcceso(perfil)) return aEntrar();
+      haySesion = !!(usuario && !usuario.isAnonymous);
+      if (!usuario || !conAcceso(perfil)) return ponerModo('publico');
       mostrar(perfil, usuario);
     }).catch(err => {
       console.warn(err);
-      if (mostrado) return;
-      const c = $('[data-cargando]');
-      c.textContent = tr('cat.lento', 'La conexión está lenta y no se pudo comprobar tu sesión.') + ' ';
-      const b = document.createElement('button');
-      b.className = 'btn btn--secondary btn--sm'; b.type = 'button'; b.textContent = tr('cat.reintentar', 'Reintentar');
-      c.appendChild(b);
-      b.addEventListener('click', () => { c.textContent = tr('cat.comprobando', 'Comprobando tu acceso…'); comprobar(); });
+      if (!mostrado) ponerModo('publico');
     });
   }
   comprobar();
@@ -413,7 +429,7 @@
   $('[data-limpiar]').addEventListener('click', () => { form.reset(); pintar(); form.elements.texto.focus(); });
 
   /* Si otra parte de la web cambia <html lang>, se repintan los textos generados aquí */
-  new MutationObserver(() => { cuentas(); saludar(); if (mostrado) pintar(); })
+  new MutationObserver(() => { cuentas(); if (modo) saludar(); if (mostrado) pintar(); })
     .observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
   function guardarUrl(f) {
@@ -437,9 +453,12 @@
     ninos: '<svg class="tag__ico" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.3l-3.8 2 .7-4.3-3.1-3 4.3-.6z"></path></svg>',
     adultos: '<svg class="tag__ico" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5" r="3"></circle><path d="M2.5 14c.6-2.6 2.8-4 5.5-4s4.9 1.4 5.5 4"></path></svg>'
   };
-  /* Lucide (ISC): arrow-right y play */
+  /* Lucide (ISC): arrow-right, eye y lock */
   const ICO_ABRIR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
-  const ICO_MUESTRA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
+  const ICO_VISTA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>';
+  const ICO_CANDADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  /* vistas previas publicadas (vista/<nombre>.html), según vista/vistas.js */
+  const VISTAS = new Set(Array.isArray(window.VISTAS) ? window.VISTAS : []);
 
   const notaDe = t => (lang() === 'en' && t.notaEn) || (lang() === 'pt' && t.notaPt) || t.nota || '';
   const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
@@ -525,17 +544,31 @@
 
     /* acciones */
     const acc = el('div', 't__acciones');
-    const abrir = el('a', 't__accion t__accion--abrir');
-    abrir.href = t.archivo;
-    abrir.innerHTML = '<span></span><span class="visually-hidden"></span>' + ICO_ABRIR;
-    abrir.children[0].textContent = tr('cat.abrir', 'Abrir');
-    abrir.children[1].textContent = ': ' + t.titulo;
-    const muestra = el('a', 't__accion t__accion--muestra');
-    muestra.href = enlace('muestra.html?t=' + encodeURIComponent(t.archivo.replace(/\.html$/, '')));
-    muestra.innerHTML = ICO_MUESTRA + '<span></span><span class="visually-hidden"></span>';
-    muestra.children[1].textContent = tr('cat.probarMuestra', 'Probar la muestra');
-    muestra.children[2].textContent = ': ' + t.titulo;
-    acc.append(abrir, muestra);
+    const nombreT = t.archivo.replace(/\.html$/, '');
+    const accion = (tag, cls, ico, texto, final) => {
+      const a = el(tag, 't__accion ' + cls);
+      a.innerHTML = (final ? '' : ico) + '<span></span><span class="visually-hidden"></span>' + (final ? ico : '');
+      a.querySelector('span').textContent = texto;
+      a.querySelector('.visually-hidden').textContent = ': ' + t.titulo;
+      return a;
+    };
+    if (modo === 'profe') {
+      const abrir = accion('a', 't__accion--abrir', ICO_ABRIR, tr('cat.abrir', 'Abrir'), true);
+      abrir.href = t.archivo;
+      acc.append(abrir);
+    } else {
+      if (VISTAS.has(nombreT)) {
+        const ver = accion('a', 't__accion--abrir', ICO_VISTA, tr('cat.verVista', 'Ver vista previa'));
+        ver.href = enlace('vista/' + nombreT + '.html');
+        acc.append(ver);
+      } else {
+        acc.append(accion('span', 't__accion--pronto', '', tr('cat.vistaPronto', 'Vista previa pronto')));
+      }
+      const des = accion('a', 't__accion--sec', ICO_CANDADO, tr('cat.desbloquear', 'Desbloquear'));
+      des.href = enlace('suscripcion.html');
+      des.title = tr('cat.desbloquearAria', 'Desbloquear con la suscripción');
+      acc.append(des);
+    }
     art.appendChild(acc);
     return art;
   }

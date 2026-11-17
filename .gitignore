@@ -1,2 +1,13 @@
 .taste-skill/
 __pycache__/
+node_modules/
+
+# Nunca subir originales de tableros ni secretos
+originales/
+*.original.html
+*.pem
+!herramientas/sello_publico.pem
+SELLO_PRIVADO*
+firebase-sa*.json
+*-firebase-adminsdk-*.json
+claves*.json

@@ -43,17 +43,34 @@
     },
     "salas": {
       "$sala": {
-        ".read": "auth != null",
         "dueno": {
+          ".read": "auth != null",
           ".write": "auth != null && !data.exists() && newData.val() === auth.uid && (root.child('profes').child(auth.uid).child('estado').val() === 'aprobado' || root.child('admins').child(auth.uid).val() === true)",
           ".validate": "newData.isString() && newData.val().length <= 128"
         },
+        "cerrada": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('salas').child($sala).child('dueno').val() === auth.uid && newData.val() === true",
+          ".validate": "newData.val() === true"
+        },
         "clave": {
-          ".write": "auth != null && root.child('salas').child($sala).child('dueno').val() === auth.uid",
+          ".read": "auth != null && !root.child('salas').child($sala).child('cerrada').exists()",
+          ".write": "auth != null && root.child('salas').child($sala).child('dueno').val() === auth.uid && (!newData.exists() || !root.child('salas').child($sala).child('cerrada').exists())",
           ".validate": "newData.isString() && newData.val().length <= 60"
         },
+        "ajustes": {
+          ".read": "auth != null && !root.child('salas').child($sala).child('cerrada').exists()",
+          ".write": "auth != null && root.child('salas').child($sala).child('dueno').val() === auth.uid && (!newData.exists() || !root.child('salas').child($sala).child('cerrada').exists())",
+          "menuOculto": {
+            ".validate": "newData.isBoolean()"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
         "d": {
-          ".write": "auth != null && root.child('salas').child($sala).child('dueno').val() === auth.uid",
+          ".read": "auth != null && !root.child('salas').child($sala).child('cerrada').exists()",
+          ".write": "auth != null && root.child('salas').child($sala).child('dueno').val() === auth.uid && (!newData.exists() || !root.child('salas').child($sala).child('cerrada').exists())",
           "$doc": {
             ".validate": "newData.hasChildren(['j', 't'])",
             "j": {
@@ -68,8 +85,10 @@
           }
         },
         "pres": {
+          ".read": "auth != null && !root.child('salas').child($sala).child('cerrada').exists()",
+          ".write": "auth != null && root.child('salas').child($sala).child('dueno').val() === auth.uid && !newData.exists()",
           "$p": {
-            ".write": "auth != null && root.child('salas').child($sala).child('dueno').exists() && (auth.uid === $p || ($p === 'P' && root.child('salas').child($sala).child('dueno').val() === auth.uid))",
+            ".write": "auth != null && root.child('salas').child($sala).child('dueno').exists() && (!newData.exists() || !root.child('salas').child($sala).child('cerrada').exists()) && (auth.uid === $p || ($p === 'P' && root.child('salas').child($sala).child('dueno').val() === auth.uid))",
             ".validate": "newData.hasChildren(['j', 't'])",
             "j": {
               ".validate": "newData.isString() && newData.val().length <= 4096"
@@ -83,8 +102,10 @@
           }
         },
         "ev": {
+          ".read": "auth != null && !root.child('salas').child($sala).child('cerrada').exists()",
+          ".write": "auth != null && root.child('salas').child($sala).child('dueno').val() === auth.uid && !newData.exists()",
           "$u": {
-            ".write": "auth != null && root.child('salas').child($sala).child('dueno').exists() && auth.uid === $u",
+            ".write": "auth != null && root.child('salas').child($sala).child('dueno').exists() && (!newData.exists() || !root.child('salas').child($sala).child('cerrada').exists()) && auth.uid === $u",
             ".validate": "newData.hasChildren(['n', 'de', 'k', 't'])",
             "n": {
               ".validate": "newData.isString() && newData.val().length <= 64"

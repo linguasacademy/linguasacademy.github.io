@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>document.documentElement.classList.add('js')</script>
+<script src="assets/i18n.js"></script>
+<title data-i18n="sus.meta.titulo">Suscripción · Lingua's Academy</title>
+<meta name="description" content="Con la suscripción de Lingua's Academy abres los tableros de clase completos, con sala en vivo para tu estudiante y material propio." data-i18n-content="sus.meta.desc">
+<meta name="theme-color" content="#F6F3EC">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lingua's Academy">
+<meta property="og:title" content="Suscripción · Lingua's Academy" data-i18n-content="sus.meta.titulo">
+<meta property="og:description" content="Con la suscripción de Lingua's Academy abres los tableros de clase completos, con sala en vivo para tu estudiante y material propio." data-i18n-content="sus.meta.desc">
+<meta property="og:url" content="https://linguasacademy.github.io/suscripcion.html">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Caveat:wght@600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.mano { font-family: 'Caveat', cursive; font-weight: 600; line-height: 1; }
+.sus { padding: calc(var(--nav) + clamp(32px, 5vw, 72px)) 0 clamp(56px, 7vw, 104px); }
+.sus .wrap { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 48px 64px; align-items: start; }
+.sus__texto { display: flex; flex-direction: column; gap: 24px; }
+.sus__para { font-size: 30px; color: var(--en); transform: rotate(-2deg); transform-origin: left center; }
+.sus h1 { font: 400 clamp(44px, 5.4vw, 80px)/1 var(--f-display); letter-spacing: -.02em; }
+.sus__lead { font-size: clamp(18px, 1.5vw, 21px); color: var(--ink-2); max-width: 30em; }
+.incluye { display: grid; gap: 14px; margin-top: 8px; }
+.incluye h2 { font: 500 13px/1.3 var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.incluye ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.item { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; padding: 20px 22px; background: var(--card); border: 1.5px solid var(--line-2); border-left: 4px solid var(--c); border-radius: var(--r-lg); }
+.item__ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--c-soft); color: var(--c); flex: none; }
+.item__ico svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.item h3 { font: 500 22px/1.2 var(--f-display); margin-bottom: 4px; }
+.item p { color: var(--ink-2); }
+
+.plan { position: sticky; top: calc(var(--nav) + 24px); display: flex; flex-direction: column; gap: 18px; padding: 28px; background: var(--card); border: 1.5px solid var(--line-2); border-top: 4px solid var(--action); border-radius: var(--r-lg); box-shadow: 0 22px 44px -32px rgba(20,33,58,.55); }
+.plan__et { font: 500 13px/1.3 var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.plan__precio { font: 400 clamp(32px, 3vw, 44px)/1.05 var(--f-display); letter-spacing: -.015em; }
+.plan__sin { font: 400 clamp(24px, 2vw, 30px)/1.2 var(--f-display); color: var(--ink); }
+.plan__sin a { color: var(--action); text-underline-offset: 5px; }
+.plan__lista { list-style: none; margin: 0; padding: 16px 0 0; border-top: 1px solid var(--line); display: grid; gap: 10px; }
+.plan__lista li { display: flex; gap: 10px; align-items: flex-start; color: var(--ink-2); font-size: 16px; }
+.plan__lista svg { width: 18px; height: 18px; flex: none; margin-top: 4px; fill: none; stroke: var(--ok); stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
+.plan .btn { width: 100%; justify-content: center; }
+.btn--pill { border-radius: 999px; --bh: 58px; padding: 0 28px; font-size: 18px; font-weight: 600; }
+.plan__nota { font-size: 14.5px; color: var(--muted); }
+.plan__otro { align-self: center; font-weight: 600; }
+.plan--activa { border-top-color: var(--ok); }
+
+.dudas { padding: 0 0 clamp(56px, 7vw, 104px); }
+.dudas .wrap { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px 64px; }
+.dudas .mano { font-size: 28px; color: var(--pt); transform: rotate(-2deg); transform-origin: left center; }
+.dudas h2 { font: 400 clamp(26px, 2.2vw, 34px)/1.15 var(--f-display); margin-bottom: 10px; }
+.dudas p:not(.mano) { color: var(--ink-2); max-width: 36em; }
+.pie { border-top: 1px solid var(--line); }
+.pie .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 32px; padding-top: 28px; padding-bottom: 28px; font-size: 15px; color: var(--muted); }
+.pie span:first-child { display: inline-flex; align-items: center; gap: 10px; }
+[hidden] { display: none !important; }
+@media (max-width: 959px) {
+  .sus .wrap, .dudas .wrap { grid-template-columns: 1fr; }
+  .plan { position: static; }
+}
+@media (max-width: 639px) {
+  .sus__para { font-size: 26px; }
+  .item { padding: 16px; gap: 12px; }
+  .item__ico { width: 40px; height: 40px; }
+  .plan { padding: 22px; }
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="skip-link" href="#top" data-i18n="nav.saltar">Saltar al contenido</a>
+    <a class="brand" href="./" aria-label="Lingua's Academy, inicio" data-i18n-aria="nav.inicio_aria"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <nav aria-label="Principal" data-i18n-aria="nav.principal_aria">
+      <ul class="nav__links">
+        <li><a href="./#muestras" data-i18n="nav.probar">Ver una clase de muestra</a></li>
+        <li><a href="tableros.html" data-i18n="nav.tableros">Tableros</a></li>
+        <li><a href="suscripcion.html" aria-current="page" data-i18n="nav.suscripcion">Suscripción</a></li>
+      </ul>
+    </nav>
+    <div class="nav__actions">
+      <div class="nav__idioma" data-selector-idioma></div>
+      <a class="nav__entrar" href="entrar.html" data-cuenta-link data-i18n="nav.entrar">Entrar</a>
+      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.menu_abrir_aria" data-txt-abrir="Menú" data-txt-cerrar="Cerrar" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir="nav.menu" data-i18n-txt-cerrar="nav.cerrar" data-i18n-txt-abrir-aria="nav.menu_abrir_aria" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><span data-i18n="nav.menu">Menú</span></button>
+    </div>
+  </div>
+</header>
+<nav class="sheet" id="menu" aria-label="Menú" data-i18n-aria="nav.menu" hidden>
+  <a href="./#muestras" data-i18n="nav.probar">Ver una clase de muestra</a>
+  <a href="tableros.html" data-i18n="nav.tableros">Tableros</a>
+  <a href="suscripcion.html" aria-current="page" data-i18n="nav.suscripcion">Suscripción</a>
+  <a class="sheet__sec" href="entrar.html" data-cuenta-link data-i18n="nav.entrar_largo">Entrar con mi cuenta</a>
+</nav>
+
+<main id="top">
+  <section class="sus" aria-labelledby="h1">
+    <div class="wrap">
+      <div class="sus__texto">
+        <p class="mano sus__para" data-i18n="sus.mano">para profes de español, inglés y portugués</p>
+        <h1 id="h1" data-i18n="sus.titulo">Toda la clase, no solo el comienzo.</h1>
+        <p class="sus__lead" data-i18n="sus.lead">La vista previa te muestra cómo empieza cada tablero. Con la suscripción lo abres completo y lo usas en tus clases.</p>
+        <div class="incluye">
+          <h2 data-i18n="sus.incluye">Qué incluye</h2>
+          <ul>
+            <li class="item" style="--c: var(--es); --c-soft: var(--es-soft)">
+              <span class="item__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg></span>
+              <div><h3 data-i18n="sus.i1.t">Tableros completos de A1 a C2</h3><p data-i18n="sus.i1.d">Cada clase entera: introducción, objetivos, actividades, lectura, juego, resumen y tarea.</p></div>
+            </li>
+            <li class="item" style="--c: var(--en); --c-soft: var(--en-soft)">
+              <span class="item__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg></span>
+              <div><h3 data-i18n="sus.i2.t">Sala en vivo sin cuenta para tu estudiante</h3><p data-i18n="sus.i2.d">Abres la sala, le mandas el enlace y entra desde el computador o el celular. Cuando tú avanzas, su pantalla avanza contigo.</p></div>
+            </li>
+            <li class="item" style="--c: var(--pt); --c-soft: var(--pt-soft)">
+              <span class="item__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></span>
+              <div><h3 data-i18n="sus.i3.t">Añadir tu propio material</h3><p data-i18n="sus.i3.d">Con «Añadir» pones en el tablero un video de YouTube, una imagen para describir, un cuento o una pregunta tuya.</p></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <aside class="plan" aria-labelledby="h-plan" data-plan>
+        <p class="plan__et" id="h-plan" data-i18n="sus.plan">Tu plan</p>
+        <p class="plan__precio" data-precio hidden></p>
+        <p class="plan__sin" data-sin-precio><a href="entrar.html" data-contacto data-i18n="sus.sinPrecioLink">Escríbenos</a> <span data-i18n="sus.sinPrecioResto">para conocer los planes.</span></p>
+        <ul class="plan__lista">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="sus.i1.t">Tableros completos de A1 a C2</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="sus.i2.t">Sala en vivo sin cuenta para tu estudiante</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="sus.i3.t">Añadir tu propio material</span></li>
+        </ul>
+        <a class="btn btn--primary btn--pill" href="entrar.html" data-boton-sus><span data-i18n="sus.solicitar">Solicitar suscripción</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <p class="plan__nota" data-nota data-i18n="sus.nota">Entras con Google o con tu correo y completas una solicitud corta. Te avisamos cuando tu suscripción esté activa.</p>
+        <a class="link plan__otro" href="./#muestras" data-i18n="sus.muestra">Ver una clase de muestra</a>
+      </aside>
+
+      <aside class="plan plan--activa" aria-labelledby="h-activa" data-activa hidden>
+        <p class="plan__et" data-i18n="sus.plan">Tu plan</p>
+        <p class="plan__sin" id="h-activa" data-i18n="sus.activa.t">Tu suscripción está activa</p>
+        <p class="plan__nota" data-i18n="sus.activa.d">Ya puedes abrir todos los tableros desde el catálogo.</p>
+        <a class="btn btn--primary btn--pill" href="tableros.html"><span data-i18n="sus.activa.cta">Ir a mis tableros</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </aside>
+    </div>
+  </section>
+
+  <section class="dudas" aria-labelledby="h-dudas">
+    <div class="wrap">
+      <p class="mano" data-i18n="faq.mano">lo que más nos preguntan</p>
+      <div>
+        <h2 id="h-dudas" data-i18n="sus.pregunta.q">¿Qué veo sin suscripción?</h2>
+        <p data-i18n="sus.pregunta.a">La vista previa de cada tablero: la introducción, los objetivos y la primera actividad, tal como los ve tu estudiante. Las demás secciones aparecen con candado.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="wrap">
+    <span><img src="logo.svg" alt="" width="28" height="28">© 2026 Lingua's Academy</span>
+    <span data-i18n="pie.lema">Tableros de clase para profesores de idiomas</span>
+  </div>
+</footer>
+
+<script src="assets/site.js"></script>
+<script src="assets/fb.js"></script>
+<script src="assets/auth.js"></script>
+<script>
+(() => {
+  'use strict';
+  /* Precio, enlace de pago y contacto: se configuran en assets/site.js (window.LA_SUSCRIPCION) */
+  const cfg = window.LA_SUSCRIPCION || {};
+  const I = window.LAi18n;
+  const en = h => (I ? I.enlace(h) : h);
+  const segura = u => typeof u === 'string' && /^(https:\/\/|mailto:)/i.test(u.trim()) ? u.trim() : '';
+  const pago = /^https:\/\//i.test(String(cfg.pago || '').trim()) ? String(cfg.pago).trim() : '';
+
+  function pintar() {
+    const lang = I ? I.lang : 'es';
+    const p = cfg.precio || {};
+    const precio = String((typeof p === 'string' ? p : (p[lang] || p.es)) || '').trim();
+    const elP = document.querySelector('[data-precio]'), elSin = document.querySelector('[data-sin-precio]');
+    elP.textContent = precio; elP.hidden = !precio; elSin.hidden = !!precio;
+    const contacto = document.querySelector('[data-contacto]');
+    contacto.href = segura(cfg.contacto) || en('entrar.html');
+    const b = document.querySelector('[data-boton-sus]'), sp = b.querySelector('span');
+    if (pago) {
+      b.href = pago; b.rel = 'noopener';
+      sp.setAttribute('data-i18n', 'sus.pagar'); sp.textContent = I ? I.t('sus.pagar') : 'Suscribirme';
+      const n = document.querySelector('[data-nota]');
+      n.setAttribute('data-i18n', 'sus.notaPago'); n.textContent = I ? I.t('sus.notaPago') : n.textContent;
+    } else {
+      b.href = en('entrar.html');
+    }
+  }
+  pintar();
+  document.addEventListener('la:idioma', pintar);
+
+  /* Con la suscripción ya activa (profe aprobado), se muestra el acceso directo al catálogo */
+  const revisar = () => window.LA && LA.estado().then(({ perfil }) => {
+    if (!perfil || !(perfil.estado === 'aprobado' || perfil.admin)) return;
+    document.querySelector('[data-plan]').hidden = true;
+    document.querySelector('[data-activa]').hidden = false;
+    document.querySelectorAll('[data-cuenta-link]').forEach(a => {
+      a.href = en('tableros.html'); a.setAttribute('data-i18n', 'nav.mis_tableros');
+      a.textContent = I ? I.t('nav.mis_tableros') : 'Mis tableros';
+    });
+  }).catch(() => {});
+  ('requestIdleCallback' in window ? requestIdleCallback : setTimeout)(revisar);
+})();
+</script>
+</body>
+</html>

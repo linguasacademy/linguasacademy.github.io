@@ -1,0 +1,84 @@
+name: Tableros
+
+# Publica en Firebase las claves de los tableros añadidos con
+# «python3 herramientas/tablero.py agregar» y borra las de los quitados.
+# Necesita dos secretos del repositorio (Settings → Secrets and variables → Actions):
+#   SELLO_PRIVADO  la clave privada que abre pendientes/<nombre>.sello
+#   FIREBASE_SA    el JSON de la cuenta de servicio de Firebase (linguas-tableros)
+# Ver README.md, «Añadir o quitar tableros (Claude)».
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pendientes/**'
+  workflow_dispatch:
+    inputs:
+      regenerar:
+        description: 'Regenerar todas las vistas previas (vista/) con las claves de Firebase'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tableros
+  cancel-in-progress: false
+
+jobs:
+  tableros:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias
+        run: |
+          python3 -m pip install --quiet cryptography
+          if [ -f herramientas/package.json ]; then npm ci --prefix herramientas --no-audit --no-fund; fi
+
+      - name: Abrir sellos y actualizar Firebase
+        id: procesar
+        env:
+          SELLO_PRIVADO: ${{ secrets.SELLO_PRIVADO }}
+          FIREBASE_SA: ${{ secrets.FIREBASE_SA }}
+        run: python3 herramientas/tablero.py procesar
+
+      - name: Regenerar todas las vistas previas
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.regenerar }}
+        env:
+          FIREBASE_SA: ${{ secrets.FIREBASE_SA }}
+        run: python3 herramientas/tablero.py regenerar
+
+      - name: Comprobar que no queda ningún original en claro
+        if: ${{ !cancelled() }}
+        run: python3 herramientas/verificar.py
+
+      - name: Guardar cambios (pendientes/ y vista/)
+        if: ${{ !cancelled() }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add -A -- pendientes
+          if [ -d vista ]; then git add -A -- vista; fi
+          if git diff --cached --quiet; then echo "No hay cambios que guardar."; exit 0; fi
+          git commit -m "Tableros: claves publicadas en Firebase y vistas previas actualizadas"
+          for intento in 1 2 3; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((intento * 5))
+          done
+          echo "::error::No se pudo subir el commit del bot (hubo otro push a la vez). Vuelve a ejecutar el workflow."
+          exit 1

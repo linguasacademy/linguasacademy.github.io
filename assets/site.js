@@ -1,5 +1,21 @@
 /* site.js · Lingua's Academy: menú del teléfono, sección activa del menú y errores de formulario.
    El idioma de la página (textos, selector ES · EN · PT y enlaces con ?lang=) lo lleva assets/i18n.js. */
+
+/* ═══════════ SUSCRIPCIÓN · el único lugar que hay que tocar cuando haya pasarela de pago ═══════════
+   pago      Enlace de la página de pago (Mercado Pago, Stripe, Hotmart…), con https://.
+             Vacío: el botón dice «Solicitar suscripción» y lleva a entrar.html (cuenta de profesor que se aprueba a mano).
+             Con enlace: el botón dice «Suscribirme» y lleva a ese enlace.
+   precio    Cómo se ve el precio en cada idioma, tal cual. Ejemplo:
+               precio: { es: 'USD 12 al mes', en: 'USD 12 a month', pt: 'US$ 12 por mês' }
+             Vacío: la página dice «Escríbenos para conocer los planes» (no se muestra ninguna cifra).
+   contacto  Adónde lleva «Escríbenos» (mailto:correo@… o https://wa.me/…). Vacío: a entrar.html.
+   La usan suscripcion.html y, a través de ella, todos los botones «Desbloquear». */
+window.LA_SUSCRIPCION = window.LA_SUSCRIPCION || {
+  pago: '',
+  precio: { es: '', en: '', pt: '' },
+  contacto: ''
+};
+
 (() => {
   'use strict';
   document.documentElement.classList.add('js');
