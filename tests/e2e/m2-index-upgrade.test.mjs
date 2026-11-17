@@ -110,11 +110,8 @@ test('M2: Preply-inspired UI sections in index.html (Hero composite, Metrics str
   assert.ok(mesa.querySelector('.nota--1'), 'Editorial sticky note .nota--1 missing');
 
   const chips = mesa.querySelectorAll('.chip-ui');
-  assert.equal(chips.length, 3, 'Expected 3 floating UI chips in .mesa');
-  assert.match(mesa.textContent, /Sala en vivo sincronizada/);
-  assert.match(mesa.textContent, /ES · EN · PT/);
-  assert.match(mesa.textContent, /50 min · A1–B2/);
-  assert.equal(mesa.querySelectorAll('.chip-ui--idiomas svg.flag').length, 3, 'Expected 3 inline SVG flags in languages chip');
+  assert.equal(chips.length, 1, 'Expected 1 focused floating UI chip in .mesa');
+  assert.match(mesa.textContent, /En vivo con tu estudiante/);
 
   // Metrics strip immediately after .hero
   const mainChildren = Array.from(doc.querySelector('main').children);
@@ -126,7 +123,7 @@ test('M2: Preply-inspired UI sections in index.html (Hero composite, Metrics str
   assert.match(metricasText, /49/);
   assert.match(metricasText, /A1–B2/);
   assert.match(metricasText, /50 min/);
-  assert.match(metricasText, /0 cuentas/);
+  assert.match(metricasText, /Sin cuenta/);
 
   // #clase: 3 numbered tactile cards (1, 2, 3) with .momento__ui
   const momentos = doc.querySelectorAll('#clase .momento');
