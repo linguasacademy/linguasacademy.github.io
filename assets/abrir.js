@@ -30,9 +30,17 @@
     return new TextDecoder().decode(plano);
   }
   const CK = 'la-clave:' + NOMBRE;
-  function pintar(html, clave) {
+  function pintar(html, clave, esProfe) {
     try { sessionStorage.setItem(CK, clave); } catch (e) {}
     window.LA_CLAVE = clave;
+    window.LA_PROFE = !!esProfe;
+    let cat = 'tableros.html';
+    try {
+      const g = sessionStorage.getItem('la-catalogo');
+      if (g && /^tableros\.html(\?.*)?$/.test(g)) cat = g;
+    } catch (e) {}
+    window.LA_CATALOGO = cat;
+
     const doc = new DOMParser().parseFromString(html, 'text/html');
     Array.from(document.documentElement.attributes).forEach(a => document.documentElement.removeAttribute(a.name));
     Array.from(doc.documentElement.attributes).forEach(a => document.documentElement.setAttribute(a.name, a.value));
@@ -62,6 +70,31 @@
     extraerScripts(doc.head, document.head);
     extraerScripts(doc.body, document.body);
 
+    if (esProfe) {
+      const st = document.createElement('style');
+      st.id = 'vivoStyle';
+      st.textContent =
+        '#vivoChip{position:fixed;left:12px;bottom:12px;z-index:19;display:flex;align-items:center;gap:6px;flex-wrap:wrap;' +
+        'font:700 14px/1.2 system-ui,\'Segoe UI\',sans-serif;color:#fff;background:#12303Aee;border-radius:14px;padding:6px;box-shadow:0 6px 20px #0005;max-width:calc(100vw - 24px)}' +
+        '#vivoChip:empty{display:none}' +
+        '#vivoChip a{color:inherit;text-decoration:none;border-radius:10px;padding:8px 12px;background:#ffffff1f;white-space:nowrap}' +
+        '#vivoChip a:hover{background:#ffffff33}' +
+        '#vivoChip a:focus-visible{outline:3px solid #F4B51E;outline-offset:2px}' +
+        'body.con-sala #lado{padding-bottom:72px}' +
+        '@media print{#vivoChip{display:none}}';
+      document.head.appendChild(st);
+      const chip = document.createElement('div');
+      chip.id = 'vivoChip';
+      const volver = document.createElement('a');
+      volver.className = 'volver';
+      volver.setAttribute('href', cat);
+      volver.title = 'Volver al catálogo de tableros';
+      volver.textContent = '← Catálogo';
+      chip.appendChild(volver);
+      document.body.appendChild(chip);
+      document.body.classList.add('con-sala');
+    }
+
     scripts.forEach(({ nodo, destino, antes }) => {
       const s = document.createElement('script');
       Array.from(nodo.attributes).forEach(a => s.setAttribute(a.name, a.value));
@@ -78,11 +111,14 @@
     const app = firebase.apps.find(a => a.name === '[DEFAULT]') || firebase.initializeApp(CFG);
     const auth = app.auth(), db = app.database();
     let u = await new Promise(ok => { let fin; let ya = false; fin = auth.onAuthStateChanged(x => { if (ya) return; ya = true; if (fin) fin(); ok(x); }); if (ya && fin) fin(); });
-    let clave = null;
+    let clave = null, esProfe = false;
 
     /* 1 · profe con sesión (y no la vista de prueba del estudiante) */
     if (u && !u.isAnonymous && !COMO_ALUMNO) {
-      try { clave = await leer2(db.ref('claves/' + NOMBRE)); }
+      try {
+        clave = await leer2(db.ref('claves/' + NOMBRE));
+        if (clave) esProfe = true;
+      }
       catch (e) { if (!denegado(e)) throw e; }
     }
     /* 2 · enlace de una sala */
@@ -112,7 +148,7 @@
     }
 
     const html = await descifrar(clave);
-    pintar(html, clave);
+    pintar(html, clave, esProfe);
   }
 
   conTiempo(principal(), 45000).catch(err => {

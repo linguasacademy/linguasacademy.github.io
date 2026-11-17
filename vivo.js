@@ -250,9 +250,11 @@
   const CSS = `
   #vivoChip{position:fixed;left:12px;bottom:12px;z-index:19;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
     font:700 14px/1.2 system-ui,'Segoe UI',sans-serif;color:#fff;background:#12303Aee;border-radius:14px;padding:6px;box-shadow:0 6px 20px #0005;max-width:calc(100vw - 24px)}
+  #vivoChip:empty{display:none}
   #vivoChip button{font:inherit;color:inherit;border:0;cursor:pointer;border-radius:10px;padding:8px 12px;background:#ffffff1f}
   #vivoChip button:hover{background:#ffffff33}
   #vivoChip a{color:inherit;text-decoration:none;border-radius:10px;padding:8px 12px;background:#ffffff1f}
+  #vivoChip a.volver{white-space:nowrap}
   #vivoChip a:hover{background:#ffffff33}
   #vivoChip a:focus-visible{outline:3px solid #F4B51E;outline-offset:2px}
   #vivoChip button:focus-visible{outline:3px solid #F4B51E;outline-offset:2px}
@@ -279,9 +281,23 @@
   }
 
   function chip() {
-    const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
-    const c = document.createElement('div'); c.id = 'vivoChip'; document.body.appendChild(c); document.body.classList.add('con-sala');
-    const plegar = () => { c.innerHTML = '<button class="x" title="Sala en vivo" aria-label="Mostrar la sala en vivo">●</button>'; c.firstChild.onclick = pintar; };
+    let st = document.getElementById('vivoStyle');
+    if (!st) { st = document.createElement('style'); st.id = 'vivoStyle'; document.head.appendChild(st); }
+    st.textContent = CSS;
+    let c = document.getElementById('vivoChip');
+    if (!c) { c = document.createElement('div'); c.id = 'vivoChip'; document.body.appendChild(c); }
+    document.body.classList.add('con-sala');
+    const urlCat = (() => {
+      if (window.LA_CATALOGO) return window.LA_CATALOGO;
+      try { return sessionStorage.getItem('la-catalogo') || 'tableros.html'; } catch (e) { return 'tableros.html'; }
+    })();
+    const esc = s => String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    const volverHtml = '<a class="volver" href="' + esc(urlCat) + '" title="Volver al catálogo de tableros">← Catálogo</a>';
+    let esProfeChip = window.LA_PROFE === true;
+    const plegar = () => {
+      c.innerHTML = (esProfeChip ? volverHtml : '') + '<button class="x" title="Sala en vivo" aria-label="Mostrar la sala en vivo">●</button>';
+      c.querySelector('.x').onclick = pintar;
+    };
 
     async function pintar() {
       if (!SALA) {
@@ -289,18 +305,20 @@
         let profe = false;
         try { profe = await profeAprobado(); } catch (e) {
           console.warn('[vivo] sin conexión:', e);
-          c.innerHTML = '<button class="reint">● Sala en vivo: sin conexión. Reintentar</button><button class="x" aria-label="Ocultar">✕</button>';
+          c.innerHTML = (esProfeChip ? volverHtml : '') + '<button class="reint">● Sala en vivo: sin conexión. Reintentar</button><button class="x" aria-label="Ocultar">✕</button>';
           c.querySelector('.reint').onclick = () => { c.querySelector('.reint').textContent = 'Conectando…'; pintar(); };
           c.querySelector('.x').onclick = plegar;
           return;
         }
         if (!profe) {
+          esProfeChip = false;
           const volver = encodeURIComponent(location.pathname.split('/').pop() || '');
           c.innerHTML = '<a class="entra" href="entrar.html?volver=' + volver + '">● Entrar como profe para abrir una sala</a><button class="x" aria-label="Ocultar">✕</button>';
           c.querySelector('.x').onclick = plegar;
           return;
         }
-        c.innerHTML = '<button class="rojo abre">● Abrir sala en vivo</button><button class="x" aria-label="Ocultar">✕</button>';
+        esProfeChip = true;
+        c.innerHTML = volverHtml + '<button class="rojo abre">● Abrir sala en vivo</button><button class="x" aria-label="Ocultar">✕</button>';
         c.querySelector('.x').onclick = plegar;
         c.querySelector('.abre').onclick = async e => {
           const b = e.currentTarget; b.disabled = true; b.textContent = 'Creando la sala…';
@@ -319,12 +337,13 @@
       }
       let S; try { S = await sala(); } catch (e) {
         console.warn('[vivo] sala sin conexión:', e); _sala = null;
-        c.innerHTML = '<button class="reint">● Sin conexión con la sala. Reintentar</button>';
+        c.innerHTML = (esProfeChip ? volverHtml : '') + '<button class="reint">● Sin conexión con la sala. Reintentar</button>';
         c.querySelector('.reint').onclick = () => { c.querySelector('.reint').textContent = 'Conectando…'; pintar(); };
         return;
       }
       if (!S.profe) { c.remove(); document.body.classList.remove('con-sala'); if (!S.existe) avisar('Esta sala no existe o ya cerró. Pídele a tu profe un enlace nuevo.', 8000); return; }
-      c.innerHTML = `<span class="txt">Sala <b>${SALA}</b></span><button class="ok cp">⧉ Copiar enlace del estudiante</button><button class="prueba" title="Abre en otra pestaña lo que ve el estudiante">Ver como estudiante</button><button class="sale" title="Volver al tablero sin sala">Salir</button><button class="x" aria-label="Ocultar">✕</button>`;
+      esProfeChip = true;
+      c.innerHTML = `${volverHtml}<span class="txt">Sala <b>${SALA}</b></span><button class="ok cp">⧉ Copiar enlace del estudiante</button><button class="prueba" title="Abre en otra pestaña lo que ve el estudiante">Ver como estudiante</button><button class="sale" title="Volver al tablero sin sala">Cerrar sala</button><button class="x" aria-label="Ocultar">✕</button>`;
       c.querySelector('.cp').onclick = async e => {
         const b = e.currentTarget, ok = await copiar(enlaceAlumno(SALA));
         b.textContent = ok ? '✓ ¡Copiado!' : enlaceAlumno(SALA); b.classList.toggle('hecho', ok);
