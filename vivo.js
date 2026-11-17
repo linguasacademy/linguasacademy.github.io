@@ -62,6 +62,30 @@
     del: k => { try { sessionStorage.removeItem(k); } catch (e) {} }
   };
 
+  /* Textos que ve el ESTUDIANTE: en español y, si su navegador está en inglés o portugués, también en su lengua
+     (en A1–A2 las consignas van en su lengua: un aviso solo en español puede no entenderse).
+     Los mandos del profe van siempre en español. */
+  const LENGUA = (() => {
+    let l = '';
+    try { l = String((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase(); } catch (e) {}
+    return l.startsWith('pt') ? 'pt' : l.startsWith('en') ? 'en' : '';
+  })();
+  const TRAD = {
+    'Tu profe cerró la clase. ¡Hasta la próxima!': ['Your teacher ended the class. See you next time!', 'Seu professor encerrou a aula. Até a próxima!'],
+    'Ya puedes cerrar esta pestaña.': ['You can close this tab now.', 'Você já pode fechar esta aba.'],
+    'Esta sala ya cerró.': ['This class has ended.', 'Esta aula já terminou.'],
+    'Si quieres volver a entrar, pídele a tu profe un enlace nuevo.': ['To join again, ask your teacher for a new link.', 'Para entrar de novo, peça um link novo ao seu professor.'],
+    'Tu profe tiene el menú cerrado durante la clase.': ['Your teacher keeps the menu closed during the class.', 'Seu professor deixou o menu fechado durante a aula.'],
+    'Esta sala no existe o ya cerró. Pídele a tu profe un enlace nuevo.': ["This class doesn't exist or has ended. Ask your teacher for a new link.", 'Esta aula não existe ou já terminou. Peça um link novo ao seu professor.'],
+    'No se pudo conectar con la sala. El tablero funciona solo en esta pantalla.': ["Couldn't connect to the class. The board only works on this screen.", 'Não foi possível conectar à aula. O quadro funciona só nesta tela.'],
+    'Reintentar': ['Try again', 'Tentar de novo'],
+    'Sin conexión con la sala. Reconectando…': ['No connection to the class. Reconnecting…', 'Sem conexão com a aula. Reconectando…'],
+    'Conexión recuperada.': ['Connection restored.', 'Conexão restabelecida.'],
+    'Sin conexión con la sala. Reintentar': ['No connection to the class. Try again', 'Sem conexão com a aula. Tentar de novo']
+  };
+  const trad = es => (LENGUA && TRAD[es] && TRAD[es][LENGUA === 'en' ? 0 : 1]) || '';
+  const bi = es => { const t = trad(es); return t ? es + ' / ' + t : es; };
+
   /* Estado global de la sala en esta pestaña */
   let CERRADA = false;          // la sala se cerró: no se vuelve a tocar nada
   let MENU_BLOQ = false;        // el estudiante no puede abrir el menú lateral
@@ -163,7 +187,7 @@
       if (CERRADA) return;
       bloquearMenu(false);   // sin sala nadie puede soltar el menú: se devuelve al estudiante
       console.warn('[vivo] sin conexión:', e);
-      avisar('No se pudo conectar con la sala. El tablero funciona solo en esta pantalla.', 0, { texto: 'Reintentar', accion: () => location.reload() });
+      avisar(bi('No se pudo conectar con la sala. El tablero funciona solo en esta pantalla.'), 0, { texto: bi('Reintentar'), accion: () => location.reload() });
     });
     return _conexion;
   }
@@ -327,8 +351,8 @@
   #vivoChip a:hover{background:#ffffff33}
   #vivoChip a:focus-visible{outline:3px solid #F4B51E;outline-offset:2px}
   #vivoChip button:focus-visible{outline:3px solid #F4B51E;outline-offset:2px}
-  #vivoChip .rojo{background:#E0392B}#vivoChip .rojo:hover{background:#c22d20}
-  #vivoChip .ok{background:#1B9A55}
+  #vivoChip .rojo{background:#C0392B}#vivoChip .rojo:hover{background:#A93226}
+  #vivoChip .ok{background:#157A43}
   #vivoChip .txt{padding:0 6px;opacity:.95;font-weight:600}
   #vivoChip .x{padding:8px 10px}
   #vivoChip .ico{flex:none}
@@ -398,11 +422,15 @@
       if (b && b.getAttribute('aria-disabled') !== 'true') {
         b.setAttribute('aria-disabled', 'true');
         b.setAttribute('data-vivo-title', b.getAttribute('title') || '');
-        b.setAttribute('title', 'Tu profe tiene el menú cerrado durante la clase');
+        b.setAttribute('title', bi('Tu profe tiene el menú cerrado durante la clase.'));
       }
       /* si el tablero intenta abrirlo por su cuenta (o lo sincroniza), se vuelve a plegar */
       if (!_obs && typeof MutationObserver === 'function') {
-        _obs = new MutationObserver(() => { if (MENU_BLOQ) plegarLado(); });
+        _obs = new MutationObserver(() => {
+          if (!MENU_BLOQ) return;
+          if (document.body && !document.body.classList.contains('vivo-sin-menu')) document.body.classList.add('vivo-sin-menu');
+          plegarLado();
+        });
         _obs.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'aria-expanded'] });
       }
     } else {
@@ -433,7 +461,7 @@
     const el = t && t.closest ? t.closest('#bMenu, [aria-controls="lado"]') : null;
     if (!el) return;
     frena(e);
-    if (e.type === 'click') avisar('Tu profe tiene el menú cerrado durante la clase.', 2500);
+    if (e.type === 'click') avisar(bi('Tu profe tiene el menú cerrado durante la clase.'), 2500);
   }
   function teclaMenuAlumno(e) {
     if (!MENU_BLOQ || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -479,7 +507,24 @@
     const p = document.createElement('p');
     p.textContent = ahora ? 'Ya puedes cerrar esta pestaña.' : 'Si quieres volver a entrar, pídele a tu profe un enlace nuevo.';
     fin.appendChild(img); fin.appendChild(h); fin.appendChild(p);
+    const t1 = trad(h.textContent), t2 = trad(p.textContent);
+    if (t1) {
+      const pt = document.createElement('p');
+      pt.setAttribute('lang', LENGUA === 'pt' ? 'pt-BR' : 'en');
+      pt.textContent = t1 + ' ' + t2;
+      fin.appendChild(pt);
+    }
     document.body.appendChild(fin);
+    /* Los scripts del tablero siguen vivos en memoria: sus escuchas de teclado y clic ya no deben
+       tocar nada (fallarían sobre elementos borrados), y sus cronómetros se detienen. */
+    if (typeof window.addEventListener === 'function') {
+      const corta = e => { const t = e.target; if (!(t && t.closest && t.closest('#vivoFin'))) e.stopImmediatePropagation(); };
+      ['keydown', 'keyup', 'keypress', 'click', 'input', 'pointerdown'].forEach(tipo => window.addEventListener(tipo, corta, true));
+    }
+    try {
+      const tope = setTimeout(() => {}, 0);
+      if (typeof tope === 'number') for (let i = tope; i > 0 && tope - i < 100000; i--) { clearTimeout(i); clearInterval(i); }
+    } catch (e) {}
   }
 
   /* ---------- lo que se escucha de la sala: cierre, menú y conexión ---------- */
@@ -519,10 +564,10 @@
       if (CERRADA) return;
       if (s.val()) {
         clearTimeout(tCaida);
-        if (caido) avisar('Conexión recuperada.', 3000);
+        if (caido) avisar(bi('Conexión recuperada.'), 3000);
         estuvo = true; caido = false;
       } else if (estuvo && !tCaida) {
-        tCaida = setTimeout(() => { tCaida = null; caido = true; if (!CERRADA) avisar('Sin conexión con la sala. Reconectando…', 0); }, 4000);
+        tCaida = setTimeout(() => { tCaida = null; caido = true; if (!CERRADA) avisar(bi('Sin conexión con la sala. Reconectando…'), 0); }, 4000);
       }
     }, () => {});
   }
@@ -604,13 +649,13 @@
         console.warn('[vivo] sala sin conexión:', e); _sala = null;
         if (!esProfeChip) bloquearMenu(false);
         /* si el tablero no logró conectarse, solo una recarga lo vuelve a enlazar con la sala */
-        c.innerHTML = (esProfeChip ? volverHtml : '') + '<button class="reint" type="button">' + ico('recargar') + 'Sin conexión con la sala. Reintentar</button>';
+        c.innerHTML = (esProfeChip ? volverHtml : '') + '<button class="reint" type="button">' + ico('recargar') + esc(esProfeChip ? 'Sin conexión con la sala. Reintentar' : bi('Sin conexión con la sala. Reintentar')) + '</button>';
         c.querySelector('.reint').onclick = () => location.reload();
         return;
       }
       if (!S.profe) {
         quitaChip();
-        if (!S.existe) { bloquearMenu(false); avisar('Esta sala no existe o ya cerró. Pídele a tu profe un enlace nuevo.', 8000); }
+        if (!S.existe) { bloquearMenu(false); avisar(bi('Esta sala no existe o ya cerró. Pídele a tu profe un enlace nuevo.'), 8000); }
         else vigilar(S);
         return;
       }

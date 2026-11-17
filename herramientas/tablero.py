@@ -262,7 +262,10 @@ def escribir_borrar(nombres: list[str]) -> None:
 
 def titulo_de(original: str) -> str | None:
     m = re.search(r"<title[^>]*>([^<]*)</title>", original, re.I)
-    return _html.unescape(m.group(1)).strip() if m and m.group(1).strip() else None
+    if not (m and m.group(1).strip()):
+        return None
+    t = _html.unescape(m.group(1)).strip()
+    return re.sub(r"\s*[·|–-]\s*Lingua'?s Academy\s*$", "", t) or t
 
 
 def cargador_html(titulo: str) -> str:

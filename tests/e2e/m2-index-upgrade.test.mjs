@@ -12,7 +12,7 @@ const REPO = path.resolve(import.meta.dirname, '..', '..');
 function extractInlineScript(relPath) {
   const html = fs.readFileSync(path.join(REPO, relPath), 'utf8');
   const matches = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)];
-  const script = matches.map(m => m[1]).join('\n');
+  const script = matches.map(m => m[1]).join(';\n'); // «;» evita que dos scripts se peguen (ASI)
   return { html, script };
 }
 
@@ -20,6 +20,8 @@ function flush(ms = 40) {
   return new Promise(r => setTimeout(r, ms));
 }
 
+/* Portada actual: fotos de Unsplash enlazadas (no copiadas), sin tira de métricas ni números de tableros,
+   «Mira una clase por dentro» con vistas previas y cierre hacia la suscripción. */
 test('M2: Asset & reference integrity in index.html and assets/site.css (srcset, video, CSS url())', () => {
   const indexHtml = fs.readFileSync(path.join(REPO, 'index.html'), 'utf8');
   const siteCss = fs.readFileSync(path.join(REPO, 'assets', 'site.css'), 'utf8');
@@ -29,41 +31,36 @@ test('M2: Asset & reference integrity in index.html and assets/site.css (srcset,
     assert.equal(fs.existsSync(path.join(REPO, 'assets', 'img', legacy)), false, `Legacy file must remain deleted: ${legacy}`);
   }
 
-  // New human photos must exist
-  for (const photo of ['hero-profe-600.jpg', 'hero-profe-1100.jpg', 'hero-estudiante-600.jpg', 'hero-estudiante-1100.jpg']) {
-    assert.equal(fs.existsSync(path.join(REPO, 'assets', 'img', photo)), true, `Missing hero photo: ${photo}`);
-  }
-
-  // Check all <img> tags: src, srcset, alt, width, height
+  // Remote photos only from the Unsplash CDN, over https; local ones must exist
+  const comprobar = (url, que) => {
+    assert.ok(!url.startsWith('http://'), `Insecure http:// ${que}: ${url}`);
+    if (url.startsWith('https://')) {
+      assert.ok(url.startsWith('https://images.unsplash.com/'), `Remote ${que} must come from images.unsplash.com: ${url}`);
+    } else if (!url.startsWith('data:')) {
+      assert.equal(fs.existsSync(path.join(REPO, url.split(/[?#]/)[0])), true, `Missing local ${que}: ${url}`);
+    }
+  };
   const imgTags = [...indexHtml.matchAll(/<img\b[^>]*>/gi)].map(m => m[0]);
   assert.ok(imgTags.length >= 9, `Expected >= 9 images in index.html, got ${imgTags.length}`);
   for (const tag of imgTags) {
     const src = tag.match(/\bsrc="([^"]+)"/i)?.[1];
     assert.ok(src, `<img> missing src: ${tag}`);
-    assert.ok(!src.startsWith('http://'), `Insecure http:// src: ${src}`);
-    if (!src.startsWith('https://') && !src.startsWith('data:')) {
-      const target = path.join(REPO, src.split(/[?#]/)[0]);
-      assert.equal(fs.existsSync(target), true, `Missing local img src: ${src}`);
-    }
+    comprobar(src.replace(/&amp;/g, '&'), 'img src');
 
     const srcset = tag.match(/\bsrcset="([^"]+)"/i)?.[1];
     if (srcset) {
-      for (const candidate of srcset.split(',').map(s => s.trim().split(/\s+/)[0]).filter(Boolean)) {
-        assert.ok(!candidate.startsWith('http://'), `Insecure http:// srcset: ${candidate}`);
-        const target = path.join(REPO, candidate.split(/[?#]/)[0]);
-        assert.equal(fs.existsSync(target), true, `Missing local srcset target: ${candidate}`);
-      }
+      for (const candidate of srcset.split(',').map(s => s.trim().split(/\s+/)[0]).filter(Boolean)) comprobar(candidate.replace(/&amp;/g, '&'), 'srcset');
     }
 
     const altMatch = tag.match(/\balt="([^"]*)"/i);
     assert.ok(altMatch !== null, `<img> missing alt attribute: ${tag}`);
-    if (altMatch[1] === '') {
-      // Decorative logos are allowed empty alt, content photos should have non-empty alt
-      assert.ok(src.includes('logo.svg'), `Non-logo <img> has empty alt: ${tag}`);
-    }
+    if (altMatch[1] === '') assert.ok(src.includes('logo.svg'), `Non-logo <img> has empty alt: ${tag}`);
     assert.ok(/\bwidth="\d+"/i.test(tag), `<img> missing width: ${tag}`);
     assert.ok(/\bheight="\d+"/i.test(tag), `<img> missing height: ${tag}`);
   }
+
+  // Every Unsplash photo carries its credit link
+  assert.match(indexHtml, /Unsplash<\/p>/);
 
   // Check <video> src and poster
   const videoMatch = indexHtml.match(/<video\b[^>]*>/i);
@@ -90,7 +87,7 @@ test('M2: Asset & reference integrity in index.html and assets/site.css (srcset,
   assert.equal(/\.idiomas\s*\{/.test(siteCss), false, 'assets/site.css must NOT define .idiomas layout rules');
 });
 
-test('M2: Preply-inspired UI sections in index.html (Hero composite, Metrics strip, #clase 1-2-3, .lugar & .idiomas)', () => {
+test('M2: UI sections in index.html (hero composite, no board counts, #muestras previews, #clase 1-2-3, .lugar & .idiomas)', () => {
   const { html } = extractInlineScript('index.html');
   const env = createBrowserEnv({ url: 'https://linguasacademy.github.io/index.html', html });
   const doc = env.document;
@@ -100,30 +97,35 @@ test('M2: Preply-inspired UI sections in index.html (Hero composite, Metrics str
   const authIdx = html.indexOf('assets/auth.js');
   assert.ok(fbIdx > -1 && authIdx > fbIdx, 'assets/fb.js must appear before assets/auth.js');
 
-  // Hero composite
+  // Hero composite: two board photos, teacher and student photos, one live chip and the sticky note
   const mesa = doc.querySelector('.hero .mesa');
   assert.ok(mesa, 'Hero .mesa container missing');
-  assert.match(mesa.querySelector('.mesa__board--front')?.getAttribute('src') || '', /a2-a-como-esta-la-pina-960\.jpg/, 'Main front board missing');
-  assert.match(mesa.querySelector('.mesa__board--back')?.getAttribute('src') || '', /a2-me-lo-llevo-960\.jpg/, 'Secondary back board missing');
-  assert.match(mesa.querySelector('.mesa__foto--profe')?.getAttribute('src') || '', /hero-profe-600\.jpg/, 'Teacher photo missing');
-  assert.match(mesa.querySelector('.mesa__foto--estudiante')?.getAttribute('src') || '', /hero-estudiante-600\.jpg/, 'Student photo missing');
+  for (const cls of ['.mesa__board--front', '.mesa__board--back', '.mesa__foto--profe', '.mesa__foto--estudiante']) {
+    const img = mesa.querySelector(cls);
+    assert.ok(img && /^https:\/\/images\.unsplash\.com\//.test(img.getAttribute('src')), `${cls} must be an Unsplash photo`);
+    assert.ok(img.getAttribute('alt'), `${cls} needs alt text`);
+  }
   assert.ok(mesa.querySelector('.nota--1'), 'Editorial sticky note .nota--1 missing');
-
-  const chips = mesa.querySelectorAll('.chip-ui');
-  assert.equal(chips.length, 1, 'Expected 1 focused floating UI chip in .mesa');
+  assert.equal(mesa.querySelectorAll('.chip-ui').length, 1, 'Expected 1 focused floating UI chip in .mesa');
   assert.match(mesa.textContent, /En vivo con tu estudiante/);
+  assert.equal(doc.querySelector('.hero a.btn--primary').getAttribute('href'), '#muestras');
 
-  // Metrics strip immediately after .hero
+  // The metrics strip (with board counts) was removed on purpose: the home page shows no number of boards
   const mainChildren = Array.from(doc.querySelector('main').children);
   assert.ok(mainChildren[0].classList.contains('hero'), 'First main section should be .hero');
-  assert.ok(mainChildren[1].classList.contains('metricas'), 'Second main section should be .metricas');
-  const metricas = doc.querySelectorAll('.metricas .metrica');
-  assert.equal(metricas.length, 4, 'Expected 4 metric items in .metricas');
-  const metricasText = doc.querySelector('.metricas').textContent;
-  assert.match(metricasText, /49/);
-  assert.match(metricasText, /A1–B2/);
-  assert.match(metricasText, /50 min/);
-  assert.match(metricasText, /Sin cuenta/);
+  assert.equal(doc.querySelectorAll('.metricas').length, 0, 'The metrics strip must stay removed');
+  assert.doesNotMatch(doc.querySelector('main').textContent, /\b\d+\s+tableros\b/, 'No board counts on the home page');
+  assert.doesNotMatch(html, /\bgratis\b/i, 'Nothing is offered as «gratis»');
+
+  // #muestras: previews that unlock with the subscription
+  const muestras = doc.querySelectorAll('#muestras .muestra[data-vista]');
+  assert.equal(muestras.length, 4, 'Expected 4 preview cards in #muestras');
+  for (const m of muestras) {
+    const link = m.querySelector('[data-vista-link]');
+    assert.equal(link.getAttribute('data-vista-link'), 'vista/' + m.dataset.vista + '.html');
+    assert.ok(m.querySelector('[data-vista-pronto]'));
+    assert.equal(m.querySelector('.muestra__lock').getAttribute('href'), 'suscripcion.html');
+  }
 
   // #clase: 3 numbered tactile cards (1, 2, 3) with .momento__ui
   const momentos = doc.querySelectorAll('#clase .momento');
@@ -141,21 +143,19 @@ test('M2: Preply-inspired UI sections in index.html (Hero composite, Metrics str
   assert.equal(doc.querySelectorAll('#tableros .lugar .tag').length >= 5, true);
   assert.equal(doc.querySelectorAll('#tableros .lugar .tag--live').length, 2, 'Expected 2 live showcase badges');
 
-  // .idiomas tactile cards with 4:3 SVG flags
+  // .idiomas: Español links to the catalog; English and Portuguese are «Pronto»
   const idiomaCards = doc.querySelectorAll('#tableros .idiomas .idioma-card');
   assert.equal(idiomaCards.length, 3, 'Expected 3 language cards in .idiomas');
-  for (const card of idiomaCards) {
-    const svg = card.querySelector('svg.flag');
-    assert.ok(svg, 'Language card missing svg.flag');
-    assert.equal(svg.getAttribute('viewBox'), '0 0 32 24');
-    assert.equal(svg.getAttribute('aria-hidden'), 'true');
-  }
   const esCard = doc.querySelector('#tableros .idiomas a.idioma-card[data-lang="es"]');
   assert.ok(esCard, 'Español card must be an <a> link');
   assert.equal(esCard.getAttribute('href'), 'tableros.html?idioma=es');
   assert.match(esCard.textContent, /Español/);
-  assert.match(esCard.textContent, /A1–B2 · 49 tableros/);
+  assert.match(esCard.textContent, /A1–C2/);
   assert.match(esCard.textContent, /›/);
+  assert.equal(doc.querySelectorAll('#tableros .idiomas .idioma-card--soon').length, 2);
+
+  // Closing call to action goes to the subscription page
+  assert.equal(doc.querySelector('[data-cuenta-cierre]').getAttribute('href'), 'suscripcion.html');
 });
 
 test('M2: Interactive & Auth behavior in index.html (menu, video toggle, [data-ver] fallback, LA.estado())', async () => {
@@ -174,6 +174,10 @@ test('M2: Interactive & Auth behavior in index.html (menu, video toggle, [data-v
 
   // Remove IntersectionObserver to test fallback marking [data-ver] as .visto
   delete env.window.IntersectionObserver;
+  // window.addEventListener('DOMContentLoaded', …) del script de la portada: se delega en document
+  const proto = Object.getPrototypeOf(env.document.createElement('div'));
+  if (!proto.toggleAttribute) proto.toggleAttribute = function (n, f) { const si = f === undefined ? !this.hasAttribute(n) : !!f; if (si) this.setAttribute(n, ''); else this.removeAttribute(n); return si; };
+  if (!env.window.addEventListener) env.window.addEventListener = (tipo, fn) => env.document.addEventListener(tipo, fn);
 
   // Patch HTMLMediaElement-like methods on <video>
   const vid = env.document.querySelector('[data-video]');
@@ -191,6 +195,7 @@ test('M2: Interactive & Auth behavior in index.html (menu, video toggle, [data-v
   env.runFile('assets/fb.js');
   env.runFile('assets/auth.js');
   env.runScript(script, 'index.html:inline');
+  env.triggerDOMContentLoaded();
 
   await flush(60);
 
@@ -201,18 +206,16 @@ test('M2: Interactive & Auth behavior in index.html (menu, video toggle, [data-v
     assert.equal(el.classList.contains('visto'), true, 'Expected [data-ver] element to get .visto without IntersectionObserver');
   }
 
-  // 2. Approved teacher rewrites [data-cuenta-link] and [data-cuenta-link-largo]
+  // 2. Approved teacher: «Entrar» (menu and sheet) and the closing button lead to the catalog
   const shortLinks = env.document.querySelectorAll('[data-cuenta-link]');
   assert.equal(shortLinks.length, 2);
   for (const a of shortLinks) {
     assert.equal(a.getAttribute('href'), 'tableros.html');
     assert.equal(a.textContent, 'Mis tableros');
   }
-  const longLinks = env.document.querySelectorAll('[data-cuenta-link-largo]');
-  assert.equal(longLinks.length, 2);
-  for (const a of longLinks) {
-    assert.equal(a.getAttribute('href'), 'tableros.html');
-  }
+  const cierre = env.document.querySelector('[data-cuenta-cierre]');
+  assert.equal(cierre.getAttribute('href'), 'tableros.html');
+  assert.match(cierre.textContent, /Ir a mis tableros/);
 
   // 3. [data-video-btn] toggles play/pause and aria-label
   const vBtn = env.document.querySelector('[data-video-btn]');
@@ -228,16 +231,20 @@ test('M2: Interactive & Auth behavior in index.html (menu, video toggle, [data-v
   assert.equal(vBtn.textContent, 'Reproducir');
   assert.equal(vBtn.getAttribute('aria-label'), 'Reproducir el video');
 
-  // 4. .menu-btn toggles #menu.hidden and Escape closes it
+  // 4. .menu-btn opens the sheet (data-abierto, background inert) and Escape closes it
+  //    (the sheet is no longer [hidden]: CSS hides it with visibility so it can animate out)
   const menuBtn = env.document.querySelector('.menu-btn');
   const menu = env.document.querySelector('#menu');
-  assert.equal(menu.hidden, true);
+  const main = env.document.querySelector('main');
+  assert.equal(menu.hasAttribute('data-abierto'), false);
   menuBtn.click();
-  assert.equal(menu.hidden, false);
+  assert.equal(menu.hasAttribute('data-abierto'), true);
   assert.equal(menuBtn.getAttribute('aria-expanded'), 'true');
+  assert.equal(main.inert, true);
   const esc = new env.window.Event('keydown', { bubbles: true });
   esc.key = 'Escape';
   env.document.dispatchEvent(esc);
-  assert.equal(menu.hidden, true);
+  assert.equal(menu.hasAttribute('data-abierto'), false);
   assert.equal(menuBtn.getAttribute('aria-expanded'), 'false');
+  assert.equal(main.inert, false);
 });

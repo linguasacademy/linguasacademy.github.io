@@ -293,7 +293,11 @@ test('Tier 5 vivo.js: throttled presence() rejection does not trigger unhandledR
 // =====================================================================
 // 3. assets/fb.js Tests
 // =====================================================================
-test('Tier 5 assets/fb.js: carga dedup/onerror/retry/existing-unloaded, conTiempo, leer, denegado, leer2', async () => {
+test('Tier 5 assets/fb.js: carga dedup/onerror/retry/existing-unloaded, conTiempo, leer, denegado, leer2', async (t) => {
+  /* Los temporizadores del entorno simulado no retienen el proceso (unref): sin este latido, node termina
+     el bucle de eventos mientras conTiempo()/leer() esperan su plazo y la prueba queda «pending». */
+  const latido = setInterval(() => {}, 25);
+  t.after(() => clearInterval(latido));
   const env = createBrowserEnv({
     url: 'https://linguasacademy.github.io/entrar.html'
   });
@@ -571,23 +575,29 @@ test('Tier 5 assets/site.js: Forma null guards & mobile nav toggle/Escape/matchM
 
   const btn = env.document.querySelector('.menu-btn');
   const sheet = env.document.getElementById('menu');
+  const proto = Object.getPrototypeOf(sheet);
+  if (!proto.toggleAttribute) proto.toggleAttribute = function (n, f) { const si = f === undefined ? !this.hasAttribute(n) : !!f; if (si) this.setAttribute(n, ''); else this.removeAttribute(n); return si; };
+  /* La hoja ya no se oculta con [hidden]: site.js la deja visible para el CSS (visibility) y marca data-abierto
+     al abrirla, así se puede animar la salida. */
+  const abierta = () => sheet.hasAttribute('data-abierto');
+  assert.equal(sheet.hidden, false, 'site.js hands the sheet over to CSS');
   // Click without <span> inside .menu-btn must not throw
   btn.click();
-  assert.equal(sheet.hidden, false);
+  assert.equal(abierta(), true);
   assert.equal(btn.getAttribute('aria-expanded'), 'true');
 
   // Escape closes menu and focuses button
   const esc = new env.window.Event('keydown');
   esc.key = 'Escape';
   env.document.dispatchEvent(esc);
-  assert.equal(sheet.hidden, true);
+  assert.equal(abierta(), false);
   assert.equal(btn.focused, true);
 
   // Open again and close via matchMedia change
   btn.click();
-  assert.equal(sheet.hidden, false);
+  assert.equal(abierta(), true);
   mmListener({ matches: true });
-  assert.equal(sheet.hidden, true);
+  assert.equal(abierta(), false);
 });
 
 // =====================================================================
@@ -713,11 +723,31 @@ test('Tier 5 tableros.html: catalog rendering, tabs & arrow keys, multi-filter, 
       for (const el of form.querySelectorAll('input, select, textarea')) {
         if (!el.name) continue;
         if (el.getAttribute('type') === 'checkbox' && !el.checked) continue;
-        this._entries.push([el.name, el.value || '']);
+        if (el.getAttribute('type') === 'radio' && !(el.checked !== undefined ? el.checked : el.hasAttribute('checked'))) continue;
+        this._entries.push([el.name, el.value || el.getAttribute('value') || '']);
       }
     }
     [Symbol.iterator]() { return this._entries[Symbol.iterator](); }
   }
+  /* El catálogo usa MutationObserver, new Image() y un grupo de radio para el nivel: se imitan lo justo */
+  const preparar = e => {
+    e.window.MutationObserver = class { observe() {} disconnect() {} };
+    e.window.Image = class { constructor() { return e.document.createElement('img'); } };
+    const fm = e.document.querySelector('[data-filtros]');
+    const base = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(Object.getPrototypeOf(fm)), 'elements')
+      || Object.getOwnPropertyDescriptor(Object.getPrototypeOf(fm), 'elements');
+    Object.defineProperty(fm, 'elements', { configurable: true, get() {
+      const p = base.get.call(fm);
+      const radios = [...fm.querySelectorAll('input')].filter(r => r.getAttribute('type') === 'radio' && r.name === 'nivel');
+      p.nivel = {
+        get value() { const r = radios.find(x => (x.checked !== undefined ? x.checked : x.hasAttribute('checked'))); return r ? r.getAttribute('value') : ''; },
+        set value(v) { radios.forEach(x => { x.checked = x.getAttribute('value') === String(v); }); }
+      };
+      return p;
+    } });
+    const r0 = fm.reset ? fm.reset.bind(fm) : null;
+    fm.reset = () => { if (r0) r0(); fm.querySelectorAll('input').forEach(x => { const ty = x.getAttribute('type'); if (ty === 'radio' || ty === 'checkbox') x.checked = x.hasAttribute('checked'); }); };
+  };
   const env = createBrowserEnv({
     url: 'https://linguasacademy.github.io/tableros.html',
     html,
@@ -738,6 +768,7 @@ test('Tier 5 tableros.html: catalog rendering, tabs & arrow keys, multi-filter, 
     };
   }
   env.window.FormData = MockFormData;
+  preparar(env);
   const tplVacio1 = env.document.getElementById('tpl-vacio');
   if (tplVacio1 && !tplVacio1.content) tplVacio1.content = tplVacio1;
   env.runFile('assets/catalogo.js');
@@ -748,20 +779,15 @@ test('Tier 5 tableros.html: catalog rendering, tabs & arrow keys, multi-filter, 
   await flush(50);
 
   // Catalog rendered
-  const cardsAll = env.document.querySelectorAll('[data-lista] a.t');
+  const cardsAll = env.document.querySelectorAll('[data-lista] article.t');
   assert.ok(cardsAll.length > 0, 'catalog boards should render');
 
   // Multi-filter: nivel=A1 + vivo=true + texto
   const form = env.document.querySelector('[data-filtros]');
-  const origReset = form.reset.bind(form);
-  form.reset = () => {
-    origReset();
-    for (const el of form.querySelectorAll('input[type="checkbox"]')) el.checked = false;
-  };
   form.elements.nivel.value = 'A1';
   form.elements.vivo.checked = true;
   form.dispatchEvent(new env.window.Event('input'));
-  const filtered = env.document.querySelectorAll('[data-lista] a.t');
+  const filtered = env.document.querySelectorAll('[data-lista] article.t');
   assert.ok(filtered.length > 0 && filtered.length < cardsAll.length);
   assert.ok(env.window.location.search.includes('nivel=A1'));
   assert.ok(env.window.location.search.includes('vivo=1'));
@@ -769,7 +795,7 @@ test('Tier 5 tableros.html: catalog rendering, tabs & arrow keys, multi-filter, 
 
   // data-limpiar resets filters
   env.document.querySelector('[data-limpiar]').click();
-  assert.equal(env.document.querySelectorAll('[data-lista] a.t').length, cardsAll.length);
+  assert.equal(env.document.querySelectorAll('[data-lista] article.t').length, cardsAll.length);
   assert.equal(env.document.querySelector('[data-limpiar]').hidden, true);
 
   // Tab switching via ArrowRight (es -> en)
@@ -788,6 +814,7 @@ test('Tier 5 tableros.html: catalog rendering, tabs & arrow keys, multi-filter, 
     preloadFirebase: true
   });
   envEmptyEs.window.FormData = MockFormData;
+  preparar(envEmptyEs);
   const tplVacio2 = envEmptyEs.document.getElementById('tpl-vacio');
   if (tplVacio2 && !tplVacio2.content) tplVacio2.content = tplVacio2;
   envEmptyEs.window.CATALOGO = [];

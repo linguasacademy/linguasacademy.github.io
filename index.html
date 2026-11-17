@@ -616,6 +616,9 @@
       if (a) { a.hidden = !hay; if (hay) a.href = a.dataset.vistaLink; else a.removeAttribute('href'); }
       if (p) p.hidden = hay;
     });
+    /* mientras no haya ninguna vista previa publicada, el botón principal lleva al video de una clase en vivo */
+    const cta = document.querySelector('.hero a[href="#muestras"], .hero a[href="#en-vivo"]');
+    if (cta) cta.setAttribute('href', V.size ? '#muestras' : '#en-vivo');
   }
   addEventListener('DOMContentLoaded', vistas);
   document.addEventListener('la:idioma', niveles);

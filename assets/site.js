@@ -49,6 +49,12 @@ window.LA_SUSCRIPCION = window.LA_SUSCRIPCION || {
     btn.addEventListener('click', () => poner(!abierto));
     sheet.addEventListener('click', e => { if (e.target.closest('a')) poner(false); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && abierto) poner(false, true); });
+    /* Con la hoja abierta, Tab no se escapa a la página inerte: desde el último elemento vuelve al botón «Cerrar» */
+    sheet.addEventListener('keydown', e => {
+      if (e.key !== 'Tab' || e.shiftKey || !abierto) return;
+      const todos = [...sheet.querySelectorAll('a[href], button:not([disabled])')].filter(el => !el.hidden && el.offsetParent !== null);
+      if (todos.length && e.target === todos[todos.length - 1]) { e.preventDefault(); btn.focus(); }
+    });
     const ancho = document.querySelector('.nav--larga') ? '(min-width: 1200px)' : '(min-width: 1024px)';
     matchMedia(ancho).addEventListener('change', e => { if (e.matches && abierto) poner(false); });
   }

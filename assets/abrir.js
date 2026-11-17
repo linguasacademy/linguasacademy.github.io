@@ -17,6 +17,14 @@
 
   const caja = document.getElementById('caja');
   const decir = (html) => { caja.innerHTML = '<img src="logo.svg" alt=""><p>' + html + '</p>'; };
+  /* avisos para el estudiante: en español y, si su navegador está en inglés o portugués, también en su lengua */
+  const LENGUA = ((navigator.language || 'es').slice(0, 2)).toLowerCase();
+  const TRAD = {
+    cerrada: { en: 'This room is closed. To join again, ask your teacher for a new link.', pt: 'Esta sala já fechou. Para entrar de novo, peça um link novo ao seu professor.' },
+    noexiste: { en: 'This room does not exist or is already closed. Ask your teacher for a new link.', pt: 'Esta sala não existe ou já fechou. Peça um link novo ao seu professor.' },
+    error: { en: 'The board could not open. Check your connection and try again.', pt: 'Não foi possível abrir o quadro. Verifique a conexão e tente de novo.' }
+  };
+  const bi = (es, k) => (TRAD[k] && TRAD[k][LENGUA]) ? es + '<br><small lang="' + LENGUA + '">' + TRAD[k][LENGUA] + '</small>' : es;
 
   const unb64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - s.length % 4) % 4)), c => c.charCodeAt(0));
 
@@ -133,11 +141,11 @@
         u = (await auth.signInAnonymously()).user;
       }
       const cerrada = await leer2(dbSala.ref('salas/' + SALA + '/cerrada')).catch(() => null);
-      if (cerrada === true) { decir('Esta sala ya cerró. Si quieres volver a entrar, pídele a tu profe un enlace nuevo.'); return; }
+      if (cerrada === true) { decir(bi('Esta sala ya cerró. Si quieres volver a entrar, pídele a tu profe un enlace nuevo.', 'cerrada')); return; }
       try { clave = await leer2(dbSala.ref('salas/' + SALA + '/clave')); }
       catch (e) { if (!denegado(e)) throw e; clave = null; }
       if (!clave) {
-        decir('Esta sala no existe o ya cerró. Pídele a tu profe un enlace nuevo.');
+        decir(bi('Esta sala no existe o ya cerró. Pídele a tu profe un enlace nuevo.', 'noexiste'));
         return;
       }
     }
@@ -156,6 +164,6 @@
 
   conTiempo(principal(), 45000).catch(err => {
     console.error(err);
-    decir('No se pudo abrir el tablero. Revisa tu conexión y <a href="">vuelve a intentarlo</a>.');
+    decir(bi('No se pudo abrir el tablero. Revisa tu conexión y <a href="">vuelve a intentarlo</a>.', 'error'));
   });
 })();

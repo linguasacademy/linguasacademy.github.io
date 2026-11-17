@@ -330,7 +330,7 @@
     pt: { img: 'assets/img/lisboa', alt: ['cat.vacio.alt.pt', 'Un tranvía amarillo sube por una calle de Lisboa'] }
   };
   const $ = s => document.querySelector(s);
-  const sinTildes = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const sinTildes = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   const nTableros = n => n === 1 ? tr('cat.unTablero', '1 tablero') : fmt(tr('cat.nTableros', '{n} tableros'), { n });
 
   /* ---------- acceso ---------- */
@@ -339,6 +339,7 @@
 
   /* modo: 'profe' (suscripción activa: «Abrir») o 'publico' (visitantes: «Ver vista previa» y «Desbloquear») */
   let mostrado = false, nombrePila = '', modo = null, haySesion = false;
+  let nTarjeta = 0;   /* tarjetas pintadas: las 3 primeras fotos cargan sin «lazy» (declarado antes del primer pintar()) */
   function saludar() {
     const s = $('[data-saludo]');
     if (modo === 'publico') { s.textContent = tr('cat.publico.saludo', 'Mira cómo empieza cada clase en la vista previa. Los tableros completos se abren con la suscripción.'); return; }
@@ -475,7 +476,6 @@
     return box;
   }
 
-  let nTarjeta = 0;
   function tarjeta(t) {
     const id = 't-' + t.archivo.replace(/\.html$/, '');
     const art = el('article', 't');

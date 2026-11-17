@@ -33,14 +33,51 @@ function flush(ms = 40) {
   return new Promise(r => setTimeout(r, ms));
 }
 
+/* El catálogo usa grupos de radio (nivel) y MutationObserver (repinta al cambiar <html lang>):
+   el DOM simulado no los trae, así que se imitan aquí lo justo. */
+function marcado(el) { return el.checked !== undefined ? !!el.checked : el.hasAttribute('checked'); }
+function patchRadiosYObservador(env) {
+  if (!env.window.Image) env.window.Image = class { constructor() { return env.document.createElement('img'); } };
+  if (!env.window.MutationObserver) env.window.MutationObserver = class { observe() {} disconnect() {} takeRecords() { return []; } };
+  const form = env.document.querySelector('[data-filtros]');
+  if (!form) return;
+  const base = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(form), 'elements')
+    || Object.getOwnPropertyDescriptor(Object.getPrototypeOf(Object.getPrototypeOf(form)), 'elements');
+  Object.defineProperty(form, 'elements', {
+    configurable: true,
+    get() {
+      const p = base.get.call(form);
+      const radios = [...form.querySelectorAll('input')].filter(el => el.getAttribute('type') === 'radio' && el.name);
+      for (const name of new Set(radios.map(r => r.name))) {
+        const grupo = radios.filter(r => r.name === name);
+        p[name] = {
+          get value() { const r = grupo.find(marcado); return r ? r.value || r.getAttribute('value') || '' : ''; },
+          set value(v) { grupo.forEach(r => { r.checked = (r.getAttribute('value') || '') === String(v); }); }
+        };
+      }
+      return p;
+    }
+  });
+  const reset0 = form.reset ? form.reset.bind(form) : null;
+  form.reset = () => {
+    if (reset0) reset0();
+    [...form.querySelectorAll('input')].forEach(el => {
+      const t = el.getAttribute('type');
+      if (t === 'radio' || t === 'checkbox') el.checked = el.hasAttribute('checked');
+    });
+  };
+}
+
 function patchTablerosDom(env) {
+  patchRadiosYObservador(env);
   class MockFormData {
     constructor(form) {
       this._entries = [];
       for (const el of form.querySelectorAll('input, select, textarea')) {
         if (!el.name) continue;
         if (el.getAttribute('type') === 'checkbox' && !el.checked) continue;
-        this._entries.push([el.name, el.value || '']);
+        if (el.getAttribute('type') === 'radio' && !marcado(el)) continue;
+        this._entries.push([el.name, el.value || el.getAttribute('value') || '']);
       }
     }
     [Symbol.iterator]() { return this._entries[Symbol.iterator](); }
