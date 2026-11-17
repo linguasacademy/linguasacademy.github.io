@@ -32,27 +32,56 @@
 .hero__lead { font-size: clamp(18px, 1.5vw, 21px); color: var(--ink-2); max-width: 30em; }
 .hero__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
 .mesa { flex: 1 1 520px; min-width: 0; }
-.mesa__in { position: relative; width: 100%; aspect-ratio: 10 / 8.6; }
-.mesa img { position: absolute; aspect-ratio: 16 / 10; height: auto; object-fit: cover; object-position: top left; border-radius: 12px; border: 1px solid var(--line-2); box-shadow: 0 22px 44px -22px rgba(20,33,58,.6); transition: transform .5s var(--ease); }
-.mesa img:nth-child(1) { left: 34%; top: 0; width: 62%; transform: rotate(4deg); }
-.mesa img:nth-child(2) { left: 0; top: 17%; width: 68%; transform: rotate(-3deg); }
-.mesa img:nth-child(3) { left: 27%; top: 46%; width: 72%; transform: rotate(1.5deg); }
-.mesa:hover img:nth-child(1) { transform: rotate(5deg) translate(6px, -6px); }
-.mesa:hover img:nth-child(2) { transform: rotate(-4deg) translate(-6px, 0); }
-.mesa:hover img:nth-child(3) { transform: rotate(1deg) translate(4px, 6px); }
-.nota { position: absolute; padding: 6px 14px 8px; font-size: clamp(19px, 2vw, 28px); line-height: 1.1; box-shadow: 0 6px 14px -8px rgba(20,33,58,.5); }
-.nota--1 { left: 0; top: 0; background: #FFE9A8; transform: rotate(-5deg); }
-.nota--2 { left: 0; bottom: 2%; background: var(--pt-soft); transform: rotate(3deg); }
+.mesa__in { position: relative; width: 100%; aspect-ratio: 10 / 8.8; }
+.mesa__board { position: absolute; aspect-ratio: 16 / 10; height: auto; object-fit: cover; object-position: top left; border-radius: 12px; border: 1px solid var(--line-2); box-shadow: 0 22px 44px -22px rgba(20,33,58,.6); transition: transform .5s var(--ease); }
+.mesa__board--back { left: 2%; top: 8%; width: 64%; transform: rotate(-2.5deg); z-index: 1; }
+.mesa__board--front { left: 24%; top: 24%; width: 72%; transform: rotate(1.5deg); z-index: 2; }
+.mesa:hover .mesa__board--back { transform: rotate(-3.5deg) translate(-4px, -4px); }
+.mesa:hover .mesa__board--front { transform: rotate(1deg) translate(4px, 4px); }
+.mesa__foto { position: absolute; aspect-ratio: 4 / 3; height: auto; object-fit: cover; border-radius: 14px; border: 3px solid var(--card); box-shadow: 0 18px 36px -18px rgba(20,33,58,.55); transition: transform .5s var(--ease); z-index: 3; }
+.mesa__foto--profe { left: 0; bottom: 4%; width: 38%; transform: rotate(-2deg); }
+.mesa__foto--estudiante { right: 0; top: 0; width: 34%; transform: rotate(2.5deg); }
+.mesa:hover .mesa__foto--profe { transform: rotate(-1deg) translate(-3px, 3px); }
+.mesa:hover .mesa__foto--estudiante { transform: rotate(1.5deg) translate(3px, -3px); }
+.chip-ui { position: absolute; z-index: 4; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(255, 253, 248, .96); border: 1px solid var(--line-2); box-shadow: 0 12px 24px -12px rgba(20,33,58,.32); font: 600 13px/1.2 var(--f-text); color: var(--ink); white-space: nowrap; }
+.chip-ui__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; box-shadow: 0 0 0 3px var(--pt-soft); }
+.chip-ui--vivo { left: 4%; top: 0; }
+.chip-ui--idiomas { right: 2%; top: 44%; }
+.chip-ui--meta { right: 6%; bottom: 2%; font-family: var(--f-mono); font-weight: 500; }
+.chip-ui__flags { display: inline-flex; align-items: center; gap: 4px; }
+.nota { position: absolute; z-index: 4; padding: 6px 14px 8px; font-size: clamp(17px, 1.8vw, 24px); line-height: 1.1; box-shadow: 0 6px 14px -8px rgba(20,33,58,.5); }
+.nota--1 { left: 36%; bottom: 4%; background: #FFE9A8; transform: rotate(-3deg); }
+
+/* metricas */
+.metricas { background: var(--paper-2); border-top: 1px solid var(--line); padding: 32px 0; }
+.metricas__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px 32px; }
+.metrica { display: flex; flex-direction: column; gap: 4px; padding-left: 16px; border-left: 2px solid var(--line-2); }
+.metrica strong { font: 400 clamp(30px, 2.8vw, 42px)/1.05 var(--f-display); letter-spacing: -.02em; color: var(--mc, var(--ink)); }
+.metrica span { font-size: 15px; color: var(--ink-2); }
 
 /* una clase */
 .clase { background: var(--card); border-block: 1px solid var(--line); }
 .clase .wrap { display: flex; flex-direction: column; gap: 56px; }
 .clase h2 { max-width: 14em; }
-.momentos { display: flex; flex-wrap: wrap; gap: 40px 48px; }
-.momento { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 14px; border-top: 4px solid var(--c); padding-top: 22px; }
-.momento .mano { font-size: 32px; color: var(--c); }
+.momentos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.momento { min-width: 0; display: flex; flex-direction: column; gap: 14px; background: var(--paper); border: 1.5px solid var(--line-2); border-top: 4px solid var(--c); border-radius: var(--r-lg); padding: 26px; transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
+.momento:hover { transform: translateY(-3px); box-shadow: 0 16px 32px -24px rgba(20,33,58,.45); }
+.momento__head { display: flex; align-items: center; gap: 12px; }
+.momento__num { width: 34px; height: 34px; border-radius: 10px; background: var(--c); color: #fff; display: grid; place-items: center; font: 600 16px/1 var(--f-mono); flex: none; }
+.momento .mano { font-size: 26px; color: var(--c); }
 .momento h3 { font: 500 28px/1.15 var(--f-display); }
-.momento p:last-child { color: var(--ink-2); }
+.momento__desc { color: var(--ink-2); }
+.momento__ui { margin-top: auto; padding: 14px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); display: grid; gap: 10px; font-size: 13px; color: var(--ink); }
+.ui-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ui-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px; background: var(--paper-2); color: var(--ink-2); font: 600 12px/1 var(--f-text); }
+.ui-pill--cta { background: var(--es-soft); color: #7D2416; }
+.ui-title { font: 500 16px/1.2 var(--f-display); color: var(--ink); }
+.ui-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ui-chip { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); font-size: 12px; font-weight: 500; }
+.ui-chip--sel { background: var(--en-soft); border-color: var(--en); color: var(--ink); font-weight: 600; }
+.ui-audio { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: var(--pt-soft); color: var(--ink); font: 500 12px/1 var(--f-mono); }
+.ui-audio__bar { flex: 1; height: 6px; border-radius: 999px; background: rgba(11, 122, 94, .2); overflow: hidden; }
+.ui-audio__bar i { display: block; width: 62%; height: 100%; background: var(--pt); border-radius: 999px; }
 
 /* en vivo */
 .vivo { background: var(--night); color: var(--on-night); }
@@ -71,18 +100,25 @@
 .lugares .wrap { display: flex; flex-direction: column; gap: 48px; }
 .lugares__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 48px; }
 .lugares__head p { color: var(--ink-2); max-width: 24em; }
-.fila { display: flex; flex-wrap: wrap; gap: 32px; }
-.lugar { margin: 0; flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.fila { display: flex; flex-wrap: wrap; gap: 28px; }
+.lugar { margin: 0; flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 14px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 14px 14px 20px; box-shadow: 0 10px 26px -22px rgba(20,33,58,.35); transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s; }
 .lugar--g { flex: 1.4 1 420px; }
 .lugar--m { flex: 1 1 320px; }
-.lugar img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top left; border-radius: 14px; border: 1px solid var(--line-2); transition: transform .4s var(--ease), box-shadow .4s var(--ease); }
-.lugar:hover img { transform: translateY(-4px) rotate(-.6deg); box-shadow: 0 22px 40px -24px rgba(20,33,58,.55); }
-.lugar figcaption { display: flex; flex-direction: column; gap: 4px; color: var(--ink-2); }
-.lugar__nivel { font-size: 14px; font-weight: 600; letter-spacing: .06em; color: var(--action-dk); }
+.lugar:hover { transform: translateY(-3px); border-color: var(--line-2); box-shadow: 0 20px 38px -24px rgba(20,33,58,.5); }
+.lugar img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top left; border-radius: 10px; border: 1px solid var(--line); }
+.lugar figcaption { display: flex; flex-direction: column; gap: 6px; padding: 0 4px; color: var(--ink-2); }
+.lugar__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 2px; }
 .lugar__titulo { font: 400 26px/1.15 var(--f-display); color: var(--ink); }
-.idiomas { display: flex; flex-wrap: wrap; gap: 10px 28px; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 28px; margin: 0; list-style: none; padding-left: 0; }
-.idiomas li { display: inline-flex; align-items: center; gap: 10px; }
-.idiomas i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+.idiomas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; border-top: 1px solid var(--line); padding-top: 32px; margin: 0; list-style: none; padding-left: 0; }
+.idioma-card { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 18px 20px; background: var(--card); border: 1.5px solid var(--line-2); border-radius: var(--r-md); text-decoration: none; color: var(--ink); transition: transform .2s var(--ease), border-color .2s, box-shadow .2s; }
+a.idioma-card:hover { transform: translateY(-2px); border-color: var(--c); box-shadow: 0 14px 28px -22px rgba(20,33,58,.45); }
+.idioma-card__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.idioma-card__title { font: 500 20px/1.2 var(--f-display); color: var(--ink); }
+.idioma-card__meta { font-size: 14px; color: var(--muted); }
+.idioma-card__chev { font: 500 22px/1 var(--f-text); color: var(--ink-2); transition: transform .2s var(--ease); }
+a.idioma-card:hover .idioma-card__chev { transform: translateX(3px); color: var(--c); }
+.idioma-card--soon { background: var(--paper-2); border-style: dashed; opacity: .9; }
+.idioma-card__soon { font: 500 12px/1 var(--f-mono); padding: 5px 9px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); color: var(--muted); }
 
 /* cierre */
 .cierre .wrap { display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center; }
@@ -98,9 +134,18 @@
 .js [data-ver].visto { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .js [data-ver] { opacity: 1; transform: none; transition: none; }
-  .mesa img, .lugar img { transition: none; }
+  .mesa__board, .mesa__foto, .momento, .lugar, .idioma-card, .idioma-card__chev { transition: none; }
 }
-@media (max-width: 639px) { .btn--pill { width: 100%; } .btn--pill.btn--sm { width: auto; } .hero__para { font-size: 26px; } }
+@media (max-width: 959px) { .momentos { grid-template-columns: 1fr; } }
+@media (max-width: 899px) { .idiomas { grid-template-columns: 1fr; } }
+@media (max-width: 767px) { .metricas__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 639px) {
+  .btn--pill { width: 100%; }
+  .btn--pill.btn--sm { width: auto; }
+  .hero__para { font-size: 26px; }
+  .chip-ui { padding: 6px 11px; font-size: 12px; }
+  .nota--1 { display: none; }
+}
 </style>
 </head>
 <body>
@@ -141,12 +186,24 @@
       </div>
       <div class="mesa">
         <div class="mesa__in">
-          <img src="assets/tableros/b2-radio-chisme-960.jpg" width="960" height="600" alt="Tablero Radio Chisme, con el guion de un programa de radio">
-          <img src="assets/tableros/a2-me-lo-llevo-960.jpg" width="960" height="600" alt="Tablero Me lo llevo, con la foto de un mercado y etiquetas de precio">
-          <img src="assets/tableros/a2-a-como-esta-la-pina-960.jpg" width="960" height="600" alt="Tablero ¿A cómo está la piña?, con un puesto de frutas y sus precios" fetchpriority="high">
+          <img class="mesa__board mesa__board--back" src="assets/tableros/a2-me-lo-llevo-960.jpg" width="960" height="600" alt="Tablero Me lo llevo, con la foto de un mercado y etiquetas de precio">
+          <img class="mesa__board mesa__board--front" src="assets/tableros/a2-a-como-esta-la-pina-960.jpg" width="960" height="600" alt="Tablero ¿A cómo está la piña?, con un puesto de frutas y sus precios" fetchpriority="high">
+          <img class="mesa__foto mesa__foto--profe" src="assets/img/hero-profe-600.jpg" srcset="assets/img/hero-profe-600.jpg 600w, assets/img/hero-profe-1100.jpg 1100w" sizes="(max-width: 639px) 42vw, 220px" width="600" height="400" alt="Profesora explicando frente a su portátil">
+          <img class="mesa__foto mesa__foto--estudiante" src="assets/img/hero-estudiante-600.jpg" srcset="assets/img/hero-estudiante-600.jpg 600w, assets/img/hero-estudiante-1100.jpg 1100w" sizes="(max-width: 639px) 40vw, 200px" width="600" height="400" alt="Estudiante con audífonos participando en clase en vivo">
+          <span class="chip-ui chip-ui--vivo"><span class="chip-ui__dot" aria-hidden="true"></span>En vivo con tu estudiante</span>
           <span class="mano nota nota--1">tocas la foto y<br>sale la palabra</span>
-          <span class="mano nota nota--2">cada actividad<br>trae sus minutos</span>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="metricas" aria-label="En cifras">
+    <div class="wrap">
+      <div class="metricas__grid">
+        <div class="metrica" style="--mc: var(--es)"><strong>49</strong><span>Tableros listos para abrir</span></div>
+        <div class="metrica" style="--mc: var(--en)"><strong>A1–B2</strong><span>Conversación paso a paso</span></div>
+        <div class="metrica" style="--mc: var(--pt)"><strong>50 min</strong><span>Actividades, juego y tarea</span></div>
+        <div class="metrica" style="--mc: var(--ink)"><strong>Sin cuenta</strong><span>Tu estudiante entra con el enlace</span></div>
       </div>
     </div>
   </section>
@@ -155,21 +212,45 @@
     <div class="wrap">
       <h2 class="t2" id="h-clase" data-ver>Así se vive una clase con un tablero</h2>
       <div class="momentos">
-        <div class="momento" style="--c: var(--es)" data-ver>
-          <p class="mano">cinco minutos antes</p>
+        <article class="momento" style="--c: var(--es)" data-ver>
+          <div class="momento__head">
+            <span class="momento__num" aria-hidden="true">1</span>
+            <p class="mano">cinco minutos antes</p>
+          </div>
           <h3>Eliges el tablero</h3>
-          <p>Buscas por tema, por nivel o por el idioma de tu estudiante. No hay nada que imprimir ni que armar.</p>
-        </div>
-        <div class="momento" style="--c: var(--en)" data-ver>
-          <p class="mano">durante la clase</p>
+          <p class="momento__desc">Buscas por tema, por nivel o por el idioma de tu estudiante. No hay nada que imprimir ni que armar.</p>
+          <div class="momento__ui" aria-hidden="true">
+            <div class="ui-row"><span class="ui-pill">A2 · Adultos</span><span class="ui-pill">50 min</span></div>
+            <div class="ui-title">¿A cómo está la piña?</div>
+            <div class="ui-row"><span class="muted">«Me da dos libras, por favor»</span><span class="ui-pill ui-pill--cta">Abrir →</span></div>
+          </div>
+        </article>
+        <article class="momento" style="--c: var(--en)" data-ver>
+          <div class="momento__head">
+            <span class="momento__num" aria-hidden="true">2</span>
+            <p class="mano">durante la clase</p>
+          </div>
           <h3>Tu estudiante participa</h3>
-          <p>Vota, ordena frases y destapa palabras desde su pantalla. Tú conduces y ves cada respuesta en el momento.</p>
-        </div>
-        <div class="momento" style="--c: var(--pt)" data-ver>
-          <p class="mano">al despedirse</p>
+          <p class="momento__desc">Vota, ordena frases y destapa palabras desde su pantalla. Tú conduces y ves cada respuesta en el momento.</p>
+          <div class="momento__ui" aria-hidden="true">
+            <div class="ui-row"><span class="tag tag--live">Sala en vivo</span><span class="muted">Ahora</span></div>
+            <div class="ui-title">¿Qué prefieres hacer?</div>
+            <div class="ui-chips"><span class="ui-chip ui-chip--sel">✓ Ir al mercado</span><span class="ui-chip">Pedir a domicilio</span></div>
+          </div>
+        </article>
+        <article class="momento" style="--c: var(--pt)" data-ver>
+          <div class="momento__head">
+            <span class="momento__num" aria-hidden="true">3</span>
+            <p class="mano">al despedirse</p>
+          </div>
           <h3>La tarea ya está escrita</h3>
-          <p>Cada tablero cierra con una misión corta para la semana, como una nota de voz de menos de un minuto.</p>
-        </div>
+          <p class="momento__desc">Cada tablero cierra con una misión corta para la semana, como una nota de voz de menos de un minuto.</p>
+          <div class="momento__ui" aria-hidden="true">
+            <div class="ui-row"><span class="ui-pill">Misión para la semana</span><span class="muted">Nota de voz</span></div>
+            <div class="ui-title" style="font-size:14px">«Cuéntame qué compraste hoy»</div>
+            <div class="ui-audio"><span>▶ 0:42</span><span class="ui-audio__bar"><i></i></span><span>1:00</span></div>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -198,31 +279,69 @@
       <div class="fila" data-ver>
       <figure class="lugar lugar--g">
         <img src="assets/tableros/a2-a-como-esta-la-pina-960.jpg" width="960" height="600" loading="lazy" alt="Puesto de frutas con precios por libra">
-        <figcaption><span class="lugar__nivel">A2 · ADULTOS</span><span class="lugar__titulo">Una plaza de mercado</span><span>Preguntar a cómo está la piña, pedir rebaja y llevarse la fruta.</span></figcaption>
+        <figcaption>
+          <div class="lugar__meta"><span class="tag">A2 · Adultos · 50 min</span></div>
+          <span class="lugar__titulo">Una plaza de mercado</span>
+          <span>Preguntar a cómo está la piña, pedir rebaja y llevarse la fruta.</span>
+        </figcaption>
       </figure>
       <figure class="lugar lugar--m">
         <img src="assets/tableros/a2-me-lo-llevo-960.jpg" width="960" height="600" loading="lazy" alt="Foto de un mercado con etiquetas de precio sobre los productos">
-        <figcaption><span class="lugar__nivel">A2 · ADULTOS</span><span class="lugar__titulo">Una tienda en Barcelona</span><span>Precios, colores y la frase que cierra la compra: «me lo llevo».</span></figcaption>
+        <figcaption>
+          <div class="lugar__meta"><span class="tag">A2 · Adultos · 50 min</span></div>
+          <span class="lugar__titulo">Una tienda en Barcelona</span>
+          <span>Precios, colores y la frase que cierra la compra: «me lo llevo».</span>
+        </figcaption>
       </figure>
       </div>
       <div class="fila" data-ver>
-      <figure class="lugar ">
+      <figure class="lugar">
         <img src="assets/tableros/a1-monstruos-gigantes-960.jpg" width="960" height="600" loading="lazy" alt="Un monstruo para pintar con botes de colores">
-        <figcaption><span class="lugar__nivel">A1 · NIÑOS</span><span class="lugar__titulo">Un taller de monstruos</span><span>Pintarlo y describirlo: colores, tamaños y partes del cuerpo.</span></figcaption>
+        <figcaption>
+          <div class="lugar__meta"><span class="tag">A1 · Niños · 50 min</span><span class="tag tag--live">En vivo</span></div>
+          <span class="lugar__titulo">Un taller de monstruos</span>
+          <span>Pintarlo y describirlo: colores, tamaños y partes del cuerpo.</span>
+        </figcaption>
       </figure>
-      <figure class="lugar ">
+      <figure class="lugar">
         <img src="assets/tableros/b1-que-harias-si-960.jpg" width="960" height="600" loading="lazy" alt="Un edificio de noche con ventanas numeradas">
-        <figcaption><span class="lugar__nivel">B1 · ADULTOS</span><span class="lugar__titulo">Un edificio con vecinos</span><span>Detrás de cada ventana hay un dilema: ¿qué harías si…?</span></figcaption>
+        <figcaption>
+          <div class="lugar__meta"><span class="tag">B1 · Adultos · 50 min</span><span class="tag tag--live">En vivo</span></div>
+          <span class="lugar__titulo">Un edificio con vecinos</span>
+          <span>Detrás de cada ventana hay un dilema: ¿qué harías si…?</span>
+        </figcaption>
       </figure>
-      <figure class="lugar ">
+      <figure class="lugar">
         <img src="assets/tableros/b2-radio-chisme-960.jpg" width="960" height="600" loading="lazy" alt="El guion de un programa de radio nocturno">
-        <figcaption><span class="lugar__nivel">B2 · ADULTOS</span><span class="lugar__titulo">Una emisora de radio</span><span>Un programa nocturno donde solo se habla de rumores.</span></figcaption>
+        <figcaption>
+          <div class="lugar__meta"><span class="tag">B2 · Adultos · 60 min</span></div>
+          <span class="lugar__titulo">Una emisora de radio</span>
+          <span>Un programa nocturno donde solo se habla de rumores.</span>
+        </figcaption>
       </figure>
       </div>
       <ul class="idiomas">
-        <li style="--c: var(--es)"><i aria-hidden="true"></i>Español, del A1 al B2</li>
-        <li style="--c: var(--en)"><i aria-hidden="true"></i>Inglés, en preparación</li>
-        <li style="--c: var(--pt)"><i aria-hidden="true"></i>Portugués, en preparación</li>
+        <li>
+          <a class="idioma-card" href="tableros.html?idioma=es" data-lang="es">
+            <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#AA151B"/><rect y="6" width="32" height="12" fill="#F1BF00"/></svg>
+            <span class="idioma-card__body"><span class="idioma-card__title">Español</span><span class="idioma-card__meta">A1–B2 · 49 tableros</span></span>
+            <span class="idioma-card__chev" aria-hidden="true">›</span>
+          </a>
+        </li>
+        <li>
+          <div class="idioma-card idioma-card--soon" data-lang="en">
+            <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#012169"/><path d="M0 0L32 24M32 0L0 24" stroke="#FFF" stroke-width="4.5"/><path d="M0 0L32 24M32 0L0 24" stroke="#C8102E" stroke-width="2"/><path d="M16 0v24M0 12h32" stroke="#FFF" stroke-width="7"/><path d="M16 0v24M0 12h32" stroke="#C8102E" stroke-width="4"/></svg>
+            <span class="idioma-card__body"><span class="idioma-card__title">Inglés</span><span class="idioma-card__meta">En preparación</span></span>
+            <span class="idioma-card__soon">Pronto</span>
+          </div>
+        </li>
+        <li>
+          <div class="idioma-card idioma-card--soon" data-lang="pt">
+            <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#009B3A"/><polygon points="16,3 29,12 16,21 3,12" fill="#FEDF00"/><circle cx="16" cy="12" r="4.5" fill="#002776"/></svg>
+            <span class="idioma-card__body"><span class="idioma-card__title">Portugués</span><span class="idioma-card__meta">En preparación</span></span>
+            <span class="idioma-card__soon">Pronto</span>
+          </div>
+        </li>
       </ul>
     </div>
   </section>

@@ -23,63 +23,94 @@
 .app__head h1 { font-size: clamp(40px, 2.6vw + 22px, 66px); }
 
 /* idiomas */
-.idiomas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); margin-bottom: 32px; }
+.idiomas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
 .idiomas button {
-  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 20px 24px 20px 0;
-  background: none; border: 0; border-right: 1px solid var(--line-2); text-align: left; cursor: pointer; color: var(--ink);
-  position: relative; min-height: 76px; font: inherit;
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 16px 20px;
+  background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); text-align: left; cursor: pointer; color: var(--ink);
+  position: relative; min-height: 78px; font: inherit; transition: transform .18s var(--ease), border-color .18s, box-shadow .18s, background .18s;
 }
-.idiomas button + button { padding-left: 24px; }
-.idiomas button:last-child { border-right: 0; }
-.idiomas button::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--c); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease); }
-.idiomas button + button::after { left: 24px; }
-.idiomas button[aria-selected="true"]::after { transform: scaleX(1); }
-.idiomas button:hover::after { transform: scaleX(.35); }
-.idiomas button[aria-selected="true"]:hover::after { transform: scaleX(1); }
-.idiomas .nombre { font: 400 28px/1.1 var(--f-display); font-variation-settings: 'opsz' 30; }
-.idiomas .cuenta { font: 500 14px/1 var(--f-mono); color: var(--muted); }
-.idiomas .dot { width: 11px; height: 11px; }
-@media (max-width: 639px) {
-  .idiomas { grid-template-columns: 1fr; }
-  .idiomas button, .idiomas button + button { padding: 16px 0; border-right: 0; min-height: 60px; }
-  .idiomas button + button { border-top: 1px solid var(--line); }
-  .idiomas button + button::after { left: 0; }
-  .idiomas .nombre { font-size: 24px; }
+.idiomas button:hover { transform: translateY(-1px); border-color: var(--line-2); box-shadow: 0 10px 22px -18px rgba(20,33,58,.35); }
+.idiomas button[aria-selected="true"] {
+  border-color: var(--c);
+  background: linear-gradient(180deg, var(--card) 0%, var(--c-soft) 180%);
+  box-shadow: 0 0 0 1px var(--c), 0 14px 26px -20px rgba(20,33,58,.35);
+}
+.idioma__info { display: grid; gap: 3px; min-width: 0; }
+.idiomas .nombre { font: 400 24px/1.1 var(--f-display); font-variation-settings: 'opsz' 30; }
+.idioma__sub { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; font: 500 13px/1.2 var(--f-mono); color: var(--muted); }
+.idioma__rango { color: var(--ink-2); }
+.idiomas .cuenta { font: inherit; color: var(--muted); }
+.idioma__chev { font: 500 22px/1 var(--f-text); color: var(--muted); transition: transform .18s var(--ease), color .18s; }
+.idiomas button:hover .idioma__chev, .idiomas button[aria-selected="true"] .idioma__chev { color: var(--c); transform: translateX(2px); }
+@media (max-width: 720px) {
+  .idiomas { grid-template-columns: 1fr; gap: 10px; }
+  .idiomas button { min-height: 68px; padding: 14px 16px; }
+  .idiomas .nombre { font-size: 22px; }
 }
 
 /* filtros */
-.filtros { display: grid; grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(140px, 1fr)) auto; gap: 16px; align-items: end; margin-bottom: 16px; }
+.filtros {
+  display: grid; grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(140px, 1fr)) auto; gap: 16px; align-items: end; margin-bottom: 16px;
+  padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md);
+  box-shadow: 0 10px 24px -22px rgba(20,33,58,.25);
+}
 .filtros .field label { font-size: 14px; }
 .filtros .field input, .filtros .field select { min-height: 48px; }
+.filtros #b-texto {
+  padding-left: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%234C5567' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: 13px center;
+}
 .chk { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 16px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); background: var(--card); cursor: pointer; font-weight: 500; white-space: nowrap; }
 .chk input { width: 18px; height: 18px; accent-color: var(--action); margin: 0; }
-.chk:has(input:checked) { border-color: var(--action); }
+.chk:has(input:checked) { border-color: var(--action); background: var(--es-soft); }
 .resumen { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; min-height: 44px; margin-bottom: 40px; color: var(--muted); font-size: var(--t-small); }
 @media (max-width: 1023px) { .filtros { grid-template-columns: 1fr 1fr; } .filtros .buscar { grid-column: 1 / -1; } }
-@media (max-width: 639px) { .filtros { grid-template-columns: 1fr; } .chk { justify-content: flex-start; } }
+@media (max-width: 639px) { .filtros { grid-template-columns: 1fr; padding: 14px 16px; } .chk { justify-content: flex-start; } }
 
 /* niveles y tarjetas */
 .nivel { margin-bottom: 64px; }
 .nivel__head { display: flex; align-items: baseline; gap: 20px; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--line-2); }
-.nivel__head b { font: 400 56px/.9 var(--f-display); letter-spacing: -.03em; font-variation-settings: 'opsz' 72; }
+.nivel__head b { font: 400 56px/.9 var(--f-display); letter-spacing: -.03em; font-variation-settings: 'opsz' 72; color: var(--lvl, var(--ink)); }
 .nivel__head h2 { font-size: 26px; }
 .nivel__head p { color: var(--muted); font-size: var(--t-small); }
 .nivel__head .label { margin-left: auto; white-space: nowrap; }
 .lista { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 @media (max-width: 1023px) { .lista { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 639px) { .lista { grid-template-columns: 1fr; gap: 12px; } .nivel__head { flex-wrap: wrap; gap: 4px 16px; } .nivel__head b { font-size: 44px; } .nivel__head .label { margin-left: 0; width: 100%; } }
+@media (max-width: 639px) { .lista { grid-template-columns: 1fr; gap: 14px; } .nivel__head { flex-wrap: wrap; gap: 4px 16px; } .nivel__head b { font-size: 44px; } .nivel__head .label { margin-left: 0; width: 100%; } }
 
 .t {
-  display: grid; grid-template-rows: auto 1fr auto; gap: 12px; min-height: 212px; padding: 22px 24px;
-  background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); text-decoration: none; color: var(--ink);
+  display: flex; flex-direction: column; min-height: 236px; padding: 0; overflow: hidden;
+  background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--lvl, var(--c));
+  border-radius: var(--r-md); text-decoration: none; color: var(--ink);
   transition: transform .2s var(--ease), border-color .2s, box-shadow .2s;
 }
-.t:hover { transform: translateY(-2px); border-color: var(--line-2); box-shadow: 0 18px 32px -24px rgba(20,33,58,.45); }
-.t__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 26px; }
-.t__top .label { color: var(--c); }
-.t h3 { font-size: 24px; margin-bottom: 6px; }
+.t:hover { transform: translateY(-3px); border-color: var(--line-2); border-top-color: var(--lvl, var(--c)); box-shadow: 0 20px 36px -24px rgba(20,33,58,.45); }
+.t__top {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 46px;
+  padding: 10px 20px; background: var(--lvl-bg, var(--paper-2)); border-bottom: 1px solid var(--line);
+}
+.t__nivel {
+  display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px;
+  background: var(--lvl, var(--ink)); color: #fff; font: 500 12.5px/1 var(--f-mono); letter-spacing: .04em;
+}
+.t__thumb { aspect-ratio: 16 / 9; overflow: hidden; background: var(--paper-2); border-bottom: 1px solid var(--line); }
+.t__thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top left; transition: transform .35s var(--ease); }
+.t:hover .t__thumb img { transform: scale(1.03); }
+.t__body { padding: 18px 20px 8px; display: grid; gap: 6px; }
+.t h3 { font-size: 24px; margin: 0; }
 .t p { color: var(--ink-2); font-size: 16px; line-height: 1.5; }
-.t__meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.t__meta { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 20px 16px; margin-top: auto; }
+.tag--flag { padding-left: 7px; }
+.tag__ico { width: 14px; height: 14px; flex: none; color: var(--muted); }
+.tag--prueba { background: var(--en-soft); color: var(--lvl-a2-ink, #114470); }
+.t__foot {
+  padding: 12px 20px 14px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between;
+  font: 600 14px/1 var(--f-text); color: var(--lvl-ink, var(--ink));
+}
+.t__cta { display: inline-flex; align-items: center; gap: 6px; }
+.t__arrow { display: inline-block; transition: transform .2s var(--ease); }
+.t:hover .t__arrow { transform: translateX(4px); }
 @media (max-width: 639px) { .t { min-height: 0; } }
 
 .vacio { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: center; }
@@ -129,16 +160,28 @@
       </div>
 
       <div class="idiomas" role="tablist" aria-label="Idioma que se enseña">
-        <button type="button" role="tab" id="i-es" data-lang="es" data-idioma="es" aria-selected="true" aria-controls="resultados"><span class="dot" aria-hidden="true"></span><span class="nombre">Español</span><span class="cuenta" data-cuenta-idioma="es"></span></button>
-        <button type="button" role="tab" id="i-en" data-lang="en" data-idioma="en" aria-selected="false" aria-controls="resultados" tabindex="-1"><span class="dot" aria-hidden="true"></span><span class="nombre">Inglés</span><span class="cuenta" data-cuenta-idioma="en"></span></button>
-        <button type="button" role="tab" id="i-pt" data-lang="pt" data-idioma="pt" aria-selected="false" aria-controls="resultados" tabindex="-1"><span class="dot" aria-hidden="true"></span><span class="nombre">Portugués</span><span class="cuenta" data-cuenta-idioma="pt"></span></button>
+        <button type="button" role="tab" id="i-es" data-lang="es" data-idioma="es" aria-selected="true" aria-controls="resultados">
+          <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#AA151B"></rect><rect y="6" width="32" height="12" fill="#F1BF00"></rect></svg>
+          <span class="idioma__info"><span class="nombre">Español</span><span class="idioma__sub"><span class="idioma__rango">A1–B2</span> · <span class="cuenta" data-cuenta-idioma="es"></span></span></span>
+          <span class="idioma__chev" aria-hidden="true">›</span>
+        </button>
+        <button type="button" role="tab" id="i-en" data-lang="en" data-idioma="en" aria-selected="false" aria-controls="resultados" tabindex="-1">
+          <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#012169"></rect><path d="M0 0L32 24M32 0L0 24" stroke="#FFF" stroke-width="4.5"></path><path d="M0 0L32 24M32 0L0 24" stroke="#C8102E" stroke-width="2"></path><path d="M16 0v24M0 12h32" stroke="#FFF" stroke-width="7"></path><path d="M16 0v24M0 12h32" stroke="#C8102E" stroke-width="4"></path></svg>
+          <span class="idioma__info"><span class="nombre">Inglés</span><span class="idioma__sub"><span class="idioma__rango">A1–B2</span> · <span class="cuenta" data-cuenta-idioma="en"></span></span></span>
+          <span class="idioma__chev" aria-hidden="true">›</span>
+        </button>
+        <button type="button" role="tab" id="i-pt" data-lang="pt" data-idioma="pt" aria-selected="false" aria-controls="resultados" tabindex="-1">
+          <svg class="flag" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#009B3A"></rect><polygon points="16,3 29,12 16,21 3,12" fill="#FEDF00"></polygon><circle cx="16" cy="12" r="4.5" fill="#002776"></circle></svg>
+          <span class="idioma__info"><span class="nombre">Portugués</span><span class="idioma__sub"><span class="idioma__rango">A1–B2</span> · <span class="cuenta" data-cuenta-idioma="pt"></span></span></span>
+          <span class="idioma__chev" aria-hidden="true">›</span>
+        </button>
       </div>
 
       <section id="resultados" role="tabpanel" aria-labelledby="i-es">
         <form class="filtros" data-filtros role="search" onsubmit="return false">
           <div class="field buscar">
             <label for="b-texto">Buscar por tema o gramática</label>
-            <input id="b-texto" name="texto" type="search" autocomplete="off">
+            <input id="b-texto" name="texto" type="search" autocomplete="off" placeholder="Ej. restaurante, pasado, familia, subjuntivo…">
           </div>
           <div class="field">
             <label for="b-nivel">Nivel</label>
@@ -235,13 +278,24 @@
   comprobar();
 
   /* ---------- estado de la vista ---------- */
-  const url = new URLSearchParams(location.search);
+  let rawSearch = location.search;
+  if (!rawSearch) {
+    try {
+      const saved = sessionStorage.getItem('la-catalogo') || '';
+      const qIdx = saved.indexOf('?');
+      if (qIdx !== -1) rawSearch = saved.slice(qIdx);
+    } catch (e) {}
+  }
+  const url = new URLSearchParams(rawSearch);
   let idioma = ['es', 'en', 'pt'].includes(url.get('idioma')) ? url.get('idioma') : 'es';
   const form = $('[data-filtros]');
   ['nivel', 'consignas', 'publico', 'texto'].forEach(k => { if (url.get(k)) form.elements[k].value = url.get(k); });
   if (url.get('vivo') === '1') form.elements.vivo.checked = true;
 
-  ['es', 'en', 'pt'].forEach(i => { $('[data-cuenta-idioma="' + i + '"]').textContent = C.filter(t => t.idioma === i).length || 'pronto'; });
+  ['es', 'en', 'pt'].forEach(i => {
+    const n = C.filter(t => t.idioma === i).length;
+    $('[data-cuenta-idioma="' + i + '"]').textContent = n ? (n === 1 ? '1 tablero' : n + ' tableros') : 'En preparación';
+  });
 
   const tabs = [...document.querySelectorAll('.idiomas [role="tab"]')];
   tabs.forEach((t, n) => {
@@ -260,21 +314,62 @@
     if (idioma !== 'es') p.set('idioma', idioma);
     for (const k of ['nivel', 'consignas', 'publico', 'texto']) if (f[k]) p.set(k, f[k]);
     if (f.vivo) p.set('vivo', '1');
-    history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
+    const qs = p.toString() ? '?' + p : '';
+    history.replaceState(null, '', location.pathname + qs);
+    try { sessionStorage.setItem('la-catalogo', 'tableros.html' + qs); } catch (e) {}
   }
+
+  const THUMBS = {
+    'a1-monstruos-gigantes.html': 'assets/tableros/a1-monstruos-gigantes-960.jpg',
+    'a2-me-lo-llevo.html': 'assets/tableros/a2-me-lo-llevo-960.jpg',
+    'a2-a-como-esta-la-pina.html': 'assets/tableros/a2-a-como-esta-la-pina-960.jpg',
+    'b1-que-harias-si.html': 'assets/tableros/b1-que-harias-si-960.jpg',
+    'b2-radio-chisme.html': 'assets/tableros/b2-radio-chisme-960.jpg'
+  };
+  const FLAGS = {
+    es: '<svg class="flag flag--sm" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#AA151B"></rect><rect y="6" width="32" height="12" fill="#F1BF00"></rect></svg>',
+    en: '<svg class="flag flag--sm" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#012169"></rect><path d="M0 0L32 24M32 0L0 24" stroke="#FFF" stroke-width="4.5"></path><path d="M0 0L32 24M32 0L0 24" stroke="#C8102E" stroke-width="2"></path><path d="M16 0v24M0 12h32" stroke="#FFF" stroke-width="7"></path><path d="M16 0v24M0 12h32" stroke="#C8102E" stroke-width="4"></path></svg>',
+    pt: '<svg class="flag flag--sm" viewBox="0 0 32 24" aria-hidden="true"><rect width="32" height="24" fill="#009B3A"></rect><polygon points="16,3 29,12 16,21 3,12" fill="#FEDF00"></polygon><circle cx="16" cy="12" r="4.5" fill="#002776"></circle></svg>'
+  };
+  const ICON_PUBLICO = {
+    ninos: '<svg class="tag__ico" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.3l-3.8 2 .7-4.3-3.1-3 4.3-.6z"></path></svg>',
+    adultos: '<svg class="tag__ico" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5" r="3"></circle><path d="M2.5 14c.6-2.6 2.8-4 5.5-4s4.9 1.4 5.5 4"></path></svg>'
+  };
 
   function tarjeta(t) {
     const a = document.createElement('a');
-    a.className = 't'; a.href = t.archivo; a.dataset.lang = t.idioma;
-    const etiquetas = ['Consignas en ' + IDIOMA[t.consignas], t.publico === 'ninos' ? 'Niños' : 'Adultos'];
-    if (t.prueba) etiquetas.push('Clase de prueba');
-    a.innerHTML = '<div class="t__top"><span class="label"></span></div><div><h3></h3><p></p></div><div class="t__meta"></div>';
-    a.querySelector('.label').textContent = t.nivel;
+    a.className = 't'; a.href = t.archivo; a.dataset.lang = t.idioma; a.dataset.nivel = t.nivel;
+    const thumb = THUMBS[t.archivo] ? '<div class="t__thumb"><img src="' + THUMBS[t.archivo] + '" alt="" width="960" height="600" loading="lazy"></div>' : '';
+    a.innerHTML =
+      '<div class="t__top"><span class="t__nivel"></span></div>' +
+      thumb +
+      '<div class="t__body"><h3></h3><p></p></div>' +
+      '<div class="t__meta"></div>' +
+      '<div class="t__foot"><span class="t__cta">Abrir tablero <span class="t__arrow" aria-hidden="true">→</span></span></div>';
+    a.querySelector('.t__nivel').textContent = t.nivel;
     if (t.vivo) a.querySelector('.t__top').insertAdjacentHTML('beforeend', '<span class="tag tag--live">En vivo</span>');
     a.querySelector('h3').textContent = t.titulo;
     a.querySelector('p').textContent = t.desc;
     const m = a.querySelector('.t__meta');
-    etiquetas.forEach(x => { const s = document.createElement('span'); s.className = 'tag'; s.textContent = x; m.appendChild(s); });
+    const cTag = document.createElement('span');
+    cTag.className = 'tag tag--flag';
+    cTag.innerHTML = (FLAGS[t.consignas] || '') + '<span></span>';
+    cTag.querySelector('span').textContent = 'Consignas en ' + IDIOMA[t.consignas];
+    m.appendChild(cTag);
+
+    const pKey = t.publico === 'ninos' ? 'ninos' : 'adultos';
+    const pTag = document.createElement('span');
+    pTag.className = 'tag tag--ico';
+    pTag.innerHTML = ICON_PUBLICO[pKey] + '<span></span>';
+    pTag.querySelector('span').textContent = pKey === 'ninos' ? 'Niños' : 'Adultos';
+    m.appendChild(pTag);
+
+    if (t.prueba) {
+      const prTag = document.createElement('span');
+      prTag.className = 'tag tag--prueba';
+      prTag.textContent = 'Clase de prueba';
+      m.appendChild(prTag);
+    }
     return a;
   }
 
@@ -325,7 +420,7 @@
     for (const n of Object.keys(NIVELES)) {
       const deN = hay.filter(t => t.nivel === n);
       if (!deN.length) continue;
-      const s = document.createElement('section'); s.className = 'nivel'; s.setAttribute('aria-labelledby', 'n-' + n);
+      const s = document.createElement('section'); s.className = 'nivel'; s.dataset.nivel = n; s.setAttribute('aria-labelledby', 'n-' + n);
       s.innerHTML = '<header class="nivel__head"><b aria-hidden="true">' + n + '</b><div><h2 id="n-' + n + '"></h2><p></p></div><span class="label"></span></header><div class="lista"></div>';
       s.querySelector('h2').innerHTML = '<span class="visually-hidden">' + n + ', </span>';
       s.querySelector('h2').append(NIVELES[n][0]);
