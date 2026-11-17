@@ -13,22 +13,7 @@
 (() => {
   'use strict';
 
-  const CFG = {
-    apiKey: 'AIzaSyAGz-__ICvH7XJyxJ7co0evyuCEIUBKH4k',
-    authDomain: 'linguas-tableros.firebaseapp.com',
-    databaseURL: 'https://linguas-tableros-default-rtdb.firebaseio.com',
-    projectId: 'linguas-tableros',
-    storageBucket: 'linguas-tableros.firebasestorage.app',
-    messagingSenderId: '992339561971',
-    appId: '1:992339561971:web:37615c68f465fadb565686'
-  };
-  const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
-
-  const carga = src => new Promise((ok, ko) => {
-    if (document.querySelector('script[src="' + src + '"]')) return ok();
-    const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => ko(new Error('red')); document.head.appendChild(s);
-  });
-  const conTiempo = (p, ms) => Promise.race([p, new Promise((_, ko) => setTimeout(() => ko(new Error('tiempo')), ms))]);
+  const { CFG, SDK, carga, conTiempo, leer2 } = window.LA_FB;
 
   let _app = null;
   function app() {
@@ -46,16 +31,9 @@
   /* El usuario actual, sin crear ninguna sesión anónima */
   async function usuario() {
     const F = await app();
-    return new Promise(ok => { const fin = F.auth.onAuthStateChanged(u => { fin(); ok(u); }); });
+    return new Promise(ok => { let fin; let ya = false; fin = F.auth.onAuthStateChanged(u => { if (ya) return; ya = true; if (fin) fin(); ok(u); }); if (ya && fin) fin(); });
   }
 
-  /* Lectura que espera a la conexión (get() falla a los 3 s con internet lento) y reintenta una vez */
-  const leer = (ref, ms) => new Promise((ok, ko) => {
-    let fin = false; const t = setTimeout(() => { if (!fin) { fin = true; ko(new Error('tiempo')); } }, ms || 12000);
-    ref.once('value').then(s => { if (!fin) { fin = true; clearTimeout(t); ok(s.val()); } }, e => { if (!fin) { fin = true; clearTimeout(t); ko(e); } });
-  });
-  const denegado = e => /permission/i.test((e && (e.code || e.message)) || '');
-  const leer2 = async ref => { try { return await leer(ref); } catch (e) { if (denegado(e)) throw e; return leer(ref, 20000); } };
 
   /* El perfil se guarda en este navegador: las páginas abren al instante y se confirma por detrás */
   const CK = 'la-perfil';
@@ -94,12 +72,18 @@
     const F = await app();
     const actual = F.auth.currentUser;
     if (actual && actual.isAnonymous) await F.auth.signOut();
+    const n = (nombre || '').trim().slice(0, 80);
     const r = await F.auth.createUserWithEmailAndPassword(correo.trim(), clave);
-    await r.user.updateProfile({ displayName: nombre.trim() }).catch(() => {});
-    await F.db.ref('profes/' + r.user.uid).set({
-      nombre: nombre.trim(), correo: correo.trim().toLowerCase(), idioma, mensaje: (mensaje || '').trim().slice(0, 600),
-      estado: 'pendiente', creado: F.TS
-    });
+    await r.user.updateProfile({ displayName: n }).catch(() => {});
+    try {
+      await F.db.ref('profes/' + r.user.uid).set({
+        nombre: n, correo: correo.trim().toLowerCase(), idioma: idioma || 'es', mensaje: (mensaje || '').trim().slice(0, 600),
+        estado: 'pendiente', creado: F.TS
+      });
+    } catch (e) {
+      if (typeof r.user.delete === 'function') await r.user.delete().catch(() => {});
+      throw e;
+    }
     return r.user;
   }
 
@@ -137,7 +121,16 @@
   }
 
   async function salir() {
-    try { Object.keys(localStorage).filter(k => k === CK || k.indexOf('la-clave:') === 0).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+    const limpiarClaves = (st, incPerfil) => {
+      const borrar = [];
+      for (let i = 0; i < st.length; i++) {
+        const k = st.key(i);
+        if (k && ((incPerfil && k === CK) || k.indexOf('la-clave:') === 0)) borrar.push(k);
+      }
+      borrar.forEach(k => st.removeItem(k));
+    };
+    try { limpiarClaves(localStorage, true); } catch (e) {}
+    try { limpiarClaves(sessionStorage, false); } catch (e) {}
     const F = await app(); await F.auth.signOut();
   }
 

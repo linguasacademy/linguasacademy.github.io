@@ -84,6 +84,7 @@
 </main>
 
 <script src="assets/site.js"></script>
+<script src="assets/fb.js"></script>
 <script src="assets/auth.js"></script>
 <script>
 (() => {
@@ -127,9 +128,16 @@
       const iv = crypto.getRandomValues(new Uint8Array(12));
       const cif = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, k, crudo));
       const bin = new Uint8Array(12 + cif.length); bin.set(iv); bin.set(cif, 12);
+      const res = await fetch('herramientas/cargador.html', { cache: 'no-cache' });
+      if (!res.ok) throw new Error('red');
+      const tpl = await res.text();
       await F.db.ref('claves/' + nombre).set(b64u(kraw));
-      const t = (texto.match(/<title>([^<]*)<\/title>/i) || [, nombre])[1].trim();
-      const cargador = (await (await fetch('herramientas/cargador.html', { cache: 'no-cache' })).text()).replace('{{TITULO}}', t);
+      const escHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const rawTitle = (texto.match(/<title[^>]*>([^<]*)<\/title>/i) || [, nombre])[1].trim();
+      const ta = document.createElement('textarea');
+      ta.innerHTML = rawTitle;
+      const t = (ta.value || ta.textContent || rawTitle).trim();
+      const cargador = tpl.replace('{{TITULO}}', () => escHtml(t));
       bajar(nombre + '.bin', bin, 'application/octet-stream');
       bajar(nombre + '.html', cargador, 'text/html');
       Forma.estado(fp, 'Listo. Sube ' + nombre + '.bin a la carpeta t/ y ' + nombre + '.html a la raíz del repositorio, y añade el tablero en assets/catalogo.js.', 'ok');
