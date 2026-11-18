@@ -315,6 +315,23 @@
 .pr-errores__bien { color: #075440; font-weight: 500; }
 .pr-errores__bien .pi { color: var(--ok); }
 .pr-enviado { margin-top: 12px; font-size: 15px; color: var(--ok); min-height: 1.4em; }
+.pr-enviado:not(:empty) { display: flex; align-items: flex-start; gap: 8px; }
+.pr-enviado .pi { flex: none; margin-top: 1px; }
+.pr-enviado--mal { color: var(--error); }
+
+/* entrega de la tarea (?tarea=): nombre y «Entregar», en una fila sobria */
+.pr-entrega__caja { margin-top: 28px; max-width: 600px; padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); }
+.pr-entrega { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.pr-entrega__campo { flex: 1 1 220px; display: grid; min-width: 0; }
+.pr-entrega__campo .pr-mini { margin-bottom: 6px; }
+.pr-campo--nombre { width: 100%; min-height: 44px; font-size: 17px; padding: 8px 12px; background: var(--card); }
+.pr-entrega .pb--main { flex: none; }
+.pr-entrega__error { margin-top: 10px; font-size: 15px; color: var(--error); }
+.pr-entrega__caja + .pr-enviado { max-width: 600px; }
+@media (max-width: 639px) {
+  .pr-entrega__caja { padding: 16px; }
+  .pr-entrega .pb--main { flex: 1 1 100%; }
+}
 .pr-copia textarea { width: 100%; margin-top: 10px; font: 400 15px/1.5 var(--f-mono); padding: 12px; border-radius: var(--r-sm); border: 1.5px solid var(--line-control); background: var(--card); }
 
 /* carga */

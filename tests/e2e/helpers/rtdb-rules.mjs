@@ -142,7 +142,11 @@ function evalExpr(expr, ctx) {
     now: ctx.now ?? Date.now(),
     ...ctx.wildcards
   };
-  return Boolean(vm.runInNewContext(`(${trimmed})`, sandbox));
+  // String.matches(regex) de las reglas de RTDB: se define dentro del contexto aislado
+  return Boolean(vm.runInNewContext(
+    `String.prototype.matches = function (re) { return re.test(String(this)); }; (${trimmed})`,
+    sandbox
+  ));
 }
 
 export class RtdbRulesEvaluator {

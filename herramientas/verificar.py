@@ -23,6 +23,7 @@ NON_BOARD_HTML = {
     "muestra.html",
     "suscripcion.html",
     "estudiantes.html",
+    "panel.html",
 }
 BOARD_NAME_RE = re.compile(r"^(en-|pt-)?[abc][12]-[a-z0-9]+(-[a-z0-9]+)*$")
 # Un cargador es pequeño y solo carga assets/abrir.js; un tablero original pesa
@@ -35,6 +36,7 @@ HTML_FILES_TO_CHECK = [
     "admin.html",
     "404.html",
     "estudiantes.html",
+    "panel.html",
     "herramientas/cargador.html",
 ]
 IGNORED_PREFIXES = ("http://", "https://", "mailto:", "tel:", "data:", "javascript:", "#")

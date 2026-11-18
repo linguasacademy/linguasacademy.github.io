@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<script src="assets/i18n.js?v=2026111801"></script>
+<script src="assets/i18n.js?v=2026111802"></script>
 <title data-i18n="cat.meta.titulo">Catálogo de tableros · Lingua's Academy</title>
 <meta name="description" data-i18n-content="cat.meta.desc" content="Catálogo de tableros de clase de Lingua's Academy por idioma y nivel, con vista previa de cada clase.">
 <meta name="theme-color" content="#F6F3EC">
@@ -16,7 +16,8 @@
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js">
-<link rel="stylesheet" href="assets/site.css?v=2026111801">
+<link rel="stylesheet" href="assets/site.css?v=2026111802">
+<link rel="stylesheet" href="assets/tareas.css?v=2026111802">
 <style>
 .app { padding: calc(var(--nav) + 56px) 0 96px; min-height: 100vh; min-height: 100svh; }
 .app__head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; margin-bottom: 40px; }
@@ -204,6 +205,7 @@
     <nav aria-label="Plataforma" data-i18n-aria="nav.plataforma">
       <ul class="nav__links">
         <li><a href="tableros.html" aria-current="page" data-i18n="nav.catalogo">Catálogo</a></li>
+        <li data-solo-profe hidden><a href="panel.html" data-i18n="nav.tareas">Tareas</a></li>
         <li data-solo-admin hidden><a href="admin.html" data-i18n="nav.solicitudes">Solicitudes</a></li>
         <li data-solo-publico hidden><a href="suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a></li>
       </ul>
@@ -220,6 +222,7 @@
 </header>
 <div class="sheet" id="menu" hidden>
   <a href="tableros.html" data-i18n="nav.catalogo">Catálogo</a>
+  <a href="panel.html" data-solo-profe hidden data-i18n="nav.tareas">Tareas</a>
   <a href="admin.html" data-solo-admin hidden data-i18n="nav.solicitudes">Solicitudes</a>
   <a href="suscripcion.html" data-solo-publico hidden data-i18n="nav.suscripcion">Suscripción</a>
   <a href="./" data-i18n="nav.inicio">Inicio</a>
@@ -291,6 +294,26 @@
 
 <p class="aviso" role="status" aria-live="polite" data-aviso></p>
 
+<dialog class="dlg" id="dlg-tarea" aria-labelledby="dlg-tarea-t">
+  <form class="dlg__caja" data-form-tarea novalidate>
+    <p class="label" data-i18n="cat.tarea">Tarea</p>
+    <h2 class="dlg__t" id="dlg-tarea-t" data-dlg-titulo></h2>
+    <p class="dlg__lead" data-i18n="cat.tarea.lead">Tus estudiantes la hacen sin cuenta y la entregan; lo que entreguen llega a Tareas.</p>
+    <div class="field">
+      <label for="tarea-etiqueta" data-i18n="cat.tarea.etiqueta">Etiqueta (opcional)</label>
+      <input id="tarea-etiqueta" name="etiqueta" type="text" maxlength="60" autocomplete="off" data-i18n-placeholder="cat.tarea.etiquetaEj" placeholder="Ej. grupo del martes">
+    </div>
+    <div class="field" data-tarea-url hidden>
+      <label for="tarea-url" data-i18n="panel.enlace">Enlace para tus estudiantes</label>
+      <input id="tarea-url" type="text" readonly class="dlg__url">
+    </div>
+    <div class="dlg__acciones">
+      <button class="btn btn--secondary btn--sm" type="button" data-cancelar data-i18n="cat.tarea.cancelar">Cancelar</button>
+      <button class="btn btn--primary btn--sm" type="submit" data-crear><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span data-i18n="cat.tarea.crear">Copiar enlace</span></button>
+    </div>
+  </form>
+</dialog>
+
 <template id="tpl-vacio">
   <div class="vacio">
     <div class="photo"><img alt="" width="1100" height="733" loading="lazy"></div>
@@ -302,12 +325,13 @@
   </div>
 </template>
 
-<script src="assets/catalogo.js?v=2026111801"></script>
-<script src="vista/vistas.js?v=2026111801"></script>
-<script src="practica/indice.js?v=2026111801"></script>
-<script src="assets/site.js?v=2026111801"></script>
-<script src="assets/fb.js?v=2026111801"></script>
-<script src="assets/auth.js?v=2026111801"></script>
+<script src="assets/catalogo.js?v=2026111802"></script>
+<script src="vista/vistas.js?v=2026111802"></script>
+<script src="practica/indice.js?v=2026111802"></script>
+<script src="assets/site.js?v=2026111802"></script>
+<script src="assets/fb.js?v=2026111802"></script>
+<script src="assets/auth.js?v=2026111802"></script>
+<script src="assets/tareas.js?v=2026111802"></script>
 <script>
 (() => {
   'use strict';
@@ -358,6 +382,7 @@
     const cambia = m !== modo;
     modo = m;
     document.querySelectorAll('[data-solo-publico]').forEach(el => { el.hidden = m !== 'publico'; });
+    document.querySelectorAll('[data-solo-profe]').forEach(el => { el.hidden = m !== 'profe'; });
     document.querySelectorAll('[data-salir]').forEach(el => { el.hidden = !(m === 'profe' || haySesion); });
     document.querySelectorAll('[data-entrar]').forEach(el => { el.hidden = m === 'profe' || haySesion; });
     if (m === 'publico') { $('[data-nombre]').textContent = ''; document.querySelectorAll('[data-solo-admin]').forEach(el => { el.hidden = true; }); }
@@ -496,6 +521,67 @@
     });
   }
 
+  /* «Tarea» del profe: diálogo con etiqueta opcional → crea tareas/<código> y copia el enlace con &tarea= */
+  const dlg = document.getElementById('dlg-tarea');
+  const dlgForm = dlg.querySelector('[data-form-tarea]');
+  const dlgCrear = dlg.querySelector('[data-crear]');
+  const dlgUrl = dlg.querySelector('[data-tarea-url]');
+  let dlgTablero = null, dlgOrigen = null, dlgOcupado = false, dlgHecha = null;
+  function rotuloCrear(clave, es) { dlgCrear.querySelector('span').textContent = tr(clave, es); }
+  function abrirTarea(t, origen) {
+    dlgTablero = t; dlgOrigen = origen; dlgHecha = null;
+    dlg.querySelector('[data-dlg-titulo]').textContent = t.titulo;
+    dlgForm.elements.etiqueta.value = '';
+    dlgForm.elements.etiqueta.closest('.field').hidden = false;
+    dlgUrl.hidden = true;
+    rotuloCrear('cat.tarea.crear', 'Copiar enlace');
+    dlgCrear.disabled = false;
+    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+    dlgForm.elements.etiqueta.focus();
+  }
+  function cerrarTarea() {
+    if (dlg.open) { if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open'); }
+  }
+  dlg.addEventListener('close', () => { dlgOcupado = false; if (dlgOrigen && document.contains(dlgOrigen)) dlgOrigen.focus(); });
+  dlg.addEventListener('click', e => { if (e.target === dlg && !dlgOcupado) cerrarTarea(); });
+  dlg.addEventListener('cancel', e => { if (dlgOcupado) e.preventDefault(); });
+  dlg.querySelector('[data-cancelar]').addEventListener('click', () => { if (!dlgOcupado) cerrarTarea(); });
+  dlgForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (dlgOcupado || !dlgTablero) return;
+    const nombre = dlgTablero.archivo.replace(/\.html$/, '');
+    /* ya creada pero sin copiar (el navegador no dejó): este toque copia */
+    if (dlgHecha) {
+      return copiar(dlgHecha).then(() => { cerrarTarea(); avisar(tr('cat.tarea.copiada', 'Enlace de la tarea copiado'), true); }, () => {
+        const i = dlgUrl.querySelector('input'); i.focus(); i.select();
+      });
+    }
+    dlgOcupado = true; dlgCrear.disabled = true; rotuloCrear('cat.tarea.creando', 'Creando…');
+    let hecha = null, fallo = null;
+    try { hecha = await LA_TAREAS.crear(nombre, dlgForm.elements.etiqueta.value); } catch (err) { fallo = err; console.warn(err); }
+    dlgOcupado = false; dlgCrear.disabled = false;
+    if (!hecha) {
+      const url = URL_TAREA(nombre);
+      const sinSesion = fallo && /sin-sesion/.test(fallo.message || '');
+      cerrarTarea();
+      return copiar(url).then(() => avisar(sinSesion ? tr('cat.tarea.sinSesion', 'Enlace copiado. Entra con tu cuenta para recibir las entregas en Tareas.')
+        : tr('cat.tarea.fallo', 'No se pudo crear la tarea: se copió el enlace sin entregas.'), false))
+        .catch(() => avisar(fmt(tr('cat.copiarFallo', 'Copia este enlace: {url}'), { url }), false));
+    }
+    try {
+      await copiar(hecha.url);
+      cerrarTarea();
+      avisar(tr('cat.tarea.copiada', 'Enlace de la tarea copiado'), true);
+    } catch (err) {
+      /* creada, pero el portapapeles no respondió: se muestra el enlace y el botón copia con un toque nuevo */
+      dlgHecha = hecha.url;
+      dlgForm.elements.etiqueta.closest('.field').hidden = true;
+      dlgUrl.hidden = false;
+      const i = dlgUrl.querySelector('input'); i.value = hecha.url; i.focus(); i.select();
+      rotuloCrear('cat.tarea.crear', 'Copiar enlace');
+    }
+  });
+
   /* vistas previas publicadas (vista/<nombre>.html), según vista/vistas.js */
   const VISTAS = new Set(Array.isArray(window.VISTAS) ? window.VISTAS : []);
 
@@ -606,12 +692,15 @@
     if (PRACTICA().has(nombreT)) {
       const tarea = accion('button', 't__accion--tarea', ICO_TAREA, tr('cat.tarea', 'Tarea'));
       tarea.type = 'button';
-      tarea.querySelector('.visually-hidden').textContent = ': ' + tr('cat.tareaAria', 'Copiar el enlace de la tarea') + ', ' + t.titulo;
-      tarea.title = tr('cat.tareaAria', 'Copiar el enlace de la tarea');
+      const ariaT = modo === 'profe' ? tr('cat.tareaCrearAria', 'Crear una tarea con este tablero') : tr('cat.tareaAria', 'Copiar el enlace de la tarea');
+      tarea.querySelector('.visually-hidden').textContent = ': ' + ariaT + ', ' + t.titulo;
+      tarea.title = ariaT;
       tarea.dataset.tarea = nombreT;
       tarea.addEventListener('click', () => {
+        /* profe con sesión: crea la tarea con entrega (panel.html); si no, el enlace de práctica de siempre */
+        if (modo === 'profe' && window.LA_TAREAS) return abrirTarea(t, tarea);
         const url = URL_TAREA(nombreT);
-        copiar(url).then(() => avisar(tr('cat.copiado', 'Enlace copiado'), true))
+        copiar(url).then(() => avisar(tr('cat.tarea.sinSesion', 'Enlace copiado. Entra con tu cuenta para recibir las entregas en Tareas.'), true))
           .catch(() => avisar(fmt(tr('cat.copiarFallo', 'Copia este enlace: {url}'), { url }), false));
       });
       acc.append(tarea);

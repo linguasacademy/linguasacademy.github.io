@@ -18,6 +18,14 @@
   var NIVELES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
   var NOMBRE_RE = /^(en-|pt-)?[abc][12]-[a-z0-9]+(-[a-z0-9]+)*$/;
   var URL_BASE = 'https://linguasacademy.github.io/estudiantes.html';
+  var VERSION = '2026111802';
+  /* ?t=<tablero>&tarea=<código>: tarea con entrega (la crea el profe en el catálogo) */
+  var TAREA = (function () {
+    try {
+      var u = new URLSearchParams(W.location.search), c = u.get('tarea') || '', n = u.get('t') || '';
+      return /^[0-9a-z]{10}$/.test(c) && n ? { codigo: c, t: n } : null;
+    } catch (e) { return null; }
+  })();
 
   var CAT = {};
   CATALOGO.forEach(function (c) { CAT[String(c.archivo || '').replace(/\.html$/, '')] = c; });
@@ -33,6 +41,7 @@
   var EST = leerEstado();
   if (!EST.p || typeof EST.p !== 'object') EST.p = {};
   if (!EST.borradores || typeof EST.borradores !== 'object') EST.borradores = {};
+  if (!EST.entregas || typeof EST.entregas !== 'object') EST.entregas = {};
   function guardar() {
     try { W.localStorage.setItem(CLAVE, JSON.stringify(EST)); } catch (e) { /* sin guardar: todo sigue igual */ }
   }
@@ -94,6 +103,12 @@
       'fin.copiado': 'Copiado. Pégalo en el chat con tu profe.',
       'fin.compartido': 'Listo.',
       'fin.no_copia': 'No se pudo copiar. Selecciona el texto y cópialo.',
+      'ent.entregar': 'Entregar a mi profe', 'ent.otra_vez': 'Volver a entregar', 'ent.entregando': 'Entregando…',
+      'ent.nombre': 'Tu nombre', 'ent.nombre_falta': 'Escribe tu nombre para que tu profe sepa de quién es.',
+      'ent.lista': 'Entregada.', 'ent.lista_el': 'Entregada el {f}. Si la repites, puedes volver a entregarla.',
+      'ent.fallo': 'No se pudo entregar. Revisa tu conexión e inténtalo otra vez, o copia el resumen y envíaselo a tu profe.',
+      'ent.cerrada': 'Esta tarea ya no recibe entregas. Copia el resumen y envíaselo a tu profe.',
+      'ent.copiar': 'Copiar el resumen',
       'mas.otra': 'Siguiente práctica'
     },
     en: {
@@ -151,6 +166,12 @@
       'fin.copiado': 'Copied. Paste it in your chat with your teacher.',
       'fin.compartido': 'Done.',
       'fin.no_copia': "Couldn't copy. Select the text and copy it.",
+      'ent.entregar': 'Hand in to my teacher', 'ent.otra_vez': 'Hand in again', 'ent.entregando': 'Handing in…',
+      'ent.nombre': 'Your name', 'ent.nombre_falta': 'Write your name so your teacher knows who it is from.',
+      'ent.lista': 'Handed in.', 'ent.lista_el': 'Handed in on {f}. If you redo it, you can hand it in again.',
+      'ent.fallo': "Couldn't hand it in. Check your connection and try again, or copy the summary and send it to your teacher.",
+      'ent.cerrada': 'This homework no longer takes submissions. Copy the summary and send it to your teacher.',
+      'ent.copiar': 'Copy the summary',
       'mas.otra': 'Next practice'
     },
     pt: {
@@ -208,6 +229,12 @@
       'fin.copiado': 'Copiado. Cole no chat com seu professor.',
       'fin.compartido': 'Pronto.',
       'fin.no_copia': 'Não foi possível copiar. Selecione o texto e copie.',
+      'ent.entregar': 'Entregar ao meu professor', 'ent.otra_vez': 'Entregar de novo', 'ent.entregando': 'Entregando…',
+      'ent.nombre': 'Seu nome', 'ent.nombre_falta': 'Escreva seu nome para seu professor saber de quem é.',
+      'ent.lista': 'Entregue.', 'ent.lista_el': 'Entregue em {f}. Se refizer, pode entregar de novo.',
+      'ent.fallo': 'Não foi possível entregar. Confira sua conexão e tente de novo, ou copie o resumo e envie ao seu professor.',
+      'ent.cerrada': 'Esta tarefa não recebe mais entregas. Copie o resumo e envie ao seu professor.',
+      'ent.copiar': 'Copiar o resumo',
       'mas.otra': 'Próxima prática'
     }
   };
@@ -261,6 +288,7 @@
     'circle-check': '<circle cx="12" cy="12" r="10"/><path d="m16 9-5.5 5.5L8 12"/>',
     'circle-dashed': '<path d="M10.1 2.182a10 10 0 0 1 3.8 0"/><path d="M13.9 21.818a10 10 0 0 1-3.8 0"/><path d="M17.609 3.721a10 10 0 0 1 2.69 2.7"/><path d="M2.182 13.9a10 10 0 0 1 0-3.8"/><path d="M20.279 17.609a10 10 0 0 1-2.7 2.69"/><path d="M21.818 10.1a10 10 0 0 1 0 3.8"/><path d="M3.721 6.391a10 10 0 0 1 2.7-2.69"/><path d="M6.391 20.279a10 10 0 0 1-2.69-2.7"/>',
     'repeat-2': '<path d="m2 9 3-3 3 3"/><path d="M13 18H7a2 2 0 0 1-2-2V6"/><path d="m22 15-3 3-3-3"/><path d="M11 6h6a2 2 0 0 1 2 2v10"/>',
+    'copy': '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
     'list-checks': '<path d="M13 5h8"/><path d="M13 12h8"/><path d="M13 19h8"/><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/>'
   };
   function icono(n, tam) {
@@ -399,8 +427,10 @@
   }
   function ir(p, reemplazar) {
     var u = new URLSearchParams();
-    if (p.t) u.set('t', p.t);
-    else {
+    if (p.t) {
+      u.set('t', p.t);
+      if (TAREA && TAREA.t === p.t) u.set('tarea', TAREA.codigo);
+    } else {
       if (p.tema) u.set('tema', p.tema);
       if (p.nivel) u.set('nivel', p.nivel);
     }
@@ -1220,7 +1250,7 @@
       l.push(String(P.reto).trim());
     }
     l.push('');
-    l.push(URL_BASE + '?t=' + P.nombre);
+    l.push(URL_BASE + '?t=' + P.nombre + (TAREA && TAREA.t === P.nombre ? '&tarea=' + TAREA.codigo : ''));
     return l.join('\n');
   }
   function enviar(estado, caja) {
@@ -1252,6 +1282,90 @@
       } catch (e) { return false; }
     }
   }
+  /* ---------- entregar la tarea (solo con ?tarea=): Firebase se carga al tocar «Entregar» ---------- */
+  function cargarScript(src, listo) {
+    return new Promise(function (ok, mal) {
+      if (listo()) return ok();
+      var s = D.createElement('script');
+      s.src = src;
+      s.onload = function () { listo() ? ok() : mal(new Error('red')); };
+      s.onerror = function () { s.remove(); mal(new Error('red')); };
+      D.head.appendChild(s);
+    });
+  }
+  function cargarTareas() {
+    return cargarScript('assets/fb.js?v=2026111801', function () { return !!W.LA_FB; })
+      .then(function () { return cargarScript('assets/tareas.js?v=' + VERSION, function () { return !!W.LA_TAREAS; }); });
+  }
+  function datosEntrega(nombre) {
+    var c = cifras(), errores = [];
+    P.datos.ejercicios.forEach(function (e, ej) {
+      P.res[ej].forEach(function (r, i) {
+        if (r && !r.ok1) errores.push({ p: textoItem(ej, i), escrito: r.resp || '', correcto: r.correcta || '' });
+      });
+    });
+    return {
+      nombre: nombre,
+      puntaje: { aciertos: c.bien, total: c.total },
+      ejercicios: c.porEj.map(function (x) { return { tipo: x.e.tipo, aciertos: x.bien, total: x.total }; }),
+      errores: errores.slice(0, 30),
+      reto: String(P.reto || '').trim(),
+      lengua: AP
+    };
+  }
+  function fechaCorta(iso) {
+    try { return new Date(iso).toLocaleString(AP === 'pt' ? 'pt-BR' : AP, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return String(iso).slice(0, 10); }
+  }
+  function bloqueEntrega(estado, caja, copiarBtn) {
+    var cod = TAREA.codigo;
+    var previa = EST.entregas[cod];
+    var campo = h('input', { id: 'pr-ent-nombre', class: 'pr-campo pr-campo--nombre', type: 'text', maxlength: 60, autocomplete: 'given-name',
+      autocapitalize: 'words', spellcheck: 'false', 'aria-describedby': 'pr-ent-error' });
+    campo.value = EST.nombre || '';
+    var error = h('p', { class: 'pr-entrega__error', id: 'pr-ent-error', hidden: true });
+    var btn = boton(t(previa ? 'ent.otra_vez' : 'ent.entregar'), 'pb--pri pb--main', null, 'send');
+    btn.type = 'submit';
+    btn.setAttribute('data-accion', 'entregar');
+    function rotulo(k) { btn.querySelector('span:last-child').textContent = t(k); }
+    function marcar(ok, msg) {
+      estado.textContent = '';
+      estado.classList.toggle('pr-enviado--mal', !ok);
+      if (ok) estado.appendChild(icono('circle-check'));
+      estado.appendChild(h('span', { text: msg }));
+    }
+    if (previa) marcar(true, t('ent.lista_el', { f: fechaCorta(previa) }));
+    var enviando = false;
+    var form = h('form', { class: 'pr-entrega', novalidate: true, onsubmit: function (ev) {
+      ev.preventDefault();
+      if (enviando) return;
+      var nombre = campo.value.replace(/\s+/g, ' ').trim();
+      if (!nombre) {
+        campo.setAttribute('aria-invalid', 'true');
+        error.textContent = t('ent.nombre_falta'); error.hidden = false;
+        campo.focus();
+        return;
+      }
+      campo.removeAttribute('aria-invalid'); error.hidden = true;
+      EST.nombre = nombre.slice(0, 60); guardar();
+      enviando = true; btn.disabled = true; btn.setAttribute('aria-busy', 'true'); rotulo('ent.entregando');
+      cargarTareas().then(function () { return W.LA_TAREAS.entregar(cod, datosEntrega(nombre)); }).then(function () {
+        EST.entregas[cod] = new Date().toISOString(); guardar();
+        marcar(true, t('ent.lista'));
+        anunciar(t('ent.lista'));
+        rotulo('ent.otra_vez');
+      }, function (err) {
+        var cerrada = W.LA_FB && W.LA_FB.denegado && W.LA_FB.denegado(err);
+        marcar(false, t(cerrada ? 'ent.cerrada' : 'ent.fallo'));
+        rotulo(EST.entregas[cod] ? 'ent.otra_vez' : 'ent.entregar');
+        copiarBtn.hidden = false;
+      }).then(function () { enviando = false; btn.disabled = false; btn.removeAttribute('aria-busy'); });
+    } },
+      h('div', { class: 'pr-entrega__campo' }, h('label', { class: 'pr-mini', for: 'pr-ent-nombre', text: t('ent.nombre') }), campo),
+      btn);
+    return h('div', { class: 'pr-entrega__caja' }, form, error);
+  }
+
   function faseFin(cont) {
     var c = cifras();
     var pct = c.total ? c.bien / c.total : 0;
@@ -1280,11 +1394,15 @@
     var n = contar(P.reto, unidad);
     var estado = h('p', { class: 'pr-enviado', role: 'status', 'aria-live': 'polite' });
     var caja = h('div', { class: 'pr-copia', hidden: true }, h('textarea', { readonly: true, rows: 8, 'aria-label': t('fin.enviar') }));
+    var enTarea = !!(TAREA && TAREA.t === P.nombre);
+    var copiarBtn = enTarea ? boton(t('ent.copiar'), 'pb--ghost', function () { enviar(estado, caja); }, 'copy') : null;
+    if (copiarBtn) { copiarBtn.hidden = true; copiarBtn.setAttribute('data-accion', 'copiar'); }
     var acciones = h('div', { class: 'pr-acciones' },
-      boton(t('fin.enviar'), 'pb--pri pb--main', function () { enviar(estado, caja); }, 'send'),
+      enTarea ? null : boton(t('fin.enviar'), 'pb--pri pb--main', function () { enviar(estado, caja); }, 'send'),
       c.errores.length ? boton(t('fin.repetir'), 'pb--sec', repetirFallos, 'repeat-2') : null,
-      P.volver.tema ? boton(t('fin.volver', { t: nombreTema(P.volver.tema) }), 'pb--ghost', function () { ir(P.volver); }, 'arrow-left') : null);
-    acciones.querySelector('.pb--pri').setAttribute('data-accion', 'enviar');
+      P.volver.tema ? boton(t('fin.volver', { t: nombreTema(P.volver.tema) }), 'pb--ghost', function () { ir(P.volver); }, 'arrow-left') : null,
+      copiarBtn);
+    if (!enTarea) acciones.querySelector('.pb--pri').setAttribute('data-accion', 'enviar');
     cont.appendChild(h('section', { class: 'pr-fase pr-fin' },
       h('div', { class: 'pr-fin__cab' },
         h('p', { class: 'pr-fin__cifra' }, h('strong', { text: String(c.bien) }), h('span', { text: ' / ' + c.total })),
@@ -1304,7 +1422,9 @@
         h('h2', { class: 'pr-h3', text: t('fin.reto') }),
         h('p', { class: 'pr-fin__texto', lang: lengua, text: String(P.reto).trim() }),
         h('p', { class: 'pr-muted', text: t('reto.u.' + unidad, { n: n }) + (n < (+r.min || 0) ? ' · ' + t('fin.reto.corto', { a: n, min: r.min }) : '') })) : null,
-      acciones, estado, caja));
+      enTarea ? bloqueEntrega(estado, caja, copiarBtn) : null,
+      enTarea ? estado : null,
+      acciones, enTarea ? null : estado, caja));
   }
 
   /* ---------------- arranque ---------------- */
