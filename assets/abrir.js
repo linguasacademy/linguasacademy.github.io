@@ -9,6 +9,7 @@
    ===================================================================== */
 (() => {
   'use strict';
+  const VERSION_VIVO = '2026111702';   // súbela cada vez que cambie vivo.js
   const { CFG, SDK, carga, conTiempo, denegado, leer2 } = window.LA_FB;
   const NOMBRE = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
   const q = new URLSearchParams(location.search);
@@ -111,6 +112,8 @@
       for (const { nodo, destino, antes } of scripts) {
         const s = document.createElement('script');
         Array.from(nodo.attributes).forEach(a => s.setAttribute(a.name, a.value));
+        /* vivo.js con versión, para que el navegador no use una copia vieja guardada */
+        if (/^(\.\/)?vivo\.js$/.test(s.getAttribute('src') || '')) s.setAttribute('src', 'vivo.js?v=' + VERSION_VIVO);
         let listo = null;
         if (s.src) {
           s.async = false;
