@@ -157,6 +157,8 @@ p { margin: 0; text-wrap: pretty; }
 .nav__entrar { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font-size: 15px; font-weight: 500; color: var(--muted); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 5px; white-space: nowrap; transition: color var(--dur-ui) var(--ease-out), text-decoration-color var(--dur-ui) var(--ease-out); }
 .nav__entrar:hover, .nav__entrar[aria-current] { color: var(--ink); text-decoration-color: currentColor; }
 .nav__actions { display: flex; align-items: center; gap: 8px; flex: none; }
+.nav__estudiantes { position: relative; }
+.nav__estudiantes + .nav__entrar::before { content: ""; width: 1px; height: 18px; background: var(--line-2); margin: 0 10px 0 -10px; }
 .nav__user { font-size: 15px; color: var(--muted); max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nav .menu-btn { display: none; }
 
@@ -219,27 +221,53 @@ p { margin: 0; text-wrap: pretty; }
 html.i18n-pendiente [data-i18n], html.i18n-pendiente [data-i18n-html] { visibility: hidden; }
 @media (max-width: 639px) { .nav__idioma { display: none; } }
 
-/* ---------- buttons and links ---------- */
+/* ---------- botones: una sola escala ----------
+   primario   relleno de acción: la acción principal de la vista (una por pantalla)
+   secundario borde fino: alternativas al lado de la principal
+   discreto   solo texto e icono: acciones de apoyo dentro de tarjetas y listas
+   Alturas: 44 px (normal) y 40 px (--sm). Ancho según el contenido; en el teléfono
+   solo la acción principal puede ir a lo ancho, y solo si se le pone a propósito. */
 .btn {
-  --bh: 48px;
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  min-height: var(--bh); padding: 0 22px; border-radius: var(--r-btn);
-  font: 500 16px/1 var(--f-text); text-decoration: none; cursor: pointer; white-space: nowrap;
-  border: 1.5px solid transparent;
-  transition: transform var(--dur-ui) var(--ease-out), background-color var(--dur-ui), border-color var(--dur-ui), color var(--dur-ui);
+  --bh: 44px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: var(--bh); padding: 0 18px; border-radius: var(--r-btn);
+  font: 500 15.5px/1 var(--f-text); text-decoration: none; cursor: pointer; white-space: nowrap;
+  border: 1.5px solid transparent; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-ui) ease, border-color var(--dur-ui) ease, color var(--dur-ui) ease;
 }
-@media (hover: hover) and (pointer: fine) { .btn:hover { transform: translateY(-1px); } }
-.btn:active { transform: translateY(1px) scale(.985); transition-duration: 80ms; }
+.btn:active { transform: scale(.97); }
 .btn--primary { background: var(--action); color: var(--on-action); }
-.btn--primary:hover { background: var(--action-dk); }
 .btn--secondary { background: transparent; color: var(--ink); border-color: var(--line-2); }
-.btn--secondary:hover { border-color: var(--ink); }
-.btn--sm { --bh: 44px; padding: 0 16px; font-size: 15px; }
+.btn--ghost { background: transparent; color: var(--ink-2); padding: 0 10px; }
+@media (hover: hover) and (pointer: fine) {
+  .btn--primary:hover { background: var(--action-dk); }
+  .btn--secondary:hover { border-color: var(--ink); }
+  .btn--ghost:hover { color: var(--ink); background: var(--paper-2); }
+}
+.btn--sm { --bh: 40px; padding: 0 14px; font-size: 15px; }
+.btn svg:not(.arrow) { width: 18px; height: 18px; flex: none; }
 .btn[disabled], .btn[aria-disabled="true"] { opacity: .55; cursor: progress; transform: none; }
 .btn .arrow { width: 16px; height: 16px; transition: transform var(--dur-ui) var(--ease-out); }
 @media (hover: hover) and (pointer: fine) { .btn:hover .arrow { transform: translateX(3px); } }
 .btn-row { display: flex; flex-wrap: wrap; gap: 12px; }
-@media (max-width: 639px) { .btn-row .btn { width: 100%; } }
+
+/* aviso breve («Enlace copiado»): sube desde abajo y se va solo */
+.aviso {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 40;
+  display: inline-flex; align-items: center; gap: 8px; max-width: calc(100vw - 32px);
+  padding: 10px 16px; border-radius: var(--r-btn); background: var(--ink); color: var(--paper);
+  font: 500 15px/1.3 var(--f-text); box-shadow: 0 14px 30px -16px rgba(20,33,58,.6);
+  opacity: 0; transform: translate(-50%, 8px); pointer-events: none;
+  transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
+}
+.aviso[data-on] { opacity: 1; transform: translate(-50%, 0); transition-duration: 200ms; }
+.aviso svg { width: 18px; height: 18px; flex: none; color: #8FD9BC; }
+
+/* ---------- pie de página de las páginas públicas ---------- */
+.pie { border-top: 1px solid var(--line); }
+.pie .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 32px; padding-top: 28px; padding-bottom: 28px; font-size: 15px; color: var(--muted); }
+.pie span:first-child { display: inline-flex; align-items: center; gap: 10px; }
+.pie a { color: var(--muted); }
 
 .link {
   color: var(--ink); text-decoration: none; font-weight: 500;
@@ -315,7 +343,7 @@ main { display: block; }
 .form__status[data-tone="error"] { color: var(--error); }
 .form__status[data-tone="ok"] { color: var(--ok); }
 .form .btn { justify-self: start; }
-@media (max-width: 639px) { .form .btn { justify-self: stretch; } }
+@media (max-width: 639px) { .form .btn { justify-self: stretch; } } /* en un formulario, enviar es la acción principal */
 
 .notice {
   border-radius: var(--r-lg); background: var(--card); border: 1px solid var(--line);
@@ -348,7 +376,7 @@ main { display: block; }
    borde y opacidad siguen, cortos. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; scroll-behavior: auto !important; }
-  .btn, .btn .arrow, .photo img, .sheet, .sheet[data-abierto] {
+  .btn, .btn .arrow, .photo img, .sheet, .sheet[data-abierto], .aviso, .aviso[data-on] {
     transform: none !important;
     transition-property: opacity, color, background-color, border-color, box-shadow, text-decoration-color, visibility !important;
     transition-duration: 150ms !important;

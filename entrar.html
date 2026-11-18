@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>document.documentElement.classList.add('js')</script>
-<script src="assets/i18n.js"></script>
+<script src="assets/i18n.js?v=2026111801"></script>
 <meta name="robots" content="noindex">
 <title data-i18n="entrar.meta.titulo">Entrar · Lingua's Academy</title>
 <meta name="description" content="Entrada al catálogo de tableros de Lingua's Academy." data-i18n-content="entrar.meta.descripcion">
@@ -18,7 +18,7 @@
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js">
 <link rel="preconnect" href="https://images.unsplash.com">
-<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/site.css?v=2026111801">
 <style>
 .login { min-height: 100vh; min-height: 100svh; padding: calc(var(--nav) + 48px) 0 64px; display: flex; align-items: center; }
 .login .wrap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: center; }
@@ -48,22 +48,26 @@
     <a class="brand" href="./" aria-label="Lingua's Academy, inicio" data-i18n-aria="nav.inicio_aria"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
     <nav aria-label="Principal" data-i18n-aria="nav.principal_aria">
       <ul class="nav__links">
-        <li><a href="./#tableros" data-i18n="nav.tableros">Tableros</a></li>
+        <li><a href="tableros.html" data-i18n="nav.tableros">Tableros</a></li>
         <li><a href="./#en-vivo" data-i18n="nav.como">Cómo funciona</a></li>
         <li><a href="./#preguntas" data-i18n="nav.preguntas">Preguntas</a></li>
+        <li><a href="suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a></li>
       </ul>
     </nav>
     <div class="nav__actions">
       <div class="nav__idioma" data-selector-idioma></div>
+      <a class="nav__entrar nav__estudiantes" href="estudiantes.html" data-i18n="nav.estudiantes">Estudiantes</a>
       <a class="nav__entrar" href="entrar.html" aria-current="page" data-i18n="nav.entrar">Entrar</a>
       <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.menu_abrir_aria" data-txt-abrir="Menú" data-txt-cerrar="Cerrar" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir="nav.menu" data-i18n-txt-cerrar="nav.cerrar" data-i18n-txt-abrir-aria="nav.menu_abrir_aria" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><span data-i18n="nav.menu">Menú</span></button>
     </div>
   </div>
 </header>
 <nav class="sheet" id="menu" aria-label="Menú" data-i18n-aria="nav.menu" hidden>
-  <a href="./#tableros" data-i18n="nav.tableros">Tableros</a>
+  <a href="tableros.html" data-i18n="nav.tableros">Tableros</a>
   <a href="./#en-vivo" data-i18n="nav.como">Cómo funciona</a>
   <a href="./#preguntas" data-i18n="nav.preguntas">Preguntas</a>
+  <a href="suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a>
+  <a class="sheet__sec" href="estudiantes.html" data-i18n="nav.estudiantes_largo">Soy estudiante</a>
   <a class="sheet__sec" href="entrar.html" aria-current="page" data-i18n="nav.entrar_largo">Entrar con mi cuenta</a>
 </nav>
 
@@ -160,17 +164,17 @@
 
     </div>
     <div class="pila" aria-hidden="true">
-      <img src="https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1545386673-7723f55e5490?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="36vw" width="800" height="500" alt="" data-foto="b1-que-harias-si">
-      <img src="https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1588422333078-44ad73367bcb?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="36vw" width="800" height="500" alt="" data-foto="a1-monstruos-gigantes">
-      <img src="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1552533384-7ea1d4bc9415?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="36vw" width="800" height="500" alt="" data-foto="a2-a-como-esta-la-pina">
+      <img src="https://images.unsplash.com/photo-1512485800893-b08ec1ea59b1?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1512485800893-b08ec1ea59b1?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1512485800893-b08ec1ea59b1?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="36vw" width="800" height="500" alt="" data-foto="b1-que-harias-si">
+      <img src="https://images.unsplash.com/photo-1555041469-10ba46e6c62e?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1555041469-10ba46e6c62e?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1555041469-10ba46e6c62e?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="36vw" width="800" height="500" alt="" data-foto="a1-monstruos-gigantes">
+      <img src="https://images.unsplash.com/photo-1782714084014-3c1b362ee256?auto=format&amp;fit=crop&amp;w=800&amp;q=70" srcset="https://images.unsplash.com/photo-1782714084014-3c1b362ee256?auto=format&amp;fit=crop&amp;w=480&amp;q=70 480w, https://images.unsplash.com/photo-1782714084014-3c1b362ee256?auto=format&amp;fit=crop&amp;w=800&amp;q=70 800w" sizes="36vw" width="800" height="500" alt="" data-foto="a2-a-como-esta-la-pina">
       <span class="pila__nota" data-i18n="entrar.nota">tu clase te espera</span>
     </div>
   </div>
 </main>
 
-<script src="assets/site.js"></script>
-<script src="assets/fb.js"></script>
-<script src="assets/auth.js"></script>
+<script src="assets/site.js?v=2026111801"></script>
+<script src="assets/fb.js?v=2026111801"></script>
+<script src="assets/auth.js?v=2026111801"></script>
 <script>
 (() => {
   'use strict';

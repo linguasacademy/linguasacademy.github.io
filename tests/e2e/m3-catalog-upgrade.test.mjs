@@ -150,11 +150,12 @@ async function bootPublico(url = 'https://linguasacademy.github.io/tableros.html
 const tarjetas = document => [...document.querySelectorAll('[data-lista] article.t')];
 const archivoDe = card => card.getAttribute('aria-labelledby').replace(/^t-/, '') + '.html';
 
-test('M3: Language tabs render 4:3 SVG flags, CEFR range, counts, chevron, and preserve tab/arrow navigation', async () => {
+test('M3: Language tabs render 4:3 SVG flags, CEFR range (no board counts), chevron, and preserve tab/arrow navigation', async () => {
   const env = await bootTableros();
   const { document, window } = env;
 
-  const expectedCounts = { es: '49 tableros', en: 'En preparación', pt: 'En preparación' };
+  /* sin cantidades de tableros: solo «En preparación» cuando un idioma aún no tiene ninguno */
+  const expectedCounts = { es: '', en: 'En preparación', pt: 'En preparación' };
   const expectedRango = { es: 'A1–C2 (C1 y C2, pronto)', en: 'A1–C2', pt: 'A1–C2' };
   for (const lang of ['es', 'en', 'pt']) {
     const tab = document.getElementById('i-' + lang);
@@ -173,6 +174,7 @@ test('M3: Language tabs render 4:3 SVG flags, CEFR range, counts, chevron, and p
 
     const cuenta = tab.querySelector(`[data-cuenta-idioma="${lang}"]`);
     assert.equal(cuenta.textContent, expectedCounts[lang]);
+    assert.doesNotMatch(tab.textContent, /\d+\s+tableros/, `#i-${lang} shows no board count`);
 
     const chev = tab.querySelector('.idioma__chev');
     assert.ok(chev && chev.textContent.trim() === '›', `#i-${lang} should render chevron`);
@@ -275,7 +277,7 @@ test('M3: Board cards render level seal, photo, 4:3 consignas flag, publico icon
   }
 });
 
-test('M3: Public catalog (no session) offers the preview or «Vista previa pronto» and «Desbloquear» to the subscription', async () => {
+test('M3: Public catalog (no session) offers the preview or «Vista previa pronto»; the subscription lives in the header, not on every card', async () => {
   const env = await bootPublico();
   const { document, window } = env;
   const vistas = new Set(window.VISTAS || []);
@@ -286,10 +288,44 @@ test('M3: Public catalog (no session) offers the preview or «Vista previa pront
     assert.equal(card.querySelectorAll(`a[href="${nombre}.html"]`).length, 0, 'the full board is not linked without a subscription');
     if (vistas.has(nombre)) assert.ok(card.querySelector(`a.t__accion--abrir[href="vista/${nombre}.html"]`));
     else assert.ok(card.querySelector('.t__accion--pronto').textContent.includes('Vista previa pronto'));
-    const des = card.querySelector('a.t__accion--sec');
-    assert.ok(des && des.getAttribute('href') === 'suscripcion.html' && des.textContent.includes('Desbloquear'));
+    assert.equal(card.querySelectorAll('a[href="suscripcion.html"]').length, 0, 'no repeated subscription link per card');
   }
   assert.equal(document.querySelector('[data-solo-publico]').hidden, false, 'public mode shows the subscription link');
+  assert.ok(document.querySelector('.app__cta a[href="suscripcion.html"]'), 'one subscription call to action in the header');
+  // Without an unfiltered count: the summary only speaks when filtering
+  assert.equal(document.querySelector('[data-resumen]').textContent, '');
+});
+
+test('M3: «Tarea» copies the student practice link only for boards listed in practica/indice.js', async () => {
+  const { html, script } = extractInlineScript('tableros.html');
+  assert.match(html, /<script src="practica\/indice\.js(\?v=\d+)?"><\/script>/, 'the catalog loads practica/indice.js');
+  const fbMock = createFirebaseMock({ currentUser: null, dbData: {} });
+  const env = createBrowserEnv({ url: 'https://linguasacademy.github.io/tableros.html', html, firebaseMock: fbMock, preloadFirebase: true });
+  patchTablerosDom(env);
+  const copiados = [];
+  env.window.isSecureContext = true;
+  env.window.navigator.clipboard = { writeText: async t => { copiados.push(t); } };
+  env.window.PRACTICA_INDICE = ['a1-esta-es-mi-familia', 'b1-que-harias-si'];
+  env.runFile('assets/catalogo.js');
+  env.runFile('assets/site.js');
+  env.runFile('assets/fb.js');
+  env.runFile('assets/auth.js');
+  env.runScript(script, 'tableros-inline.js');
+  await flush(40);
+  const { document } = env;
+  const botones = [...document.querySelectorAll('[data-lista] button.t__accion--tarea')];
+  assert.deepEqual(botones.map(b => b.dataset.tarea).sort(), ['a1-esta-es-mi-familia', 'b1-que-harias-si']);
+  assert.ok(botones[0].textContent.includes('Tarea'));
+  botones[0].click();
+  await flush(10);
+  assert.equal(copiados[0], 'https://linguasacademy.github.io/estudiantes.html?t=' + botones[0].dataset.tarea);
+  const aviso = document.querySelector('[data-aviso]');
+  assert.ok(aviso.hasAttribute('data-on') && aviso.textContent.includes('Enlace copiado'));
+});
+
+test('M3: Without practica/indice.js no card shows «Tarea»', async () => {
+  const env = await bootPublico();
+  assert.equal(env.document.querySelectorAll('.t__accion--tarea').length, 0);
 });
 
 test('M3: Filtering (sinTildes, nivel, consignas, publico, vivo) & sessionStorage persistence work with upgraded cards', async () => {

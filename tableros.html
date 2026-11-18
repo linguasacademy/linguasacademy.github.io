@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<script src="assets/i18n.js"></script>
+<script src="assets/i18n.js?v=2026111801"></script>
 <title data-i18n="cat.meta.titulo">Catálogo de tableros · Lingua's Academy</title>
 <meta name="description" data-i18n-content="cat.meta.desc" content="Catálogo de tableros de clase de Lingua's Academy por idioma y nivel, con vista previa de cada clase.">
 <meta name="theme-color" content="#F6F3EC">
@@ -16,7 +16,7 @@
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js">
-<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/site.css?v=2026111801">
 <style>
 .app { padding: calc(var(--nav) + 56px) 0 96px; min-height: 100vh; min-height: 100svh; }
 .app__head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; margin-bottom: 40px; }
@@ -125,25 +125,28 @@
 .t__credito a { position: relative; z-index: 2; color: inherit; text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 2px; display: inline-block; padding: 4px 0; }
 .t__credito a:hover { color: var(--ink); text-decoration-color: currentColor; }
 
-.t__acciones { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 20px 18px; }
+.t__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 20px 18px; }
 .t__accion {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px;
-  border-radius: var(--r-btn); font: 600 15px/1 var(--f-text); text-decoration: none; white-space: nowrap;
-  transition: background-color 200ms var(--ease-out), border-color 200ms var(--ease-out), color 200ms var(--ease-out);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 14px;
+  border-radius: var(--r-btn); font: 500 15px/1 var(--f-text); text-decoration: none; white-space: nowrap;
+  transition: background-color 200ms var(--ease-out), border-color 200ms var(--ease-out), color 200ms var(--ease-out), transform 120ms var(--ease-out);
 }
+/* «Tarea»: acción discreta, a la derecha, por encima del enlace que cubre la tarjeta */
+.t__accion--tarea { position: relative; z-index: 2; margin-left: auto; padding: 0 10px; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; font-family: var(--f-text); -webkit-tap-highlight-color: transparent; }
+.t__accion--tarea svg { width: 17px; height: 17px; color: var(--lvl, var(--ink)); }
+.t__accion--tarea:active { transform: scale(.97); }
+.t__accion--tarea:focus-visible { outline: 3px solid var(--en); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .t__accion--tarea:hover { background: var(--lvl-bg, var(--paper-2)); color: var(--ink); } }
 .t__accion svg { width: 18px; height: 18px; flex: none; }
 .t__accion--abrir { background: var(--lvl, var(--ink)); color: #fff; border: 1.5px solid var(--lvl, var(--ink)); }
-.t__accion--sec { position: relative; z-index: 2; background: transparent; color: var(--lvl-ink, var(--ink)); border: 1.5px solid var(--line-2); }
-.t__accion--sec:hover { border-color: var(--lvl, var(--ink)); background: var(--lvl-bg, var(--paper-2)); }
-/* toda la tarjeta abre el tablero (o su vista previa); «Desbloquear» y el crédito quedan por encima */
+/* toda la tarjeta abre el tablero (o su vista previa); «Tarea» y el crédito quedan por encima */
 .t__accion--pronto { border: 1.5px dashed var(--line-2); color: var(--muted); cursor: default; }
-.t__accion--sec svg { width: 16px; height: 16px; }
 .app__head > .app__cta { grid-column: 9 / span 4; justify-self: end; align-self: end; display: flex; flex-wrap: wrap; gap: 10px; }
 @media (max-width: 1023px) { .app__head > .app__cta { grid-column: 1 / -1; justify-self: start; } }
 .t__accion--abrir::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
 .t__accion--abrir:focus-visible { outline: none; }
 .t:has(.t__accion--abrir:focus-visible) { outline: 3px solid var(--en); outline-offset: 3px; }
-.t__accion--sec:focus-visible, .t__credito a:focus-visible { outline: 3px solid var(--en); outline-offset: 2px; }
+.t__credito a:focus-visible { outline: 3px solid var(--en); outline-offset: 2px; }
 
 @media (hover: hover) and (pointer: fine) {
   .t:hover { transform: translateY(-2px); border-color: var(--lvl, var(--ink)); border-top-color: var(--lvl, var(--ink)); box-shadow: 0 16px 32px -24px rgba(20,33,58,.45); }
@@ -151,16 +154,15 @@
   .t:hover .t__accion--abrir { background: var(--lvl-ink, var(--ink)); border-color: var(--lvl-ink, var(--ink)); }
 }
 .t:has(.t__accion--abrir:active) { transform: translateY(2px); box-shadow: none; transition-duration: 100ms; }
-.t__accion--sec:active { transform: translateY(1px); transition: transform 100ms var(--ease-out); }
 @media (prefers-reduced-motion: reduce) {
   .t, .t__portada img, .t__accion { transition: opacity 150ms ease, border-color 150ms ease, background-color 150ms ease; }
-  .t:hover, .t:has(.t__accion--abrir:active), .t__accion--sec:active { transform: none; }
+  .t:hover, .t:has(.t__accion--abrir:active), .t__accion--tarea:active { transform: none; }
   .t:hover .t__portada img { transform: none; }
   .t:has(.t__accion--abrir:active) { opacity: .85; }
 }
 @media (max-width: 639px) {
   .t__body { padding: 16px 16px 4px; } .t__meta, .t__credito { padding-left: 16px; padding-right: 16px; }
-  .t__acciones { padding: 12px 16px 16px; } .t__accion { flex: 1 1 auto; }
+  .t__acciones { padding: 12px 16px 16px; }
 }
 
 /* nivel: seis botones siempre visibles; los niveles sin tableros llevan «pronto» a mano */
@@ -209,6 +211,7 @@
     <div class="nav__actions">
       <div class="nav__idioma" data-selector-idioma></div>
       <span class="nav__user" data-nombre></span>
+      <a class="nav__entrar nav__estudiantes" href="estudiantes.html" data-i18n="nav.estudiantes">Estudiantes</a>
       <a class="nav__entrar" href="entrar.html" data-entrar hidden data-i18n="cat.publico.entrar">Entrar</a>
       <button class="btn btn--secondary btn--sm" type="button" data-salir hidden data-i18n="nav.salir">Salir</button>
       <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.abrirMenu" data-txt-abrir="Menú" data-txt-cerrar="Cerrar" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir="nav.menu" data-i18n-txt-cerrar="nav.cerrar" data-i18n-txt-abrir-aria="nav.abrirMenu" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><span data-i18n="nav.menu">Menú</span></button>
@@ -220,6 +223,7 @@
   <a href="admin.html" data-solo-admin hidden data-i18n="nav.solicitudes">Solicitudes</a>
   <a href="suscripcion.html" data-solo-publico hidden data-i18n="nav.suscripcion">Suscripción</a>
   <a href="./" data-i18n="nav.inicio">Inicio</a>
+  <a class="sheet__sec" href="estudiantes.html" data-i18n="nav.estudiantes_largo">Soy estudiante</a>
   <a href="entrar.html" data-entrar hidden data-i18n="cat.publico.entrar">Entrar</a>
   <button class="btn btn--secondary" type="button" data-salir hidden data-i18n="nav.salir">Salir</button>
 </div>
@@ -231,8 +235,8 @@
     <div data-contenido hidden>
       <div class="app__head">
         <div>
-          <h1 data-i18n="cat.titulo">Catálogo de tableros</h1>
-          <p class="lead" data-saludo>Elige el idioma que enseñas y filtra por nivel.</p>
+          <h1 data-i18n="cat.titulo">Una clase lista para cada tema</h1>
+          <p class="lead" data-saludo hidden></p>
         </div>
         <div class="app__cta" data-solo-publico hidden>
           <a class="btn btn--primary" href="suscripcion.html"><span data-i18n="cat.publico.cta">Ver la suscripción</span><svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -285,6 +289,8 @@
   </div>
 </main>
 
+<p class="aviso" role="status" aria-live="polite" data-aviso></p>
+
 <template id="tpl-vacio">
   <div class="vacio">
     <div class="photo"><img alt="" width="1100" height="733" loading="lazy"></div>
@@ -296,11 +302,12 @@
   </div>
 </template>
 
-<script src="assets/catalogo.js"></script>
-<script src="vista/vistas.js"></script>
-<script src="assets/site.js"></script>
-<script src="assets/fb.js"></script>
-<script src="assets/auth.js"></script>
+<script src="assets/catalogo.js?v=2026111801"></script>
+<script src="vista/vistas.js?v=2026111801"></script>
+<script src="practica/indice.js?v=2026111801"></script>
+<script src="assets/site.js?v=2026111801"></script>
+<script src="assets/fb.js?v=2026111801"></script>
+<script src="assets/auth.js?v=2026111801"></script>
 <script>
 (() => {
   'use strict';
@@ -337,15 +344,15 @@
   document.querySelectorAll('[data-salir]').forEach(b => b.addEventListener('click', async () => { await LA.salir().catch(() => {}); location.replace('./'); }));
   const enlace = h => (window.LAi18n ? LAi18n.enlace(h) : h);
 
-  /* modo: 'profe' (suscripción activa: «Abrir») o 'publico' (visitantes: «Ver vista previa» y «Desbloquear») */
+  /* modo: 'profe' (suscripción activa: «Abrir») o 'publico' (visitantes: «Ver vista previa»; la suscripción, arriba).
+     En los dos, «Tarea» copia el enlace de práctica del estudiante si el tablero la tiene. */
   let mostrado = false, nombrePila = '', modo = null, haySesion = false;
   let nTarjeta = 0;   /* tarjetas pintadas: las 3 primeras fotos cargan sin «lazy» (declarado antes del primer pintar()) */
   function saludar() {
     const s = $('[data-saludo]');
-    if (modo === 'publico') { s.textContent = tr('cat.publico.saludo', 'Mira cómo empieza cada clase en la vista previa. Los tableros completos se abren con la suscripción.'); return; }
-    s.textContent = nombrePila
-      ? fmt(tr('cat.saludoNombre', 'Hola, {nombre}. Elige el idioma que enseñas y filtra por nivel.'), { nombre: nombrePila })
-      : tr('cat.saludo', 'Elige el idioma que enseñas y filtra por nivel.');
+    if (modo === 'publico') s.textContent = tr('cat.publico.saludo', 'La vista previa muestra cómo empieza cada clase; la suscripción abre el tablero completo.');
+    else s.textContent = nombrePila ? fmt(tr('cat.saludoNombre', 'Hola, {nombre}.'), { nombre: nombrePila }) : tr('cat.saludo', '');
+    s.hidden = !s.textContent;
   }
   function ponerModo(m) {
     const cambia = m !== modo;
@@ -400,7 +407,8 @@
   ['nivel', 'consignas', 'publico', 'texto'].forEach(k => { if (url.get(k)) form.elements[k].value = url.get(k); });
   if (url.get('vivo') === '1') form.elements.vivo.checked = true;
 
-  /* Rango de cada idioma: siempre A1–C2; los niveles que aún no tienen tableros se marcan «pronto» */
+  /* Rango de cada idioma: siempre A1–C2; los niveles que aún no tienen tableros se marcan «pronto».
+     No se muestran cantidades de tableros: solo «En preparación» cuando un idioma aún no tiene ninguno. */
   const NIV = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
   const listaNiveles = arr => {
     try { return new Intl.ListFormat(lang(), { style: 'long', type: 'conjunction' }).format(arr); }
@@ -409,7 +417,10 @@
   function cuentas() {
     ['es', 'en', 'pt'].forEach(i => {
       const deI = C.filter(t => t.idioma === i);
-      $('[data-cuenta-idioma="' + i + '"]').textContent = deI.length ? nTableros(deI.length) : tr('cat.enPreparacion', 'En preparación');
+      const cuenta = $('[data-cuenta-idioma="' + i + '"]');
+      cuenta.textContent = deI.length ? '' : tr('cat.enPreparacion', 'En preparación');
+      cuenta.hidden = !!deI.length;
+      if (cuenta.previousSibling && cuenta.previousSibling.nodeType === 3) cuenta.previousSibling.textContent = deI.length ? '' : ' · ';
       const faltan = deI.length ? NIV.filter(n => !deI.some(t => t.nivel === n)) : [];
       $('[data-rango-idioma="' + i + '"]').textContent = tr('cat.rango', 'A1–C2') +
         (faltan.length ? ' (' + fmt(tr('cat.rangoPronto', '{niveles}, pronto'), { niveles: listaNiveles(faltan) }) + ')' : '');
@@ -454,10 +465,37 @@
     ninos: '<svg class="tag__ico" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.3l-3.8 2 .7-4.3-3.1-3 4.3-.6z"></path></svg>',
     adultos: '<svg class="tag__ico" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5" r="3"></circle><path d="M2.5 14c.6-2.6 2.8-4 5.5-4s4.9 1.4 5.5 4"></path></svg>'
   };
-  /* Lucide (ISC): arrow-right, eye y lock */
+  /* Lucide (ISC): arrow-right, eye, clipboard-copy y check */
   const ICO_ABRIR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
   const ICO_VISTA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>';
-  const ICO_CANDADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  const ICO_TAREA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M16 4h2a2 2 0 0 1 2 2v4"/><path d="M21 14H11"/><path d="m15 10-4 4 4 4"/></svg>';
+  const ICO_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+  /* tableros con práctica para el estudiante (practica/indice.js); sin ese archivo, ninguna tarjeta ofrece «Tarea» */
+  const PRACTICA = () => new Set(Array.isArray(window.PRACTICA_INDICE) ? window.PRACTICA_INDICE : []);
+  const URL_TAREA = n => 'https://linguasacademy.github.io/estudiantes.html?t=' + encodeURIComponent(n);
+
+  /* «Enlace copiado»: un aviso breve abajo, que también lee el lector de pantalla */
+  let tAviso = 0;
+  function avisar(texto, ok) {
+    const a = $('[data-aviso]');
+    if (!a) return;
+    a.innerHTML = ok ? ICO_OK : '';
+    a.appendChild(document.createTextNode(texto));
+    a.setAttribute('data-on', '');
+    clearTimeout(tAviso);
+    tAviso = setTimeout(() => a.removeAttribute('data-on'), ok ? 2000 : 6000);
+  }
+  function copiar(texto) {
+    if (navigator.clipboard && window.isSecureContext !== false) return navigator.clipboard.writeText(texto);
+    return new Promise((ok, mal) => {
+      const ta = document.createElement('textarea');
+      ta.value = texto; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      let hecho = false; try { hecho = document.execCommand('copy'); } catch (e) {}
+      ta.remove(); hecho ? ok() : mal(new Error('copiar'));
+    });
+  }
+
   /* vistas previas publicadas (vista/<nombre>.html), según vista/vistas.js */
   const VISTAS = new Set(Array.isArray(window.VISTAS) ? window.VISTAS : []);
 
@@ -564,10 +602,19 @@
       } else {
         acc.append(accion('span', 't__accion--pronto', '', tr('cat.vistaPronto', 'Vista previa pronto')));
       }
-      const des = accion('a', 't__accion--sec', ICO_CANDADO, tr('cat.desbloquear', 'Desbloquear'));
-      des.href = enlace('suscripcion.html');
-      des.title = tr('cat.desbloquearAria', 'Desbloquear con la suscripción');
-      acc.append(des);
+    }
+    if (PRACTICA().has(nombreT)) {
+      const tarea = accion('button', 't__accion--tarea', ICO_TAREA, tr('cat.tarea', 'Tarea'));
+      tarea.type = 'button';
+      tarea.querySelector('.visually-hidden').textContent = ': ' + tr('cat.tareaAria', 'Copiar el enlace de la tarea') + ', ' + t.titulo;
+      tarea.title = tr('cat.tareaAria', 'Copiar el enlace de la tarea');
+      tarea.dataset.tarea = nombreT;
+      tarea.addEventListener('click', () => {
+        const url = URL_TAREA(nombreT);
+        copiar(url).then(() => avisar(tr('cat.copiado', 'Enlace copiado'), true))
+          .catch(() => avisar(fmt(tr('cat.copiarFallo', 'Copia este enlace: {url}'), { url }), false));
+      });
+      acc.append(tarea);
     }
     art.appendChild(acc);
     return art;
@@ -595,8 +642,8 @@
       const img = v.querySelector('img'), cfg = VACIO[idioma];
       img.src = cfg.img + '-1100.jpg'; img.srcset = cfg.img + '-600.jpg 600w, ' + cfg.img + '-1100.jpg 1100w'; img.sizes = '(max-width: 1023px) 100vw, 48vw'; img.alt = tr(cfg.alt[0], cfg.alt[1]);
       v.querySelector('h2').textContent = fmt(tr('cat.vacio.titulo', 'Tableros de {idioma} en preparación'), { idioma: idiomaNombre(idioma) });
-      v.querySelector('.lead').textContent = fmt(tr('cat.vacio.texto', 'Aparecerán aquí, ordenados por nivel, en cuanto estén listos. Mientras tanto, {n} tableros de español tienen las consignas en {idioma}.'),
-        { n: C.filter(t => t.idioma === 'es' && t.consignas === idioma).length, idioma: idiomaNombre(idioma) });
+      v.querySelector('.lead').textContent = fmt(tr('cat.vacio.texto', 'Aparecerán aquí, ordenados por nivel, en cuanto estén listos. Mientras tanto, hay tableros de español con las consignas en {idioma}.'),
+        { idioma: idiomaNombre(idioma) });
       const ir = v.querySelector('[data-a-espanol]');
       ir.textContent = fmt(tr('cat.vacio.boton', 'Ver los de español con consignas en {idioma}'), { idioma: idiomaNombre(idioma) });
       ir.addEventListener('click', () => { const antes = idioma; idioma = 'es'; form.reset(); form.elements.consignas.value = antes; pintar(); $('#i-es').focus(); });
@@ -616,8 +663,9 @@
     );
     const filtrando = !!(f.nivel || f.consignas || f.publico || f.vivo || txt);
     $('[data-limpiar]').hidden = !filtrando;
-    $('[data-resumen]').textContent = hay.length === 1 ? nTableros(1)
-      : filtrando ? fmt(tr('cat.nConFiltros', '{n} tableros con estos filtros'), { n: hay.length }) : nTableros(hay.length);
+    /* el número solo aparece como resultado de una búsqueda o un filtro */
+    $('[data-resumen]').textContent = !filtrando ? '' : hay.length === 1 ? nTableros(1)
+      : fmt(tr('cat.nConFiltros', '{n} tableros con estos filtros'), { n: hay.length });
 
     const soloOtros = !!(f.consignas || f.publico || f.vivo || txt);
     const nivelVacio = f.nivel && !delIdioma.some(t => t.nivel === f.nivel);
@@ -641,7 +689,6 @@
         s.querySelector('.label').textContent = tr('cat.pronto', 'pronto');
         s.querySelector('.lista').replaceWith(pronto(n));
       } else {
-        s.querySelector('.label').textContent = nTableros(deN.length);
         const l = s.querySelector('.lista'); deN.forEach(t => l.appendChild(tarjeta(t)));
       }
       lista.appendChild(s);

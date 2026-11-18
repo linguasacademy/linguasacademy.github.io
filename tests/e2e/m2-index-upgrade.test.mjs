@@ -87,7 +87,7 @@ test('M2: Asset & reference integrity in index.html and assets/site.css (srcset,
   assert.equal(/\.idiomas\s*\{/.test(siteCss), false, 'assets/site.css must NOT define .idiomas layout rules');
 });
 
-test('M2: UI sections in index.html (hero composite, no board counts, #muestras previews, #clase 1-2-3, .lugar & .idiomas)', () => {
+test('M2: UI sections in index.html (hero composite with two doors, no board counts, no repeated sections or photos, #muestras, #clase 1-2-3)', () => {
   const { html } = extractInlineScript('index.html');
   const env = createBrowserEnv({ url: 'https://linguasacademy.github.io/index.html', html });
   const doc = env.document;
@@ -117,15 +117,31 @@ test('M2: UI sections in index.html (hero composite, no board counts, #muestras 
   assert.doesNotMatch(doc.querySelector('main').textContent, /\b\d+\s+tableros\b/, 'No board counts on the home page');
   assert.doesNotMatch(html, /\bgratis\b/i, 'Nothing is offered as «gratis»');
 
-  // #muestras: previews that unlock with the subscription
+  // Two doors in the hero: teachers (sample lesson) and students (estudiantes.html); also in the header and the sheet
+  const puertas = doc.querySelectorAll('.hero .puertas .puerta');
+  assert.equal(puertas.length, 2, 'Expected two doors in the hero');
+  assert.equal(puertas[0].querySelector('a.btn--primary').getAttribute('href'), '#muestras');
+  assert.equal(puertas[1].querySelector('a.btn').getAttribute('href'), 'estudiantes.html');
+  assert.ok(doc.querySelector('.nav a[href="estudiantes.html"]'), 'Header links to the student door');
+  assert.ok(doc.querySelector('#menu a[href="estudiantes.html"]'), 'Mobile sheet links to the student door');
+
+  // #muestras: one section of boards-as-places (the old «lugares» showcase and language cards were merged into it)
   const muestras = doc.querySelectorAll('#muestras .muestra[data-vista]');
   assert.equal(muestras.length, 4, 'Expected 4 preview cards in #muestras');
   for (const m of muestras) {
     const link = m.querySelector('[data-vista-link]');
     assert.equal(link.getAttribute('data-vista-link'), 'vista/' + m.dataset.vista + '.html');
     assert.ok(m.querySelector('[data-vista-pronto]'));
-    assert.equal(m.querySelector('.muestra__lock').getAttribute('href'), 'suscripcion.html');
+    assert.ok(m.querySelector('.muestra__lugar.mano'), 'Each preview card names its place in handwriting');
+    assert.equal(m.querySelector('.muestra__lock'), null, 'No per-card subscription link: the closing section has the only one');
   }
+  assert.equal(doc.querySelectorAll('.lugar').length, 0, 'The «lugares» showcase repeated the previews: it stays merged');
+  assert.equal(doc.querySelectorAll('.idioma-card').length, 0, 'Language cards repeated the catalog tabs');
+  assert.equal(doc.querySelector('#muestras a[href="tableros.html"]') !== null, true, 'One link to the full catalog');
+
+  // No Unsplash photo is used twice on the home page
+  const fotos = [...doc.querySelectorAll('main img')].map(i => i.getAttribute('src').split('?')[0]);
+  assert.equal(new Set(fotos).size, fotos.length, 'Each photo appears once on the home page');
 
   // #clase: 3 numbered tactile cards (1, 2, 3) with .momento__ui
   const momentos = doc.querySelectorAll('#clase .momento');
@@ -137,22 +153,8 @@ test('M2: UI sections in index.html (hero composite, no board counts, #muestras 
     assert.ok(card.querySelector('.momento__ui'), `Card ${idx + 1} missing .momento__ui`);
   });
 
-  // .lugar showcase cards with .tag and .tag--live
-  const lugares = doc.querySelectorAll('#tableros .lugar');
-  assert.equal(lugares.length, 5, 'Expected 5 .lugar showcase cards');
-  assert.equal(doc.querySelectorAll('#tableros .lugar .tag').length >= 5, true);
-  assert.equal(doc.querySelectorAll('#tableros .lugar .tag--live').length, 2, 'Expected 2 live showcase badges');
-
-  // .idiomas: Español links to the catalog; English and Portuguese are «Pronto»
-  const idiomaCards = doc.querySelectorAll('#tableros .idiomas .idioma-card');
-  assert.equal(idiomaCards.length, 3, 'Expected 3 language cards in .idiomas');
-  const esCard = doc.querySelector('#tableros .idiomas a.idioma-card[data-lang="es"]');
-  assert.ok(esCard, 'Español card must be an <a> link');
-  assert.equal(esCard.getAttribute('href'), 'tableros.html?idioma=es');
-  assert.match(esCard.textContent, /Español/);
-  assert.match(esCard.textContent, /A1–C2/);
-  assert.match(esCard.textContent, /›/);
-  assert.equal(doc.querySelectorAll('#tableros .idiomas .idioma-card--soon').length, 2);
+  // FAQ keeps only questions no other section answers
+  assert.equal(doc.querySelectorAll('#preguntas details').length, 4);
 
   // Closing call to action goes to the subscription page
   assert.equal(doc.querySelector('[data-cuenta-cierre]').getAttribute('href'), 'suscripcion.html');

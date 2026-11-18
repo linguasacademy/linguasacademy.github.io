@@ -22,6 +22,7 @@ NON_BOARD_HTML = {
     "404.html",
     "muestra.html",
     "suscripcion.html",
+    "estudiantes.html",
 }
 BOARD_NAME_RE = re.compile(r"^(en-|pt-)?[abc][12]-[a-z0-9]+(-[a-z0-9]+)*$")
 # Un cargador es pequeño y solo carga assets/abrir.js; un tablero original pesa
@@ -33,6 +34,7 @@ HTML_FILES_TO_CHECK = [
     "entrar.html",
     "admin.html",
     "404.html",
+    "estudiantes.html",
     "herramientas/cargador.html",
 ]
 IGNORED_PREFIXES = ("http://", "https://", "mailto:", "tel:", "data:", "javascript:", "#")
@@ -193,7 +195,7 @@ def check_js_syntax() -> list[str]:
         print("[NOTA] node no encontrado en PATH; se omite comprobación de sintaxis JS")
         return []
 
-    js_files = sorted(list(ROOT.glob("*.js")) + list((ROOT / "assets").rglob("*.js")))
+    js_files = sorted(list(ROOT.glob("*.js")) + list((ROOT / "assets").rglob("*.js")) + list((ROOT / "practica").rglob("*.js")))
     errors: list[str] = []
     for js_file in js_files:
         proc = subprocess.run(
@@ -247,6 +249,20 @@ def check_html_refs() -> list[str]:
     return errors
 
 
+def check_practica() -> list[str]:
+    """practica/datos/*.js cumplen el contrato y practica/indice.js está al día (herramientas/indice_practica.py)."""
+    if not (ROOT / "practica").is_dir():
+        return []
+    proc = subprocess.run([sys.executable, str(ROOT / "herramientas" / "indice_practica.py"), "--comprobar"],
+                          capture_output=True, text=True)
+    out = (proc.stdout or "").strip()
+    if out:
+        print(out)
+    if proc.returncode != 0:
+        return [l.strip(" -") for l in (proc.stderr or "").strip().splitlines() if l.strip() and not l.startswith("Errores")]
+    return []
+
+
 def main() -> int:
     errors: list[str] = []
     errors.extend(check_catalog_parity())
@@ -255,6 +271,7 @@ def main() -> int:
     errors.extend(check_database_rules())
     errors.extend(check_js_syntax())
     errors.extend(check_html_refs())
+    errors.extend(check_practica())
 
     if errors:
         print("\nErrores encontrados:", file=sys.stderr)
