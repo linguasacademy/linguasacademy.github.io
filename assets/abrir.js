@@ -103,14 +103,24 @@
       document.body.classList.add('con-sala');
     }
 
-    scripts.forEach(({ nodo, destino, antes }) => {
-      const s = document.createElement('script');
-      Array.from(nodo.attributes).forEach(a => s.setAttribute(a.name, a.value));
-      if (s.src) s.async = false;
-      else s.textContent = nodo.textContent;
-      if (antes && antes.parentNode === destino) destino.replaceChild(s, antes);
-      else destino.appendChild(s);
-    });
+    /* Los scripts se ejecutan EN ORDEN, esperando a que cargue cada uno con src antes de seguir.
+       Un script en línea insertado a mano se ejecuta al instante, mientras que uno con src tarda en
+       llegar: sin esta espera, el tablero arrancaba antes que vivo.js, no encontraba la sala y quedaba
+       en modo local (el estudiante podía navegar y nada se veía en tiempo real). */
+    (async () => {
+      for (const { nodo, destino, antes } of scripts) {
+        const s = document.createElement('script');
+        Array.from(nodo.attributes).forEach(a => s.setAttribute(a.name, a.value));
+        let listo = null;
+        if (s.src) {
+          s.async = false;
+          listo = new Promise(ok => { s.onload = ok; s.onerror = ok; setTimeout(ok, 15000); });
+        } else s.textContent = nodo.textContent;
+        if (antes && antes.parentNode === destino) destino.replaceChild(s, antes);
+        else destino.appendChild(s);
+        if (listo) await listo;
+      }
+    })();
   }
 
   async function principal() {

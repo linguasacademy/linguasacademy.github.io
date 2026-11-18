@@ -756,5 +756,96 @@
     pintar();
     if (SALA) sala().then(S => { if (S.profe && !S.cerrada) avisar('Sala abierta. Toca «Copiar enlace del estudiante» y pégalo en el chat de la clase.', 6000); }).catch(() => {});
   }
+
+  /* ---------- el estudiante no navega: solo el profe pasa de página ----------
+     Defensa propia de vivo.js, además de la que trae el tablero: oculta Anterior, Inicio,
+     Siguiente, Añadir y Vaciar, y frena las flechas ← → (salvo dentro de un campo de texto). */
+  const NAV_ALUMNO = '#bAnt,#bSig,#bInicio,#bEditar,#bVaciar,.vaciar,#bHecha,.reini,.editbar,.herr';
+  if (pareceAlumno() && typeof window.addEventListener === 'function') {
+    const st = document.createElement('style');
+    st.id = 'vivoAlumnoStyle';
+    st.textContent = NAV_ALUMNO.split(',').map(x => 'body ' + x).join(',') + '{display:none!important}' +
+      '.tabs button,.it,.flecha,.libro .nav button{pointer-events:none}';
+    (document.head || document.documentElement).appendChild(st);
+    window.addEventListener('click', e => {
+      if (CERRADA) return;
+      const t = e.target;
+      if (t && t.closest && t.closest(NAV_ALUMNO + ',.tabs button,.it')) frena(e);
+    }, true);
+    window.addEventListener('keydown', e => {
+      if (CERRADA || e.ctrlKey || e.metaKey || e.altKey || esCampo(e.target)) return;
+      if (/^(ArrowLeft|ArrowRight|PageUp|PageDown|Home|End)$/.test(e.key)) frena(e);
+    }, true);
+  }
+
+  /* ---------- punteros en vivo: el profe ve el del estudiante y el estudiante ve el del profe ----------
+     La posición viaja en la presencia de la sala como fracción (0–1) del área del tablero,
+     así coincide aunque las dos pantallas tengan tamaños distintos. */
+  function punteros() {
+    if (!SALA || typeof window.addEventListener !== 'function') return;
+    const area = () => document.getElementById('lamina') || document.querySelector('.lamina') || document.getElementById('escena') || document.querySelector('main') || document.body;
+    const st = document.createElement('style');
+    st.id = 'vivoPunteroStyle';
+    st.textContent =
+      '.vivoPtr{position:fixed;left:0;top:0;z-index:30;pointer-events:none;display:flex;align-items:flex-start;gap:2px;transition:transform .12s linear,opacity .2s;will-change:transform}' +
+      '.vivoPtr[hidden]{display:none}' +
+      '.vivoPtr svg{filter:drop-shadow(0 1px 1px #0006)}' +
+      '.vivoPtr span{margin-top:16px;font:700 12px/1 system-ui,sans-serif;color:#fff;padding:4px 8px;border-radius:9px;white-space:nowrap}' +
+      '@media (prefers-reduced-motion:reduce){.vivoPtr{transition:none}}';
+    (document.head || document.documentElement).appendChild(st);
+    const capas = new Map();
+    function capa(id, profe) {
+      let el = capas.get(id);
+      if (el) return el;
+      const color = profe ? '#C2533A' : '#1B7A88';
+      el = document.createElement('div');
+      el.className = 'vivoPtr';
+      el.setAttribute('aria-hidden', 'true');
+      el.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="' + color + '" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"><path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"/></svg><span style="background:' + color + '">' + (profe ? 'Profe' : 'Estudiante') + '</span>';
+      document.body.appendChild(el);
+      capas.set(id, el);
+      return el;
+    }
+    function pintar(peers) {
+      if (CERRADA) { capas.forEach(el => el.remove()); capas.clear(); return; }
+      const r = area().getBoundingClientRect();
+      const vistos = new Set();
+      (peers || []).forEach(p => {
+        if (p.isMe) return;
+        const c = p.presence && p.presence.cur;
+        if (!Array.isArray(c) || c.length !== 2) return;
+        vistos.add(p.peer);
+        const el = capa(p.peer, p.peer === 'P' || p.presence.rol === 'P');
+        el.hidden = false;
+        el.style.transform = 'translate(' + Math.round(r.left + c[0] * r.width) + 'px,' + Math.round(r.top + c[1] * r.height) + 'px)';
+      });
+      capas.forEach((el, id) => { if (!vistos.has(id)) el.hidden = true; });
+    }
+    window.claude.use('room').then(room => {
+      if (!room) return;
+      let ult = [];
+      room.onPeers(ch => { ult = ch.peers; pintar(ult); });
+      /* al desplazar o cambiar el tamaño, los punteros de los demás se recolocan */
+      const repintar = () => pintar(ult);
+      window.addEventListener('resize', repintar);
+      document.addEventListener('scroll', repintar, true);
+      let ultimoEnvio = 0, tFin = null, fuera = true;
+      window.addEventListener('pointermove', e => {
+        if (CERRADA) return;
+        const r = area().getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        const dentro = x >= -0.02 && x <= 1.02 && y >= -0.02 && y <= 1.02;
+        if (!dentro) { if (!fuera) { fuera = true; room.presence({ cur: null }).catch(() => {}); } return; }
+        fuera = false;
+        const ahora = Date.now();
+        clearTimeout(tFin);
+        const manda = () => { ultimoEnvio = Date.now(); room.presence({ cur: [Math.round(x * 1000) / 1000, Math.round(y * 1000) / 1000] }).catch(() => {}); };
+        if (ahora - ultimoEnvio >= 100) manda(); else tFin = setTimeout(manda, 100);
+      }, { passive: true });
+      document.addEventListener('mouseleave', () => { fuera = true; room.presence({ cur: null }).catch(() => {}); });
+    }).catch(() => {});
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', punteros); else punteros();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', chip); else chip();
 })();
