@@ -1,0 +1,58 @@
+/* Lingua's Academy · tokens del rediseño
+   Fuente única de colores, espacios, radios y sombras.
+   El sitio y los tableros cargan este archivo antes que su propio CSS.
+   Contrastes medidos (WCAG) sobre --crema salvo que se indique. */
+
+:root {
+  /* Paleta base */
+  --bosque: #1E3F2F;        /* texto principal 10.2:1; fondos de héroe y pie */
+  --crema: #F3F0E7;         /* fondo general */
+  --hueso: #FBFAF6;         /* tarjetas; texto sobre --bosque 11.1:1 */
+  --naranja: #D96C38;       /* relleno de botón principal y acentos (no para texto) */
+  --lima: #C6D86B;          /* bloques, etiquetas, figuras */
+  --cielo: #7EBFE9;         /* bloques informativos, «en vivo» */
+  --hoja: #5DB46B;          /* éxito y respuestas correctas (relleno) */
+
+  /* Variantes para texto pequeño (pasan 4.5:1) */
+  --naranja-texto: #A04A1C; /* enlaces y texto de acento: 5.3:1 */
+  --hoja-texto: #2F7A3C;    /* mensajes de éxito: 4.6:1 */
+  --error: #B03A2E;         /* mensajes de error: 5.3:1 */
+
+  /* Roles */
+  --fondo: var(--crema);
+  --superficie: var(--hueso);
+  --texto: var(--bosque);
+  --texto-2: rgba(30, 63, 47, .78);  /* texto secundario: 5.5:1 */
+  --linea: rgba(30, 63, 47, .14);
+  --linea-fuerte: rgba(30, 63, 47, .32);
+  --borde-campo: #6E7F75;            /* borde de campos: 4.1:1 sobre --hueso */
+  --foco: var(--naranja-texto);
+  --foco-oscuro: var(--lima);        /* foco sobre --bosque: 7.4:1 */
+  --accion: var(--naranja);
+  --sobre-accion: var(--bosque);     /* texto en botón naranja: 3.4:1, solo ≥18.66px negrita */
+  --oscuro: var(--bosque);
+  --sobre-oscuro: var(--hueso);
+
+  /* Espacios: escala de 4 px */
+  --e-1: 4px;
+  --e-2: 8px;
+  --e-3: 12px;
+  --e-4: 16px;
+  --e-5: 24px;
+  --e-6: 32px;
+  --e-7: 48px;
+  --e-8: 64px;
+  --e-9: 96px;
+
+  /* Radios */
+  --radio-s: 8px;
+  --radio-m: 12px;
+  --radio-l: 20px;
+  --radio-pildora: 999px;
+
+  /* Sombras: planas, tinte bosque, sin difuminado excesivo */
+  --sombra-1: 0 1px 0 rgba(30, 63, 47, .06);
+  --sombra-2: 0 2px 0 rgba(30, 63, 47, .08), 0 12px 24px -18px rgba(30, 63, 47, .45);
+  --sombra-3: 0 3px 0 rgba(30, 63, 47, .10), 0 24px 44px -26px rgba(30, 63, 47, .55);
+  --sombra-bloque: 4px 4px 0 var(--bosque); /* sombra sólida del estilo plano */
+}
