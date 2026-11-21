@@ -1,0 +1,93 @@
+/* Lingua's Academy · tokens del rediseño
+   Fuente única de colores, espacios, radios y sombras.
+   El sitio y los tableros cargan este archivo antes que su propio CSS.
+   Contrastes medidos (WCAG) sobre --blanco salvo que se indique. */
+
+:root {
+  /* Paleta base */
+  --bosque: #1E3F2F;        /* texto principal 11.6:1; fondos de héroe y pie */
+  --blanco: #FFFFFF;        /* fondo general */
+  --crema: #F3F0E7;         /* bandas alternas y bloques suaves */
+  --hueso: #FBFAF6;         /* tarjetas; texto sobre --bosque 11.1:1 */
+  --naranja: #D96C38;       /* relleno de botón principal y acentos (no para texto) */
+  --lima: #C6D86B;          /* bloques, etiquetas, figuras */
+  --cielo: #7EBFE9;         /* bloques informativos, «en vivo» */
+  --hoja: #5DB46B;          /* éxito y respuestas correctas (relleno) */
+
+  /* Variantes para texto pequeño (pasan 4.5:1) */
+  --naranja-texto: #A04A1C; /* enlaces y texto de acento: 6.0:1 */
+  --hoja-texto: #2F7A3C;    /* mensajes de éxito: 5.3:1 */
+  --error: #B03A2E;         /* mensajes de error: 6.0:1 */
+
+  /* Roles */
+  --fondo: var(--blanco);
+  --fondo-alterno: var(--crema);
+  --superficie: var(--blanco);       /* tarjetas: se separan del fondo con --linea y sombra */
+  --texto: var(--bosque);
+  --texto-2: rgba(30, 63, 47, .78);  /* texto secundario: 6.0:1 */
+  --linea: rgba(30, 63, 47, .14);
+  --linea-fuerte: rgba(30, 63, 47, .32);
+  --borde-campo: #6E7F75;            /* borde de campos: 4.2:1 */
+  --foco: var(--naranja-texto);
+  --foco-oscuro: var(--lima);        /* foco sobre --bosque: 7.4:1 */
+  --accion: var(--naranja);
+  --sobre-accion: var(--bosque);     /* texto en botón naranja: 3.4:1, solo ≥18.66px negrita */
+  --oscuro: var(--bosque);
+  --sobre-oscuro: var(--hueso);
+
+  /* Tipografías (se conservan las actuales) */
+  --f-titulo: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+  --f-texto: 'Schibsted Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --f-mano: 'Caveat', 'Segoe Print', cursive; /* frases a mano, peso 600, solo tamaños grandes */
+
+  /* Escala de texto: mismos tamaños que usa hoy site.css, para que nada cambie al migrar */
+  --t-h1: clamp(42px, 3.4vw + 18px, 78px);   /* título de portada, uno por página */
+  --t-h2: clamp(32px, 1.9vw + 20px, 54px);   /* título de sección */
+  --t-h3: clamp(22px, .6vw + 18px, 28px);    /* título de tarjeta */
+  --t-lead: clamp(18px, .35vw + 16px, 21px); /* entradilla bajo un título */
+  --t-body: 17px;                            /* texto corrido; 16px en móvil */
+  --t-small: 15px;                           /* notas y texto de apoyo */
+  --t-label: 13px;                           /* etiquetas mono; nada más pequeño */
+  --t-mano: clamp(26px, 1.4vw + 20px, 40px); /* frase a mano en Caveat 600 */
+
+  /* Interlineado */
+  --lh-titulo: 1.04;   /* h1 y h2 */
+  --lh-subtitulo: 1.15;/* h3 */
+  --lh-texto: 1.55;    /* texto corrido y entradilla */
+  --lh-etiqueta: 1.3;  /* etiquetas y botones */
+
+  /* Pesos y espaciado de letras */
+  --peso-titulo: 400;  /* Newsreader se usa ligera; el tamaño da la jerarquía */
+  --peso-texto: 400;
+  --peso-fuerte: 600;  /* énfasis y botones */
+  --tracking-titulo: -.018em;
+  --tracking-etiqueta: .04em;
+
+  /* Espacios: escala de 4 px */
+  --e-1: 4px;
+  --e-2: 8px;
+  --e-3: 12px;
+  --e-4: 16px;
+  --e-5: 24px;
+  --e-6: 32px;
+  --e-7: 48px;
+  --e-8: 64px;
+  --e-9: 96px;
+
+  /* Radios */
+  --radio-s: 8px;
+  --radio-m: 12px;
+  --radio-l: 20px;
+  --radio-pildora: 999px;
+
+  /* Sombras: planas, tinte bosque, sin difuminado excesivo */
+  --sombra-1: 0 1px 0 rgba(30, 63, 47, .06);
+  --sombra-2: 0 2px 0 rgba(30, 63, 47, .08), 0 12px 24px -18px rgba(30, 63, 47, .45);
+  --sombra-3: 0 3px 0 rgba(30, 63, 47, .10), 0 24px 44px -26px rgba(30, 63, 47, .55);
+  --sombra-bloque: 4px 4px 0 var(--bosque); /* sombra sólida del estilo plano */
+}
+
+@media (max-width: 639px) {
+  :root { --t-body: 16px; }
+}
