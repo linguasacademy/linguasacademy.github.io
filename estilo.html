@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Guía de estilo · Lingua's Academy</title>
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&family=Caveat:wght@500;600&display=swap">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/componentes.css">
+<style>
+/* Solo para maquetar esta guía */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--fondo); color: var(--texto); font: var(--peso-texto) var(--t-body)/var(--lh-texto) var(--f-texto); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { margin: 0; font-family: var(--f-titulo); font-weight: var(--peso-titulo); letter-spacing: var(--tracking-titulo); text-wrap: balance; }
+h1 { font-size: var(--t-h1); line-height: var(--lh-titulo); }
+h2 { font-size: var(--t-h2); line-height: var(--lh-titulo); }
+h3 { font-size: var(--t-h3); line-height: var(--lh-subtitulo); }
+p { margin: 0; text-wrap: pretty; }
+code, .mono { font: 500 var(--t-label)/var(--lh-etiqueta) var(--f-mono); }
+.envoltura { max-width: 1120px; margin: 0 auto; padding: 0 var(--e-5); }
+@media (max-width: 639px) { .envoltura { padding: 0 var(--e-4); } }
+.cabecera { padding: var(--e-4) 0; border-bottom: 1px solid var(--linea); }
+.cabecera .envoltura { display: flex; align-items: center; justify-content: space-between; gap: var(--e-4); flex-wrap: wrap; }
+.heroe { position: relative; overflow: hidden; background: var(--oscuro); color: var(--sobre-oscuro); padding: var(--e-8) 0 var(--e-9); }
+.heroe .envoltura { position: relative; z-index: 1; }
+.heroe p { max-width: 34em; margin-top: var(--e-4); font-size: var(--t-lead); }
+.mano { display: block; margin-top: var(--e-3); font: 600 var(--t-mano)/1.1 var(--f-mano); color: var(--lima); transform: rotate(-2deg); transform-origin: left; }
+.seccion { padding: var(--e-8) 0; }
+.seccion--alterna { background: var(--fondo-alterno); }
+.seccion > .envoltura > p.intro { max-width: 38em; margin: var(--e-3) 0 var(--e-6); color: var(--texto-2); }
+.rejilla { display: grid; gap: var(--e-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+.rejilla--colores { grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); }
+.rejilla--ancha { grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+.muestra { border: 1px solid var(--linea); border-radius: var(--radio-m); overflow: hidden; background: var(--superficie); }
+.muestra__color { height: 88px; }
+.muestra__datos { padding: var(--e-3) var(--e-4); display: grid; gap: 2px; font-size: var(--t-small); }
+.muestra__datos b { font-weight: var(--peso-fuerte); font-size: var(--t-body); }
+.muestra__datos span { color: var(--texto-2); }
+.fila { display: flex; flex-wrap: wrap; gap: var(--e-4); align-items: center; }
+.bloque-sub { margin-top: var(--e-7); }
+.bloque-sub h3 { margin-bottom: var(--e-4); }
+.tipo { display: grid; gap: 4px; padding: var(--e-4) 0; border-bottom: 1px solid var(--linea); }
+.tipo .mono { color: var(--texto-2); }
+.panel-oscuro { background: var(--oscuro); color: var(--sobre-oscuro); border-radius: var(--radio-l); padding: var(--e-5); }
+.logo-caja { display: grid; place-items: center; min-height: 160px; padding: var(--e-5); border-radius: var(--radio-l); border: 1px solid var(--linea); background: var(--blanco); }
+.logo-caja--oscura { background: var(--oscuro); border-color: var(--oscuro); }
+.logo-caja img { max-width: 100%; height: auto; }
+.pie-logo { display: flex; justify-content: space-between; gap: var(--e-2); margin-top: var(--e-2); font-size: var(--t-small); color: var(--texto-2); }
+.pie-logo a { color: var(--naranja-texto); }
+.formulario { display: grid; gap: var(--e-5); max-width: 440px; }
+.figuras { display: flex; flex-wrap: wrap; gap: var(--e-6); align-items: flex-end; }
+.figuras figure { margin: 0; display: grid; gap: var(--e-2); justify-items: center; }
+.figuras figcaption { font: 500 var(--t-label)/1 var(--f-mono); color: var(--texto-2); }
+.pie { background: var(--oscuro); color: var(--sobre-oscuro); padding: var(--e-6) 0; font-size: var(--t-small); }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="envoltura">
+    <a class="marca" href="./"><img src="assets/logo/logo-animado.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <span class="etiqueta etiqueta--simple">Guía de estilo</span>
+  </div>
+</header>
+
+<section class="heroe oscuro" aria-labelledby="t-guia">
+  <span class="figura figura--abanico figura--absoluta" style="--c: var(--naranja); --t: 260px; right: -30px; top: 24px" aria-hidden="true"></span>
+  <span class="figura figura--hexagono figura--absoluta" style="--c: var(--hoja); --t: 110px; right: 240px; bottom: -36px" aria-hidden="true"></span>
+  <div class="envoltura">
+    <h1 id="t-guia">Guía de estilo</h1>
+    <span class="mano">para el sitio y los tableros</span>
+    <p>Todo sale de dos archivos: <code>tokens.css</code> (colores, letras, espacios) y <code>componentes.css</code> (piezas). Una página o un tablero nuevo carga los dos y usa estas clases.</p>
+    <div class="btn-row" style="margin-top: var(--e-5)">
+      <a class="btn btn--primary" href="#componentes">Ver componentes</a>
+      <a class="btn btn--secondary" href="#logo">Descargar el logo</a>
+    </div>
+  </div>
+</section>
+
+<main>
+
+<section class="seccion" id="logo" aria-labelledby="t-logo">
+  <div class="envoltura">
+    <h2 id="t-logo">Logo</h2>
+    <p class="intro">El logo completo va en cabeceras; el pájaro solo, en espacios pequeños. Sobre verde bosque se usa la versión oscura. Alrededor del logo se deja libre al menos la mitad de su altura.</p>
+    <div class="rejilla rejilla--ancha">
+      <div><div class="logo-caja"><img src="assets/logo/logo-completo.svg" alt="Logo completo" width="300"></div><p class="pie-logo"><span>Completo</span><a href="assets/logo/logo-completo.svg" download>SVG</a></p></div>
+      <div><div class="logo-caja logo-caja--oscura"><img src="assets/logo/logo-completo-oscuro.svg" alt="Logo completo para fondo oscuro" width="300"></div><p class="pie-logo"><span>Completo, fondo oscuro</span><a href="assets/logo/logo-completo-oscuro.svg" download>SVG</a></p></div>
+      <div><div class="logo-caja"><img src="assets/logo/logo-completo-mono.svg" alt="Logo completo en una tinta" width="300"></div><p class="pie-logo"><span>Completo, una tinta</span><a href="assets/logo/logo-completo-mono.svg" download>SVG</a></p></div>
+    </div>
+    <div class="rejilla" style="margin-top: var(--e-5)">
+      <div><div class="logo-caja"><img src="assets/logo/nuevo/logo.svg" alt="Pájaro" width="110" height="110"></div><p class="pie-logo"><span>Pájaro</span><a href="assets/logo/nuevo/logo.svg" download>SVG</a></p></div>
+      <div><div class="logo-caja logo-caja--oscura"><img src="assets/logo/logo-oscuro.svg" alt="Pájaro para fondo oscuro" width="110" height="110"></div><p class="pie-logo"><span>Fondo oscuro</span><a href="assets/logo/logo-oscuro.svg" download>SVG</a></p></div>
+      <div><div class="logo-caja"><img src="assets/logo/logo-mono.svg" alt="Pájaro en una tinta" width="110" height="110"></div><p class="pie-logo"><span>Una tinta</span><a href="assets/logo/logo-mono.svg" download>SVG</a></p></div>
+      <div><div class="logo-caja"><div class="fila"><img src="assets/logo/favicon-32.png" alt="Ícono a 32 píxeles" width="32" height="32"><img src="assets/logo/apple-touch-icon.png" alt="Ícono para celular" width="60" height="60" style="border-radius: 14px"></div></div><p class="pie-logo"><span>Ícono de pestaña y celular</span><a href="assets/logo/icono-512.png" download>PNG</a></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion seccion--alterna" aria-labelledby="t-color">
+  <div class="envoltura">
+    <h2 id="t-color">Color</h2>
+    <p class="intro">El texto va en verde bosque sobre blanco o crema, o en blanco hueso sobre verde bosque. Naranja, lima, cielo y hoja son rellenos y figuras; para texto pequeño se usan sus tonos oscuros.</p>
+    <div class="rejilla rejilla--colores">
+      <div class="muestra"><div class="muestra__color" style="background: var(--bosque)"></div><div class="muestra__datos"><b>Verde bosque</b><code>--bosque · #1E3F2F</code><span>Texto, héroe y pie</span></div></div>
+      <div class="muestra"><div class="muestra__color" style="background: var(--blanco); border-bottom: 1px solid var(--linea)"></div><div class="muestra__datos"><b>Blanco</b><code>--blanco · #FFFFFF</code><span>Fondo general y tarjetas</span></div></div>
+      <div class="muestra"><div class="muestra__color" style="background: var(--crema)"></div><div class="muestra__datos"><b>Crema</b><code>--crema · #F3F0E7</code><span>Bandas alternas</span></div></div>
+      <div class="muestra"><div class="muestra__color" style="background: var(--hueso)"></div><div class="muestra__datos"><b>Blanco hueso</b><code>--hueso · #FBFAF6</code><span>Texto sobre verde bosque</span></div></div>
+      <div class="muestra"><div class="muestra__color" style="background: var(--naranja)"></div><div class="muestra__datos"><b>Naranja terracota</b><code>--naranja · #D96C38</code><span>Botón principal, acentos</span></div></div>
+      <div class="muestra"><div class="muestra__color" style="background: var(--lima)"></div><div class="muestra__datos"><b>Verde lima</b><code>--lima · #C6D86B</code><span>Bloques, foco sobre oscuro</span></div></div>
+      <div class="muestra"><div class="muestra__color" style="background: var(--cielo)"></div><div class="muestra__datos"><b>Azul cielo</b><code>--cielo · #7EBFE9</code><span>Información, «en vivo»</span></div></div>
+      <div class="muestra"><div class="muestra__color" style="background: var(--hoja)"></div><div class="muestra__datos"><b>Verde hoja</b><code>--hoja · #5DB46B</code><span>Éxito</span></div></div>
+      <div class="muestra"><div class="muestra__color" style="background: var(--naranja-texto)"></div><div class="muestra__datos"><b>Naranja para texto</b><code>--naranja-texto · 6.0:1</code><span>Enlaces y foco</span></div></div>
+      <div class="muestra"><div class="muestra__color" style="background: var(--hoja-texto)"></div><div class="muestra__datos"><b>Verde para texto</b><code>--hoja-texto · 5.3:1</code><span>Mensajes de éxito</span></div></div>
+      <div class="muestra"><div class="muestra__color" style="background: var(--error)"></div><div class="muestra__datos"><b>Rojo error</b><code>--error · 6.0:1</code><span>Errores</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="seccion" aria-labelledby="t-letra">
+  <div class="envoltura">
+    <h2 id="t-letra">Letra</h2>
+    <p class="intro">Las cuatro tipografías de siempre. La jerarquía la da el tamaño, no el grosor.</p>
+    <div class="tipo"><span class="mono">Título · Newsreader · --t-h2</span><p style="font: var(--peso-titulo) var(--t-h2)/var(--lh-titulo) var(--f-titulo); letter-spacing: var(--tracking-titulo)">Aprender conversando</p></div>
+    <div class="tipo"><span class="mono">Subtítulo · Newsreader · --t-h3</span><p style="font: var(--peso-titulo) var(--t-h3)/var(--lh-subtitulo) var(--f-titulo)">Tableros listos para la clase</p></div>
+    <div class="tipo"><span class="mono">Texto · Schibsted Grotesk · --t-body</span><p>Abres un tablero, compartes el enlace y la clase empieza: actividades, juego y tarea en cincuenta minutos.</p></div>
+    <div class="tipo"><span class="mono">A mano · Caveat · --t-mano</span><p style="font: 600 var(--t-mano)/1.1 var(--f-mano); color: var(--naranja-texto)">para profes de español, inglés y portugués</p></div>
+    <div class="tipo"><span class="mono">Etiqueta · IBM Plex Mono · --t-label</span><p class="mono" style="letter-spacing: var(--tracking-etiqueta)">A1 · ESPAÑOL · 50 MIN</p></div>
+  </div>
+</section>
+
+<section class="seccion seccion--alterna" id="componentes" aria-labelledby="t-comp">
+  <div class="envoltura">
+    <h2 id="t-comp">Componentes</h2>
+
+    <div class="bloque-sub">
+      <h3>Botones</h3>
+      <div class="btn-row">
+        <a class="btn btn--primary" href="#componentes">Crear cuenta</a>
+        <a class="btn btn--secondary" href="#componentes">Ver tableros</a>
+        <a class="btn btn--ghost" href="#componentes">Cómo funciona</a>
+        <button class="btn btn--secondary" type="button" disabled>No disponible</button>
+      </div>
+      <div class="panel-oscuro oscuro btn-row" style="margin-top: var(--e-4)">
+        <a class="btn btn--primary" href="#componentes">Crear cuenta</a>
+        <a class="btn btn--secondary" href="#componentes">Ver tableros</a>
+        <a class="btn btn--ghost" href="#componentes">Cómo funciona</a>
+      </div>
+    </div>
+
+    <div class="bloque-sub">
+      <h3>Etiquetas de nivel</h3>
+      <div class="fila">
+        <span class="etiqueta" data-nivel="a1">A1</span>
+        <span class="etiqueta" data-nivel="a2">A2</span>
+        <span class="etiqueta" data-nivel="b1">B1</span>
+        <span class="etiqueta" data-nivel="b2">B2</span>
+        <span class="etiqueta" data-nivel="c1">C1</span>
+        <span class="etiqueta" data-nivel="c2">C2</span>
+        <span class="etiqueta etiqueta--vivo">En vivo</span>
+        <span class="etiqueta etiqueta--simple">Clase de prueba</span>
+      </div>
+    </div>
+
+    <div class="bloque-sub">
+      <h3>Tarjetas</h3>
+      <div class="rejilla rejilla--ancha">
+        <a class="tarjeta tarjeta--enlace" href="#componentes">
+          <div class="fila" style="gap: var(--e-2)"><span class="etiqueta" data-nivel="a1">A1</span><span class="etiqueta etiqueta--simple">Español</span></div>
+          <h4 class="tarjeta__titulo">Un café, por favor</h4>
+          <p class="tarjeta__texto">Pedir en una cafetería, preguntar precios y pagar.</p>
+          <div class="tarjeta__pie"><span class="mono" style="color: var(--texto-2)">50 min</span></div>
+        </a>
+        <a class="tarjeta tarjeta--enlace" href="#componentes">
+          <div class="fila" style="gap: var(--e-2)"><span class="etiqueta" data-nivel="b2">B2</span><span class="etiqueta etiqueta--simple">Español</span></div>
+          <h4 class="tarjeta__titulo">Se me fue el tren: excusas, accidentes y descuidos con nombres larguísimos</h4>
+          <p class="tarjeta__texto">El «se» accidental para contar lo que pasó sin culpar a nadie.</p>
+          <div class="tarjeta__pie"><span class="mono" style="color: var(--texto-2)">50 min</span></div>
+        </a>
+        <div class="tarjeta tarjeta--bloque">
+          <span class="etiqueta etiqueta--vivo">En vivo</span>
+          <h4 class="tarjeta__titulo">Tu clase de hoy</h4>
+          <p class="tarjeta__texto">Comparte el enlace con tu estudiante para empezar.</p>
+          <div class="tarjeta__pie"><a class="btn btn--primary btn--sm" href="#componentes">Abrir sala</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bloque-sub">
+      <h3>Avisos</h3>
+      <div style="display: grid; gap: var(--e-3); max-width: 640px">
+        <div class="aviso" role="status"><p><strong>Sala abierta.</strong> Tu estudiante entra con el enlace.</p></div>
+        <div class="aviso aviso--exito" role="status"><p><strong>Cuenta creada.</strong> Ya puedes abrir cualquier tablero.</p></div>
+        <div class="aviso aviso--atencion" role="status"><p><strong>Sin conexión.</strong> Los cambios se guardan cuando vuelva internet.</p></div>
+        <div class="aviso aviso--error" role="alert"><p><strong>No pudimos entrar.</strong> Revisa el correo y la contraseña.</p></div>
+      </div>
+    </div>
+
+    <div class="bloque-sub">
+      <h3>Formularios</h3>
+      <form class="formulario" onsubmit="return false" novalidate>
+        <div class="campo">
+          <label class="campo__etiqueta" for="g-nombre">Nombre</label>
+          <input class="campo__control" id="g-nombre" type="text" autocomplete="name">
+        </div>
+        <div class="campo campo--error">
+          <label class="campo__etiqueta" for="g-correo">Correo</label>
+          <input class="campo__control" id="g-correo" type="email" value="profe@" aria-invalid="true" aria-describedby="g-correo-error">
+          <p class="campo__error" id="g-correo-error">Falta el final del correo, por ejemplo @gmail.com</p>
+        </div>
+        <div class="campo">
+          <label class="campo__etiqueta" for="g-clave">Contraseña</label>
+          <input class="campo__control" id="g-clave" type="password" autocomplete="new-password" aria-describedby="g-clave-ayuda">
+          <p class="campo__ayuda" id="g-clave-ayuda">Al menos 8 caracteres.</p>
+        </div>
+        <div class="campo">
+          <label class="campo__etiqueta" for="g-nivel">Nivel</label>
+          <select class="campo__control" id="g-nivel"><option>A1</option><option>A2</option><option>B1</option><option>B2</option></select>
+        </div>
+        <fieldset class="grupo">
+          <legend>Idiomas que enseñas</legend>
+          <label class="opcion"><input type="checkbox" checked> Español</label>
+          <label class="opcion"><input type="checkbox"> Inglés</label>
+          <label class="opcion"><input type="checkbox"> Portugués</label>
+        </fieldset>
+        <div class="btn-row"><button class="btn btn--primary" type="submit">Crear cuenta</button></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="seccion" aria-labelledby="t-fig">
+  <div class="envoltura">
+    <h2 id="t-fig">Figuras</h2>
+    <p class="intro">Formas planas, sin degradados, para decorar héroes y tableros. Toman cualquier color de la paleta y siempre van detrás del texto.</p>
+    <div class="figuras">
+      <figure><span class="figura figura--hexagono" style="--c: var(--hoja)" aria-hidden="true"></span><figcaption>hexagono</figcaption></figure>
+      <figure><span class="figura figura--arco" style="--c: var(--naranja)" aria-hidden="true"></span><figcaption>arco</figcaption></figure>
+      <figure><span class="figura figura--abanico" style="--c: var(--cielo)" aria-hidden="true"></span><figcaption>abanico</figcaption></figure>
+      <figure><span class="figura figura--bloque" style="--c: var(--lima)" aria-hidden="true"></span><figcaption>bloque</figcaption></figure>
+      <figure><span class="figura figura--circulo" style="--c: var(--bosque)" aria-hidden="true"></span><figcaption>circulo</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie oscuro">
+  <div class="envoltura fila" style="justify-content: space-between">
+    <a class="marca" href="./"><img src="assets/logo/logo-oscuro.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <span>Guía interna. No aparece en buscadores.</span>
+  </div>
+</footer>
+
+</body>
+</html>
