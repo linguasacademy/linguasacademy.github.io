@@ -1,11 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 732 732" role="img" aria-label="Lingua's Academy">
-  <circle cx="366" cy="366" r="338" fill="#F8F8F8"/>
-  <circle cx="366" cy="366" r="338" fill="none" stroke="#6FC0AB" stroke-width="40"/>
-  <g transform="translate(338 382) scale(1.1) translate(-366 -380)">
-    <path d="M186 452 C158 404, 154 350, 178 302 C212 236, 286 190, 368 184 C408 181, 446 189, 472 199" fill="none" stroke="#1A6FAF" stroke-width="30" stroke-linecap="round"/>
-    <path d="M470 212 C420 194, 366 188, 322 196 C238 212, 176 268, 165 348 C158 402, 176 454, 212 488 C221 497, 223 506, 217 519 C207 543, 192 562, 185 572 C178 581, 184 590, 194 585 C233 570, 269 558, 303 556 L470 556 Z" fill="#14C49B"/>
-    <path d="M462 206 L628 322 L462 438 Z" fill="#F52323" stroke="#F52323" stroke-width="10" stroke-linejoin="round"/>
-    <circle cx="398" cy="282" r="25" fill="#111"/>
-    <circle cx="406" cy="274" r="7" fill="#fff"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="516 236 1184 1184" role="img" aria-label="Lingua's Academy">
+  <circle cx="1108" cy="828" r="557" fill="#FFFFFF"/>
+  <!-- cabeza -->
+  <path d="M1000 690C1050 590 1130 540 1215 540c90 0 160 60 175 150v170H1000z" fill="#FFFFFF"/>
+  <!-- cresta -->
+  <path d="M712 985C672 880 672 700 760 580 850 455 980 405 1110 405c170 0 290 95 315 235l-50 50c-20-90-85-145-165-145-90 0-160 55-210 145l-60 110-80 30z" fill="#EDB03B"/>
+  <path d="M768 945C738 850 738 705 805 610c65-90 150-135 250-145-95 45-160 130-162 235v90l-40 40z" fill="#FFFFFF"/>
+  <!-- segunda pluma de la cresta, en mostaza oscuro -->
+  <path d="M905 830C925 760 960 690 1010 620 1070 545 1140 517 1215 517c90 0 160 45 190 135" fill="none" stroke="#C99325" stroke-width="58"/>
+  <!-- cuerpo -->
+  <path d="M1405 690V860C1405 1100 1200 1272 990 1272C900 1272 820 1247 745 1197L895 997 1130 880C1255 905 1360 820 1375 690Z" fill="#2E8D73"/>
+  <!-- pico -->
+  <path d="M1425 640c75 10 130 60 135 125-50-15-100-5-125 75z" fill="#E96940"/>
+  <path d="M1432 742c50-8 95 0 128 23-50-15-100-5-125 75z" fill="#C85A3C"/>
+  <!-- contorno del pecho y la cola -->
+  <path d="M1405 670v190c0 240-205 412-415 412-90 0-170-25-245-75" fill="none" stroke="#1F4130" stroke-width="58" stroke-linecap="round"/>
+    <!-- ala -->
+  <path d="M655 1100 885 845c55-60 200-70 260 15 55 80 45 190-30 260-110 105-300 120-460-20z" fill="#2E8D73" stroke="#1F4130" stroke-width="58" stroke-linejoin="round"/>
+  <!-- ojo -->
+  <circle cx="1232" cy="680" r="66" fill="#1F4130"/>
+  <circle cx="1256" cy="646" r="22" fill="#FFFFFF"/>
+  <!-- aro -->
+  <circle cx="1108" cy="828" r="557" fill="none" stroke="#1F4130" stroke-width="60"/>
 </svg>
