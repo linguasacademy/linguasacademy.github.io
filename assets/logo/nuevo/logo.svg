@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="516 236 1184 1184" role="img" aria-label="Lingua's Academy">
+  <circle cx="1108" cy="828" r="557" fill="#FFFFFF"/>
+  <!-- cabeza -->
+  <path d="M1000 690C1050 590 1130 540 1215 540c90 0 160 60 175 150v170H1000z" fill="#FFFFFF"/>
+  <!-- cresta -->
+  <path d="M712 985C672 880 672 700 760 580 850 455 980 405 1110 405c170 0 290 95 315 235l-50 50c-20-90-85-145-165-145-90 0-160 55-210 145l-60 110-80 30z" fill="#EDB03B"/>
+  <path d="M768 945C738 850 738 705 805 610c65-90 150-135 250-145-95 45-160 130-162 235v90l-40 40z" fill="#FFFFFF"/>
+  <!-- cuerpo -->
+  <path d="M1405 690v170c0 240-205 412-415 412-60 0-120-12-170-35l40-180 300-120c110 20 200-60 215-170z" fill="#2E8D73"/>
+  <!-- pico -->
+  <path d="M1425 640c75 10 130 60 135 125-50-15-100-5-125 75z" fill="#E96940"/>
+  <!-- contorno del pecho y la cola -->
+  <path d="M1405 670v190c0 240-205 412-415 412-80 0-150-20-210-50" fill="none" stroke="#1F4130" stroke-width="58" stroke-linecap="round"/>
+    <!-- ala -->
+  <path d="M655 1100 885 845c55-60 200-70 260 15 55 80 45 190-30 260-110 105-300 120-460-20z" fill="#2E8D73" stroke="#1F4130" stroke-width="58" stroke-linejoin="round"/>
+  <!-- ojo -->
+  <circle cx="1232" cy="680" r="66" fill="#1F4130"/>
+  <circle cx="1256" cy="646" r="22" fill="#FFFFFF"/>
+  <!-- aro -->
+  <circle cx="1108" cy="828" r="557" fill="none" stroke="#1F4130" stroke-width="60"/>
+</svg>
