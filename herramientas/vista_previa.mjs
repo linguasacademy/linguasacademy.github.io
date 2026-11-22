@@ -414,7 +414,7 @@ export function generarVistaPrevia(html, { hasta = 1, raiz = '../', nombre = '' 
     cambiosHtml.push({ s: l.startOffset, e: l.endOffset, t: 'Vista previa · ' + tituloTxt });
   }
   const cabeza = (robots ? '' : '\n<meta name="robots" content="noindex, nofollow">') +
-    '\n<script>/* Vista previa: sin sala en vivo. El tablero funciona solo en esta pantalla. */window.claude={use:async function(){return null}};window.LA_VISTA_PREVIA=true;</script>\n';
+    '\n<script>/* Vista previa: sin sala en vivo. El tablero funciona solo en esta pantalla. */window.claude={use:async function(){return null}};window.LA_VISTA_PREVIA=true;</script>\n<script src="../assets/sin-creditos.js?v=1" defer></script>\n';
   if (head && head.sourceCodeLocation && head.sourceCodeLocation.startTag) {
     const p = head.sourceCodeLocation.startTag.endOffset; cambiosHtml.push({ s: p, e: p, t: cabeza });
   } else falla('El tablero no tiene <head>.');

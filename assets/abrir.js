@@ -79,6 +79,11 @@
     extraerScripts(doc.head, document.head);
     extraerScripts(doc.body, document.body);
 
+    /* Sin créditos de fotos: las imágenes son de uso libre */
+    const sc = document.createElement('script');
+    sc.src = 'assets/sin-creditos.js?v=1';
+    document.head.appendChild(sc);
+
     if (esProfe) {
       const st = document.createElement('style');
       st.id = 'vivoStyle';

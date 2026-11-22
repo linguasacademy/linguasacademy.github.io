@@ -167,8 +167,6 @@
 .pr-inicio { display: grid; gap: 28px; }
 .pr-portada { margin: 0; display: grid; gap: 8px; }
 .pr-portada img { width: 100%; aspect-ratio: 16 / 8; object-fit: cover; border-radius: var(--r-lg); background: var(--paper-2); }
-.pr-credito { font-size: 12.5px; color: var(--muted); text-align: right; }
-.pr-credito a { color: inherit; text-underline-offset: 3px; }
 .pr-inicio__txt { display: grid; gap: 16px; }
 .pr-inicio__txt .pr-kicker { margin-bottom: 0; }
 .pr-indice { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--ink-2); font-size: 15.5px; }

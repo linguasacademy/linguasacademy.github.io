@@ -723,8 +723,7 @@
       h('li', null, icono('pencil'), h('span', { text: t('pr.ejercicios', { n: d.ejercicios.length }) })),
       h('li', null, icono('send'), h('span', { text: t('pr.reto') })));
     var foto = c.foto ? h('figure', { class: 'pr-portada' },
-      h('img', { src: fotoUrl(c, 1100), alt: c.fotoAlt || '', width: 1100, height: 620, onerror: function () { this.parentNode.remove(); } }),
-      c.fotoAutor ? h('figcaption', { class: 'pr-credito' }, 'Foto: ', c.fotoPagina ? h('a', { href: c.fotoPagina, target: '_blank', rel: 'noopener', text: c.fotoAutor }) : c.fotoAutor, ' · Unsplash') : null) : null;
+      h('img', { src: fotoUrl(c, 1100), alt: c.fotoAlt || '', width: 1100, height: 620, onerror: function () { this.parentNode.remove(); } })) : null;
     cont.appendChild(h('section', { class: 'pr-inicio' },
       foto,
       h('div', { class: 'pr-inicio__txt' },
