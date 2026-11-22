@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>document.documentElement.classList.add('js')</script>
-<script src="assets/i18n.js?v=2026112201"></script>
+<script src="assets/i18n.js?v=2026112202"></script>
 <title data-i18n="meta.titulo">Lingua's Academy · La clase de mañana ya está lista</title>
 <meta name="description" content="Tableros interactivos para profes de idiomas: abres uno, compartes un enlace y empieza la clase, con actividades, juego y tarea." data-i18n-content="meta.descripcion">
-<meta name="theme-color" content="#F6F3EC">
+<meta name="theme-color" content="#FFFFFF">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_LA" data-i18n-content="meta.og_locale">
 <meta property="og:locale:alternate" content="en_US">
@@ -18,11 +18,13 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://linguasacademy.github.io/">
-<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Caveat:wght@500;600&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=2026111802">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&family=Caveat:wght@500;600&display=swap">
+<link rel="stylesheet" href="assets/site.css?v=2026112202">
 <style>
 .mano { font-family: 'Caveat', cursive; font-weight: 600; line-height: 1; }
 .pad { padding-top: clamp(56px, 7vw, 104px); padding-bottom: clamp(56px, 7vw, 104px); }
@@ -45,15 +47,15 @@
 .puerta--profe { padding-right: 32px; }
 .puerta--estudiante { padding-left: 32px; border-left: 1px solid var(--line-2); }
 .puerta__quien { font-size: 24px; transform: rotate(-2deg); transform-origin: left center; }
-.puerta--profe .puerta__quien { color: var(--action); }
+.puerta--profe .puerta__quien { color: var(--action-ink); }
 .puerta--estudiante .puerta__quien { color: var(--pt); }
 
 .mesa { flex: 1 1 520px; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
 .mesa__in { position: relative; width: 100%; aspect-ratio: 10 / 8.8; }
-.mesa__board { position: absolute; aspect-ratio: 16 / 10; height: auto; object-fit: cover; object-position: center; border-radius: 12px; border: 1px solid var(--line-2); box-shadow: 0 22px 44px -22px rgba(20,33,58,.6); transition: transform 450ms var(--ease-out); background: var(--paper-2); }
+.mesa__board { position: absolute; aspect-ratio: 16 / 10; height: auto; object-fit: cover; object-position: center; border-radius: 12px; border: 1px solid var(--line-2); box-shadow: 0 22px 44px -22px rgba(30, 63, 47,.6); transition: transform 450ms var(--ease-out); background: var(--paper-2); }
 .mesa__board--back { left: 2%; top: 8%; width: 64%; transform: rotate(-2.5deg); z-index: 1; }
 .mesa__board--front { left: 24%; top: 24%; width: 72%; transform: rotate(1.5deg); z-index: 2; }
-.mesa__foto { position: absolute; aspect-ratio: 4 / 3; height: auto; object-fit: cover; border-radius: 14px; border: 3px solid var(--card); box-shadow: 0 18px 36px -18px rgba(20,33,58,.55); transition: transform 450ms var(--ease-out); z-index: 3; background: var(--paper-2); }
+.mesa__foto { position: absolute; aspect-ratio: 4 / 3; height: auto; object-fit: cover; border-radius: 14px; border: 3px solid var(--card); box-shadow: 0 18px 36px -18px rgba(30, 63, 47,.55); transition: transform 450ms var(--ease-out); z-index: 3; background: var(--paper-2); }
 .mesa__foto--profe { left: 0; bottom: 4%; width: 38%; transform: rotate(-2deg); }
 .mesa__foto--estudiante { right: 0; top: 0; width: 34%; transform: rotate(2.5deg); }
 @media (hover: hover) and (pointer: fine) {
@@ -62,10 +64,10 @@
   .mesa:hover .mesa__foto--profe { transform: rotate(-1deg) translate(-3px, 3px); }
   .mesa:hover .mesa__foto--estudiante { transform: rotate(1.5deg) translate(3px, -3px); }
 }
-.chip-ui { position: absolute; z-index: 4; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(255, 253, 248, .96); border: 1px solid var(--line-2); box-shadow: 0 12px 24px -12px rgba(20,33,58,.32); font: 600 13px/1.2 var(--f-text); color: var(--ink); white-space: nowrap; }
+.chip-ui { position: absolute; z-index: 4; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(255, 253, 248, .96); border: 1px solid var(--line-2); box-shadow: 0 12px 24px -12px rgba(30, 63, 47,.32); font: 600 13px/1.2 var(--f-text); color: var(--ink); white-space: nowrap; }
 .chip-ui__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; box-shadow: 0 0 0 3px var(--pt-soft); }
 .chip-ui--vivo { left: 4%; top: 0; }
-.nota { position: absolute; z-index: 4; padding: 6px 14px 8px; font-size: clamp(17px, 1.8vw, 24px); line-height: 1.1; box-shadow: 0 6px 14px -8px rgba(20,33,58,.5); }
+.nota { position: absolute; z-index: 4; padding: 6px 14px 8px; font-size: clamp(17px, 1.8vw, 24px); line-height: 1.1; box-shadow: 0 6px 14px -8px rgba(30, 63, 47,.5); }
 .nota--1 { left: 36%; bottom: 4%; background: #FFE9A8; transform: rotate(-3deg); }
 
 /* tarjetas .momento: número en cuadrito, nota manuscrita y borde superior del mismo color */
@@ -130,7 +132,6 @@
 .muestra__meta { font-size: 13.5px; color: var(--muted); }
 .muestra__acc { margin-top: auto; padding-top: 8px; display: flex; }
 .muestra__cta svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.muestra__pronto { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border: 1.5px dashed var(--line-2); border-radius: var(--r-btn); color: var(--muted); font-size: 15px; font-weight: 500; }
 .muestras__pie { display: flex; justify-content: center; }
 
 /* preguntas */
@@ -188,32 +189,30 @@
 </style>
 </head>
 <body>
-<header class="nav nav--larga">
+<header class="nav">
   <div class="wrap">
     <a class="skip-link" href="#top" data-i18n="nav.saltar">Saltar al contenido</a>
-    <a class="brand" href="./" aria-label="Lingua's Academy, inicio" data-i18n-aria="nav.inicio_aria"><img src="logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <a class="brand" href="./" aria-label="Lingua's Academy, inicio" data-i18n-aria="nav.inicio_aria"><img src="assets/logo/logo-animado.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
     <nav aria-label="Principal" data-i18n-aria="nav.principal_aria">
       <ul class="nav__links">
+        <li><a href="estudiantes.html" data-i18n="nav.estudiante">Estudiante</a></li>
+        <li><a href="panel.html" data-i18n="nav.profesor">Profesor</a></li>
         <li><a href="tableros.html" data-i18n="nav.tableros">Tableros</a></li>
-        <li><a href="#en-vivo" data-i18n="nav.como">Cómo funciona</a></li>
-        <li><a href="#preguntas" data-i18n="nav.preguntas">Preguntas</a></li>
-        <li><a href="suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a></li>
       </ul>
     </nav>
     <div class="nav__actions">
       <div class="nav__idioma" data-selector-idioma></div>
-      <a class="nav__entrar nav__estudiantes" href="estudiantes.html" data-i18n="nav.estudiantes">Estudiantes</a>
       <a class="nav__entrar" href="entrar.html" data-cuenta-link data-i18n="nav.entrar">Entrar</a>
-      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.menu_abrir_aria" data-txt-abrir="Menú" data-txt-cerrar="Cerrar" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir="nav.menu" data-i18n-txt-cerrar="nav.cerrar" data-i18n-txt-abrir-aria="nav.menu_abrir_aria" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><span data-i18n="nav.menu">Menú</span></button>
+      <a class="btn btn--primary btn--sm nav__registro" href="entrar.html" data-i18n="nav.registrarse">Registrarse</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.menu_abrir_aria" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir-aria="nav.menu_abrir_aria" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><svg class="menu-btn__ico" viewBox="0 0 24 24" aria-hidden="true"><path class="l1" d="M4 7h16"/><path class="l2" d="M4 12h16"/><path class="l3" d="M4 17h16"/></svg></button>
     </div>
   </div>
 </header>
 <nav class="sheet" id="menu" aria-label="Menú" data-i18n-aria="nav.menu" hidden>
+  <a href="estudiantes.html" data-i18n="nav.estudiante">Estudiante</a>
+  <a href="panel.html" data-i18n="nav.profesor">Profesor</a>
   <a href="tableros.html" data-i18n="nav.tableros">Tableros</a>
-  <a href="#en-vivo" data-i18n="nav.como">Cómo funciona</a>
-  <a href="#preguntas" data-i18n="nav.preguntas">Preguntas</a>
-  <a href="suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a>
-  <a class="sheet__sec" href="estudiantes.html" data-i18n="nav.estudiantes_largo">Soy estudiante</a>
+  <a class="btn btn--primary" href="entrar.html" data-i18n="nav.registrarse">Registrarse</a>
   <a class="sheet__sec" href="entrar.html" data-cuenta-link data-i18n="nav.entrar_largo">Entrar con mi cuenta</a>
 </nav>
 
@@ -294,7 +293,6 @@
             <p class="muestra__meta"><span data-i18n="muestras.pina.tag1">Adultos</span> <span aria-hidden="true">·</span> <span data-i18n="muestras.pina.tag2">Consignas en portugués</span></p>
             <div class="muestra__acc">
               <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/a2-a-como-esta-la-pina.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.pina.titulo">¿A cómo está la piña?</span></span></a>
-              <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
             </div>
           </div>
         </li>
@@ -310,7 +308,6 @@
             <p class="muestra__meta"><span data-i18n="muestras.cafe.tag1">Adultos</span> <span aria-hidden="true">·</span> <span data-i18n="muestras.cafe.tag2">Consignas en inglés</span> <span aria-hidden="true">·</span> <span data-i18n="muestras.cafe.tag3">Clase de prueba</span></p>
             <div class="muestra__acc">
               <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/a1-un-cafe-por-favor.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.cafe.titulo">Un café, por favor</span></span></a>
-              <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
             </div>
           </div>
         </li>
@@ -326,7 +323,6 @@
             <p class="muestra__meta"><span data-i18n="muestras.harias.tag1">Adultos</span> <span aria-hidden="true">·</span> <span data-i18n="muestras.harias.tag2">Consignas en portugués</span></p>
             <div class="muestra__acc">
               <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/b1-que-harias-si.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.harias.titulo">¿Qué harías si…?</span></span></a>
-              <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
             </div>
           </div>
         </li>
@@ -342,7 +338,6 @@
             <p class="muestra__meta"><span data-i18n="muestras.monstruos.tag1">Niños</span> <span aria-hidden="true">·</span> <span data-i18n="muestras.monstruos.tag2">Consignas en inglés</span></p>
             <div class="muestra__acc">
               <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/a1-monstruos-gigantes.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.monstruos.titulo">Monstruos gigantes</span></span></a>
-              <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
             </div>
           </div>
         </li>
@@ -442,7 +437,12 @@
 
 <footer class="pie">
   <div class="wrap">
-    <span><img src="logo.svg" alt="" width="28" height="28">© 2026 Lingua's Academy</span>
+    <span><img src="assets/logo/nuevo/logo.svg" alt="" width="28" height="28">© 2026 Lingua's Academy</span>
+    <nav class="pie__enlaces" aria-label="Más información" data-i18n-aria="pie.enlaces_aria">
+      <a href="#en-vivo" data-i18n="nav.como">Cómo funciona</a>
+      <a href="#preguntas" data-i18n="nav.preguntas">Preguntas</a>
+      <a href="suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a>
+    </nav>
     <span data-i18n="pie.lema">Tableros de clase para profesores de idiomas</span>
   </div>
 </footer>
@@ -486,15 +486,14 @@
   }
   addEventListener('DOMContentLoaded', niveles);
 
-  /* Vistas previas: «Ver vista previa» si existe vista/<nombre>.html (lista en vista/vistas.js); si no, «Vista previa pronto».
+  /* Vistas previas: «Ver vista previa» solo si existe vista/<nombre>.html (lista en vista/vistas.js).
      Para destacar otro tablero aquí, cambia data-vista y data-vista-link de su tarjeta. */
   function vistas() {
     const V = new Set(Array.isArray(window.VISTAS) ? window.VISTAS : []);
     document.querySelectorAll('[data-vista]').forEach(li => {
       const hay = V.has(li.dataset.vista);
-      const a = li.querySelector('[data-vista-link]'), p = li.querySelector('[data-vista-pronto]');
+      const a = li.querySelector('[data-vista-link]');
       if (a) { a.hidden = !hay; if (hay) a.href = a.dataset.vistaLink; else a.removeAttribute('href'); }
-      if (p) p.hidden = hay;
     });
     /* mientras no haya ninguna vista previa publicada, el botón principal lleva al video de una clase en vivo */
     const cta = document.querySelector('.hero a[href="#muestras"], .hero a[href="#en-vivo"]');

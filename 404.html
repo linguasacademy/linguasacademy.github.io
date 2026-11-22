@@ -7,10 +7,12 @@
 <script src="/assets/i18n.js"></script>
 <meta name="robots" content="noindex">
 <title data-i18n="e404.meta.titulo">Página no encontrada · Lingua's Academy</title>
-<meta name="theme-color" content="#F6F3EC">
-<link rel="icon" href="/logo.svg" type="image/svg+xml">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="/assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/logo/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <link rel="stylesheet" href="/assets/site.css">
 <style>
 .not-found {
@@ -35,33 +37,31 @@
 </style>
 </head>
 <body>
-<header class="nav nav--larga">
+<header class="nav">
   <div class="wrap">
     <a class="skip-link" href="#top" data-i18n="nav.saltar">Saltar al contenido</a>
-    <a class="brand" href="/" aria-label="Lingua's Academy, inicio" data-i18n-aria="nav.inicio_aria"><img src="/logo.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
+    <a class="brand" href="/" aria-label="Lingua's Academy, inicio" data-i18n-aria="nav.inicio_aria"><img src="/assets/logo/logo-animado.svg" alt="" width="40" height="40"><span>Lingua's Academy</span></a>
     <nav aria-label="Principal" data-i18n-aria="nav.principal_aria">
       <ul class="nav__links">
+        <li><a href="/estudiantes.html" data-i18n="nav.estudiante">Estudiante</a></li>
+        <li><a href="/panel.html" data-i18n="nav.profesor">Profesor</a></li>
         <li><a href="/tableros.html" data-i18n="nav.tableros">Tableros</a></li>
-        <li><a href="/#en-vivo" data-i18n="nav.como">Cómo funciona</a></li>
-        <li><a href="/#preguntas" data-i18n="nav.preguntas">Preguntas</a></li>
-        <li><a href="/suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a></li>
       </ul>
     </nav>
     <div class="nav__actions">
       <div class="nav__idioma" data-selector-idioma></div>
-      <a class="nav__entrar nav__estudiantes" href="/estudiantes.html" data-i18n="nav.estudiantes">Estudiantes</a>
-      <a class="nav__entrar" href="/entrar.html" data-i18n="nav.entrar">Entrar</a>
-      <button class="btn btn--secondary btn--sm menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.menu_abrir_aria" data-txt-abrir="Menú" data-txt-cerrar="Cerrar" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir="nav.menu" data-i18n-txt-cerrar="nav.cerrar" data-i18n-txt-abrir-aria="nav.menu_abrir_aria" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><span data-i18n="nav.menu">Menú</span></button>
+      <a class="nav__entrar" href="/entrar.html" data-cuenta-link data-i18n="nav.entrar">Entrar</a>
+      <a class="btn btn--primary btn--sm nav__registro" href="/entrar.html" data-i18n="nav.registrarse">Registrarse</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.menu_abrir_aria" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir-aria="nav.menu_abrir_aria" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><svg class="menu-btn__ico" viewBox="0 0 24 24" aria-hidden="true"><path class="l1" d="M4 7h16"/><path class="l2" d="M4 12h16"/><path class="l3" d="M4 17h16"/></svg></button>
     </div>
   </div>
 </header>
 <nav class="sheet" id="menu" aria-label="Menú" data-i18n-aria="nav.menu" hidden>
+  <a href="/estudiantes.html" data-i18n="nav.estudiante">Estudiante</a>
+  <a href="/panel.html" data-i18n="nav.profesor">Profesor</a>
   <a href="/tableros.html" data-i18n="nav.tableros">Tableros</a>
-  <a href="/#en-vivo" data-i18n="nav.como">Cómo funciona</a>
-  <a href="/#preguntas" data-i18n="nav.preguntas">Preguntas</a>
-  <a href="/suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a>
-  <a class="sheet__sec" href="/estudiantes.html" data-i18n="nav.estudiantes_largo">Soy estudiante</a>
-  <a class="sheet__sec" href="/entrar.html" data-i18n="nav.entrar_largo">Entrar con mi cuenta</a>
+  <a class="btn btn--primary" href="/entrar.html" data-i18n="nav.registrarse">Registrarse</a>
+  <a class="sheet__sec" href="/entrar.html" data-cuenta-link data-i18n="nav.entrar_largo">Entrar con mi cuenta</a>
 </nav>
 
 <main id="top" class="not-found">
@@ -83,7 +83,12 @@
 
 <footer class="pie">
   <div class="wrap">
-    <span><img src="/logo.svg" alt="" width="28" height="28">© 2026 Lingua's Academy</span>
+    <span><img src="/assets/logo/nuevo/logo.svg" alt="" width="28" height="28">© 2026 Lingua's Academy</span>
+    <nav class="pie__enlaces" aria-label="Más información" data-i18n-aria="pie.enlaces_aria">
+      <a href="/#en-vivo" data-i18n="nav.como">Cómo funciona</a>
+      <a href="/#preguntas" data-i18n="nav.preguntas">Preguntas</a>
+      <a href="/suscripcion.html" data-i18n="nav.suscripcion">Suscripción</a>
+    </nav>
     <span data-i18n="pie.lema">Tableros de clase para profesores de idiomas</span>
   </div>
 </footer>

@@ -75,7 +75,7 @@
 .pr-opcion__t { font: 400 24px/1.1 var(--f-display); }
 .pr-opcion__s { font-size: 15px; color: var(--muted); }
 @media (hover: hover) and (pointer: fine) {
-  .pr-opcion:hover { transform: translateY(-2px); border-color: var(--ink); box-shadow: 0 14px 28px -22px rgba(20,33,58,.45); }
+  .pr-opcion:hover { transform: translateY(-2px); border-color: var(--ink); box-shadow: 0 14px 28px -22px rgba(30, 63, 47,.45); }
   .pr-opcion:hover .pi { transform: translateX(3px); color: var(--ink); }
 }
 .pr-opcion:active { transform: translateY(0) scale(.99); }
@@ -108,7 +108,7 @@
 .pr-tema__cuerpo { display: grid; gap: 8px; padding: 16px 18px 18px; }
 .pr-tema__nombre { font: 400 25px/1.1 var(--f-display); letter-spacing: -.01em; }
 @media (hover: hover) and (pointer: fine) {
-  .pr-tema:hover { transform: translateY(-3px); border-color: var(--line-2); box-shadow: 0 18px 36px -26px rgba(20,33,58,.5); }
+  .pr-tema:hover { transform: translateY(-3px); border-color: var(--line-2); box-shadow: 0 18px 36px -26px rgba(30, 63, 47,.5); }
   .pr-tema:hover img { transform: scale(1.03); }
 }
 .pr-cuentas { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; color: var(--muted); }
@@ -135,7 +135,7 @@
 .pr-fila__desc { font-size: 14.5px; color: var(--muted); line-height: 1.4; }
 .pr-fila__chev { color: var(--muted); transition: transform var(--dur-ui) var(--ease-out); }
 @media (hover: hover) and (pointer: fine) {
-  .pr-fila:hover { border-color: var(--line-2); box-shadow: 0 14px 28px -24px rgba(20,33,58,.5); }
+  .pr-fila:hover { border-color: var(--line-2); box-shadow: 0 14px 28px -24px rgba(30, 63, 47,.5); }
   .pr-fila:hover .pr-fila__chev { transform: translateX(3px); color: var(--ink); }
 }
 .pr-estado { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); white-space: nowrap; }
@@ -197,7 +197,7 @@
 @media (hover: hover) and (pointer: fine) { .pr-tarjeta:hover .pr-tarjeta__frente { border-color: var(--ink); } }
 
 /* ítem */
-.pr-item { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: clamp(22px, 4vw, 40px); display: grid; gap: 18px; box-shadow: 0 1px 0 rgba(20,33,58,.03); }
+.pr-item { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: clamp(22px, 4vw, 40px); display: grid; gap: 18px; box-shadow: 0 1px 0 rgba(30, 63, 47,.03); }
 .pr-frase { font: 400 clamp(24px, 1.6vw + 16px, 32px)/1.35 var(--f-display); letter-spacing: -.01em; overflow-wrap: anywhere; }
 .pr-glosa { font-size: 15.5px; color: var(--muted); margin-top: -8px; }
 .pr-hueco { display: inline-block; min-width: 3.2em; height: 1em; border-bottom: 2px solid var(--ink-2); vertical-align: -0.12em; margin: 0 .12em; }
