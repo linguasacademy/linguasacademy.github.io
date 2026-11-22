@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>document.documentElement.classList.add('js')</script>
-<script src="assets/i18n.js?v=2026111802"></script>
+<script src="assets/i18n.js?v=2026112201"></script>
 <title data-i18n="meta.titulo">Lingua's Academy · La clase de mañana ya está lista</title>
 <meta name="description" content="Tableros interactivos para profes de idiomas: abres uno, compartes un enlace y empieza la clase, con actividades, juego y tarea." data-i18n-content="meta.descripcion">
 <meta name="theme-color" content="#F6F3EC">
@@ -27,8 +27,6 @@
 .mano { font-family: 'Caveat', cursive; font-weight: 600; line-height: 1; }
 .pad { padding-top: clamp(56px, 7vw, 104px); padding-bottom: clamp(56px, 7vw, 104px); }
 .t2 { font: 400 clamp(36px, 4vw, 60px)/1.05 var(--f-display); letter-spacing: -.015em; }
-.credito { font-size: 12.5px; line-height: 1.4; color: var(--muted); }
-.credito a { color: inherit; text-underline-offset: 3px; }
 .sec-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 48px; }
 .sec-head p:not(.mano) { color: var(--ink-2); max-width: 26em; }
 
@@ -64,7 +62,6 @@
   .mesa:hover .mesa__foto--profe { transform: rotate(-1deg) translate(-3px, 3px); }
   .mesa:hover .mesa__foto--estudiante { transform: rotate(1.5deg) translate(3px, -3px); }
 }
-.mesa__credito { text-align: right; }
 .chip-ui { position: absolute; z-index: 4; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(255, 253, 248, .96); border: 1px solid var(--line-2); box-shadow: 0 12px 24px -12px rgba(20,33,58,.32); font: 600 13px/1.2 var(--f-text); color: var(--ink); white-space: nowrap; }
 .chip-ui__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; box-shadow: 0 0 0 3px var(--pt-soft); }
 .chip-ui--vivo { left: 4%; top: 0; }
@@ -134,7 +131,6 @@
 .muestra__acc { margin-top: auto; padding-top: 8px; display: flex; }
 .muestra__cta svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .muestra__pronto { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border: 1.5px dashed var(--line-2); border-radius: var(--r-btn); color: var(--muted); font-size: 15px; font-weight: 500; }
-.muestra .credito { margin-top: 2px; }
 .muestras__pie { display: flex; justify-content: center; }
 
 /* preguntas */
@@ -188,7 +184,6 @@
   .muestras__lista { grid-template-columns: 1fr; }
   .vivo__text .ruta__suma { font-size: 24px; }
   .momento { padding: 22px; }
-  .mesa__credito { text-align: left; }
 }
 </style>
 </head>
@@ -249,7 +244,6 @@
           <span class="chip-ui chip-ui--vivo"><span class="chip-ui__dot" aria-hidden="true"></span><span data-i18n="hero.chip">En vivo con tu estudiante</span></span>
           <span class="mano nota nota--1" data-i18n-html="hero.nota">tocas la foto y<br>sale la palabra</span>
         </div>
-        <figcaption><p class="credito mesa__credito"><span data-i18n="comun.fotos">Fotos:</span> <a href="https://unsplash.com/photos/a-woman-sitting-at-a-table-with-a-laptop-and-headphones-on-r3gxTlf46a4" rel="noopener" target="_blank">Julio Lopez</a>, <a href="https://unsplash.com/photos/a-woman-wearing-a-headset-and-smiling-at-the-camera-Ry3KyBpEGSs" rel="noopener" target="_blank">Vinicius &quot;amnx&quot; Amano</a>, <a href="https://unsplash.com/photos/silver-laptop-computer-table-table-beside-of-journal-book-N0NLGH5YU90" rel="noopener" target="_blank">Jess Bailey</a> <span data-i18n="comun.y">y</span> <a href="https://unsplash.com/photos/colonial-street-and-church-in-cartagena-GcHar4P8V_Q" rel="noopener" target="_blank">Ricardo Gomez Angel</a> · Unsplash</p></figcaption>
       </figure>
     </div>
   </section>
@@ -302,7 +296,6 @@
               <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/a2-a-como-esta-la-pina.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.pina.titulo">¿A cómo está la piña?</span></span></a>
               <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
             </div>
-            <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/man-sitting-beside-fruit-stand-XQ7LF574HhY" rel="noopener" target="_blank">Julian Florez</a> · Unsplash</p>
           </div>
         </li>
         <li class="muestra" data-vista="a1-un-cafe-por-favor" data-nivel="A1" data-ver>
@@ -319,7 +312,6 @@
               <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/a1-un-cafe-por-favor.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.cafe.titulo">Un café, por favor</span></span></a>
               <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
             </div>
-            <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/man-in-gray-crew-neck-t-shirt-making-cappuccino-jRPxc8VGqco" rel="noopener" target="_blank">Nathan Dumlao</a> · Unsplash</p>
           </div>
         </li>
         <li class="muestra" data-vista="b1-que-harias-si" data-nivel="B1" data-ver>
@@ -336,7 +328,6 @@
               <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/b1-que-harias-si.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.harias.titulo">¿Qué harías si…?</span></span></a>
               <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
             </div>
-            <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/woman-holding-teacup-while-standing-near-window-inside-room-during-daytime-3LbpZo8MG8A" rel="noopener" target="_blank">Daiga Ellaby</a> · Unsplash</p>
           </div>
         </li>
         <li class="muestra" data-vista="a1-monstruos-gigantes" data-nivel="A1" data-ver>
@@ -353,7 +344,6 @@
               <a class="btn btn--secondary btn--sm muestra__cta" data-vista-link="vista/a1-monstruos-gigantes.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="muestras.cta">Ver vista previa</span><span class="visually-hidden">: <span data-i18n="muestras.monstruos.titulo">Monstruos gigantes</span></span></a>
               <span class="muestra__pronto" data-vista-pronto><span data-i18n="muestras.pronto">Vista previa pronto</span></span>
             </div>
-            <p class="credito"><span data-i18n="comun.foto">Foto:</span> <a href="https://unsplash.com/photos/blue-and-brown-plush-toy--usSqel0j5U" rel="noopener" target="_blank">Ashkan Forouzani</a> · Unsplash</p>
           </div>
         </li>
       </ul>

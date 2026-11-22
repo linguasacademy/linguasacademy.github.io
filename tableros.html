@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<script src="assets/i18n.js?v=2026111802"></script>
+<script src="assets/i18n.js?v=2026112201"></script>
 <title data-i18n="cat.meta.titulo">Catálogo de tableros · Lingua's Academy</title>
 <meta name="description" data-i18n-content="cat.meta.desc" content="Catálogo de tableros de clase de Lingua's Academy por idioma y nivel, con vista previa de cada clase.">
 <meta name="theme-color" content="#F6F3EC">
@@ -122,9 +122,6 @@
 .tag--flag { padding-left: 7px; }
 .tag__ico { width: 14px; height: 14px; flex: none; color: var(--muted); }
 .tag--prueba { background: var(--en-soft); color: var(--lvl-a2-ink, #114470); }
-.t__credito { padding: 6px 20px 0; font-size: 12.5px; line-height: 1.4; color: var(--muted); }
-.t__credito a { position: relative; z-index: 2; color: inherit; text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 2px; display: inline-block; padding: 4px 0; }
-.t__credito a:hover { color: var(--ink); text-decoration-color: currentColor; }
 
 .t__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 20px 18px; }
 .t__accion {
@@ -140,14 +137,13 @@
 @media (hover: hover) and (pointer: fine) { .t__accion--tarea:hover { background: var(--lvl-bg, var(--paper-2)); color: var(--ink); } }
 .t__accion svg { width: 18px; height: 18px; flex: none; }
 .t__accion--abrir { background: var(--lvl, var(--ink)); color: #fff; border: 1.5px solid var(--lvl, var(--ink)); }
-/* toda la tarjeta abre el tablero (o su vista previa); «Tarea» y el crédito quedan por encima */
+/* toda la tarjeta abre el tablero (o su vista previa); «Tarea» queda por encima */
 .t__accion--pronto { border: 1.5px dashed var(--line-2); color: var(--muted); cursor: default; }
 .app__head > .app__cta { grid-column: 9 / span 4; justify-self: end; align-self: end; display: flex; flex-wrap: wrap; gap: 10px; }
 @media (max-width: 1023px) { .app__head > .app__cta { grid-column: 1 / -1; justify-self: start; } }
 .t__accion--abrir::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
 .t__accion--abrir:focus-visible { outline: none; }
 .t:has(.t__accion--abrir:focus-visible) { outline: 3px solid var(--en); outline-offset: 3px; }
-.t__credito a:focus-visible { outline: 3px solid var(--en); outline-offset: 2px; }
 
 @media (hover: hover) and (pointer: fine) {
   .t:hover { transform: translateY(-2px); border-color: var(--lvl, var(--ink)); border-top-color: var(--lvl, var(--ink)); box-shadow: 0 16px 32px -24px rgba(20,33,58,.45); }
@@ -162,7 +158,7 @@
   .t:has(.t__accion--abrir:active) { opacity: .85; }
 }
 @media (max-width: 639px) {
-  .t__body { padding: 16px 16px 4px; } .t__meta, .t__credito { padding-left: 16px; padding-right: 16px; }
+  .t__body { padding: 16px 16px 4px; } .t__meta { padding-left: 16px; padding-right: 16px; }
   .t__acciones { padding: 12px 16px 16px; }
 }
 
@@ -656,15 +652,6 @@
     m.appendChild(pTag);
     if (t.prueba) m.appendChild(el('span', 'tag tag--prueba', tr('cat.clasePrueba', 'Clase de prueba')));
     art.appendChild(m);
-
-    /* crédito de la foto */
-    if (t.foto && t.fotoAutor) {
-      const cr = el('p', 't__credito');
-      const a = el('a', null, fmt(tr('cat.foto', 'Foto: {autor} · Unsplash'), { autor: t.fotoAutor }));
-      a.href = t.fotoPagina || 'https://unsplash.com/'; a.target = '_blank'; a.rel = 'noopener';
-      cr.appendChild(a);
-      art.appendChild(cr);
-    }
 
     /* acciones */
     const acc = el('div', 't__acciones');

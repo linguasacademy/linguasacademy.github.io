@@ -13,8 +13,8 @@
               El título y la descripción no se traducen: son contenido del curso. La nota sí.
    foto       URL base de la foto de portada en images.unsplash.com, sin parámetros (el catálogo añade ?auto=format&fit=crop&w=…)
               Solo fotos reales con licencia libre (Unsplash gratuitas, nunca Unsplash+ ni IA); idealmente la misma de la Introducción o la lectura
-   fotoAutor  nombre del autor de la foto, para el crédito «Foto: Autor · Unsplash»
-   fotoPagina página de la foto en unsplash.com (el crédito enlaza aquí)
+   fotoAutor  autor de la foto (dato interno; el sitio no muestra créditos de fotos)
+   fotoPagina página de la foto en unsplash.com (dato interno)
    fotoAlt    texto alternativo en español: qué se ve en la foto
    Si falta la foto o no carga, la tarjeta muestra el color suave del nivel con el título. */
 window.CATALOGO = [
