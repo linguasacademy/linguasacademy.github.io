@@ -86,6 +86,11 @@
   --sombra-2: 0 2px 0 rgba(30, 63, 47, .08), 0 12px 24px -18px rgba(30, 63, 47, .45);
   --sombra-3: 0 3px 0 rgba(30, 63, 47, .10), 0 24px 44px -26px rgba(30, 63, 47, .55);
   --sombra-bloque: 4px 4px 0 var(--bosque); /* sombra sólida del estilo plano */
+
+  /* Movimiento: mismos valores que site.css */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --dur-press: 120ms;  /* respuesta al pulsar */
+  --dur-ui: 200ms;     /* hover, menú, pestañas */
 }
 
 @media (max-width: 639px) {
