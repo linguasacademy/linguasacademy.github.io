@@ -24,6 +24,7 @@ NON_BOARD_HTML = {
     "suscripcion.html",
     "estudiantes.html",
     "panel.html",
+    "estilo.html",
 }
 BOARD_NAME_RE = re.compile(r"^(en-|pt-)?[abc][12]-[a-z0-9]+(-[a-z0-9]+)*$")
 # Un cargador es pequeño y solo carga assets/abrir.js; un tablero original pesa
