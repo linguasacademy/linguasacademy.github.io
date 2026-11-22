@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 732 732" role="img" aria-label="Lingua's Academy">
+  <circle cx="366" cy="366" r="338" fill="#FFFFFF"/>
+  <circle cx="366" cy="366" r="338" fill="none" stroke="#1E3F2F" stroke-width="40"/>
+  <g transform="translate(338 382) scale(1.1) translate(-366 -380)">
+    <path d="M186 452 C158 404, 154 350, 178 302 C212 236, 286 190, 368 184 C408 181, 446 189, 472 199" fill="none" stroke="#F2B544" stroke-width="30" stroke-linecap="round"/>
+    <path d="M470 212 C420 194, 366 188, 322 196 C238 212, 176 268, 165 348 C158 402, 176 454, 212 488 C221 497, 223 506, 217 519 C207 543, 192 562, 185 572 C178 581, 184 590, 194 585 C233 570, 269 558, 303 556 L470 556 Z" fill="#2E9C83"/>
+    <path d="M462 206 L628 322 L462 438 Z" fill="#E8553A" stroke="#E8553A" stroke-width="10" stroke-linejoin="round"/>
+    <circle cx="398" cy="282" r="25" fill="#1E3F2F"/>
+    <circle cx="406" cy="274" r="7" fill="#FFFFFF"/>
+  </g>
+</svg>
