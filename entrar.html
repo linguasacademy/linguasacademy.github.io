@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>document.documentElement.classList.add('js')</script>
-<script src="assets/i18n.js?v=2026112202"></script>
+<script src="assets/i18n.js?v=2026112203"></script>
 <meta name="robots" content="noindex">
 <title data-i18n="entrar.meta.titulo">Entrar · Lingua's Academy</title>
 <meta name="description" content="Entrada al catálogo de tableros de Lingua's Academy." data-i18n-content="entrar.meta.descripcion">
@@ -122,41 +122,10 @@
         <div class="alt-links"><button class="plain-btn link" type="button" data-ir="entrar" data-i18n="clave.volver">Volver a entrar</button></div>
       </div>
 
-      <!-- 3 · primera vez con Google: completar la solicitud -->
-      <div data-modo="completar" style="gap:28px">
-        <div style="display:grid;gap:16px">
-          <h1 data-i18n="solicitud.titulo">Completa tu solicitud</h1>
-          <p class="lead"><span data-i18n="solicitud.como">Entraste como</span> <b data-completar-correo></b>. <span data-i18n="solicitud.lead">Revisamos cada solicitud a mano. Cuando la aprobemos, entra otra vez con Google y verás el catálogo.</span></p>
-        </div>
-        <form class="form" id="f-completar" novalidate>
-          <div class="field">
-            <label for="k-nombre" data-i18n="solicitud.nombre">Nombre y apellido</label>
-            <input id="k-nombre" name="nombre" type="text" autocomplete="name" maxlength="80" aria-describedby="k-nombre-error">
-            <p class="field__error" id="k-nombre-error"></p>
-          </div>
-          <div class="field">
-            <label for="k-idioma" data-i18n="solicitud.idioma">Idioma que enseñas</label>
-            <select id="k-idioma" name="idioma">
-              <option value="es" data-i18n="idiomas.es">Español</option>
-              <option value="en" data-i18n="idiomas.en">Inglés</option>
-              <option value="pt" data-i18n="idiomas.pt">Portugués</option>
-              <option value="varios" data-i18n="solicitud.varios">Más de uno</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="k-mensaje" data-i18n="solicitud.donde">Dónde das clase (opcional)</label>
-            <textarea id="k-mensaje" name="mensaje" maxlength="600"></textarea>
-          </div>
-          <button class="btn btn--primary" type="submit" data-i18n="solicitud.boton">Enviar la solicitud</button>
-          <p class="form__status" role="status" data-form-status></p>
-        </form>
-        <div class="alt-links"><button class="plain-btn link" type="button" data-salir data-i18n="solicitud.otra">Usar otra cuenta</button></div>
-      </div>
-
-      <!-- 4 · solicitud en revisión o rechazada -->
+      <!-- 3 · cuenta sin acceso -->
       <div data-modo="estado" style="gap:24px">
-        <h1 data-estado-titulo data-i18n="estado.titulo">Tu solicitud está en revisión</h1>
-        <p class="lead" data-estado-texto data-i18n="estado.texto">La revisamos a mano. Cuando la aprobemos, entra otra vez con este correo y verás el catálogo.</p>
+        <h1 data-i18n="estado.rechazado_titulo">Esta cuenta no tiene acceso al catálogo</h1>
+        <p class="lead" data-i18n="estado.rechazado_texto">Si crees que es un error, escríbele a la administración de Lingua’s Academy.</p>
         <p class="muted"><span data-i18n="estado.sesion">Sesión abierta como</span> <b data-estado-correo></b>.</p>
         <div class="btn-row"><button class="btn btn--secondary" type="button" data-salir data-i18n="estado.salir">Salir</button></div>
       </div>
@@ -173,7 +142,7 @@
 
 <script src="assets/site.js?v=2026111802"></script>
 <script src="assets/fb.js?v=2026111802"></script>
-<script src="assets/auth.js?v=2026111802"></script>
+<script src="assets/auth.js?v=2026112203"></script>
 <script>
 (() => {
   'use strict';
@@ -205,19 +174,7 @@
   function mostrar(perfil) {
     if (!perfil) return false;
     if (perfil.estado === 'aprobado' || perfil.admin) { location.replace(window.LAi18n ? LAi18n.enlace(volver) : volver); return true; }
-    if (perfil.estado === 'sin-solicitud') {
-      document.querySelector('[data-completar-correo]').textContent = perfil.correo;
-      document.getElementById('k-nombre').value = perfil.nombreGoogle || '';
-      ir('completar');
-      return true;
-    }
-    const t = document.querySelector('[data-estado-titulo]'), x = document.querySelector('[data-estado-texto]');
-    if (perfil.estado === 'rechazado') {
-      t.dataset.i18n = 'estado.rechazado_titulo'; x.dataset.i18n = 'estado.rechazado_texto';
-      t.textContent = T('estado.rechazado_titulo', 'Tu solicitud no fue aprobada');
-      x.textContent = T('estado.rechazado_texto', 'Por ahora esta cuenta no tiene acceso al catálogo. Si crees que es un error, escríbele a la administración de Lingua’s Academy.');
-    }
-    document.querySelector('[data-estado-correo]').textContent = perfil.correo;
+    document.querySelector('[data-estado-correo]').textContent = perfil.correo || perfil.nombre || '';
     ir('estado');
     return true;
   }
@@ -236,13 +193,7 @@
     const b = fe.querySelector('button[type="submit"]'); b.disabled = true;
     const t = setTimeout(() => Forma.estado(fe, T('entrar.msg.entrando', 'Entrando…')), 300);
     try {
-      let p = await LA.entrar(d.correo, d.clave);
-      if (p && p.estado === 'sin-solicitud' && !p.admin) {
-        /* cuenta creada a mano en Firebase, sin solicitud: se registra como pendiente */
-        const F = await LA.app();
-        await F.db.ref('profes/' + p.uid).set({ nombre: F.auth.currentUser.displayName || d.correo.split('@')[0], correo: d.correo.trim().toLowerCase(), idioma: 'es', mensaje: '', estado: 'pendiente', creado: F.TS });
-        p.estado = 'pendiente';
-      }
+      const p = await LA.entrar(d.correo, d.clave);
       clearTimeout(t); Forma.estado(fe, '');
       mostrar(p);
     } catch (err) {
@@ -277,19 +228,6 @@
       sg.textContent = motivo(err); sg.dataset.tone = 'error';
     }
     bg.disabled = false;
-  });
-
-  /* Primera vez con Google: enviar la solicitud */
-  const fk = document.getElementById('f-completar');
-  fk.addEventListener('submit', async e => {
-    e.preventDefault(); Forma.limpiar(fk);
-    const d = Object.fromEntries(new FormData(fk));
-    if (!d.nombre.trim()) { Forma.error(fk, 'nombre', T('entrar.msg.nombre', 'Escribe tu nombre y apellido.')); Forma.enfocarPrimero(fk); Forma.estado(fk, revisa(1), 'error'); return; }
-    const b = fk.querySelector('button[type="submit"]'); b.disabled = true;
-    try {
-      mostrar(await LA.completarSolicitud(d));
-    } catch (err) { console.warn(err); Forma.estado(fk, motivo(err), 'error'); }
-    b.disabled = false;
   });
 
   document.querySelectorAll('[data-salir]').forEach(x => x.addEventListener('click', async () => { await LA.salir().catch(() => {}); location.reload(); }));
