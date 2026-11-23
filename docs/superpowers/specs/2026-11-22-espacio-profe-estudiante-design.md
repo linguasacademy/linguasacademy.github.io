@@ -114,7 +114,7 @@ Reglas clave:
 - `invitaciones/<codigo>` se puede leer con el código (para unirse); solo su profe la crea o la borra.
 - Unirse: el estudiante escribe `estudiantes/<su uid>` y `alumnos/<uidProfe>/<su uid>` (solo nombre y unido) si `invitaciones/<codigo>/profe === uidProfe` y el código está vigente en `invitacionDe`.
 - `prueba/<uid>`: solo el propio usuario anónimo, solo si no existe, y el valor debe ser un tablero del catálogo (que tenga clave en `claves`).
-- Los profes ya no necesitan aprobación: la regla de `profes/<uid>` deja que el propio usuario escriba `estado: 'aprobado'` si no es anónimo.
+- Los profes ya no necesitan aprobación: **ya está hecho** en la rama (fase 4, porción 1, commit 80e2c75): la ficha nace «aprobado» y las cuentas en «pendiente» se activan solas. Falta que Arley pegue esas reglas; se pegan junto con las de este proyecto.
 
 ## Lo que queda al constructor
 
