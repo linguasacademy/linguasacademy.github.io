@@ -12,12 +12,13 @@ Es una **prueba** para saber si el espacio atrae profes. Si funciona, después v
 
 ## Objetivos
 
-1. **Prueba gratis de un tablero.** Un visitante sin cuenta puede abrir **un solo tablero completo**. Para abrir otro debe entrar con Google.
+1. **Prueba gratis de un tablero.** Un visitante sin cuenta puede abrir **un solo tablero completo** para verlo y recorrerlo él mismo (sin sala en vivo ni tareas). Para abrir otro, o para usarlo con un estudiante, debe entrar con Google.
 2. **Entrada directa del profe.** Quien entra con Google queda aprobado al instante: sin solicitud ni revisión manual. Acceso a todos los tableros, gratis (no hay suscripción por ahora).
 3. **Espacio del profe** (`panel.html`):
    - Su **enlace de invitación** para estudiantes (copiar, y crear uno nuevo si el anterior se filtró).
    - **Lista de estudiantes**: nombre, idioma, nivel.
-   - **Agenda**: clases con fecha y hora, estudiante y tablero. Desde una clase se abre la sala en vivo de ese tablero.
+   - **Grupos**: el profe arma grupos con nombre (por ejemplo «B1 martes») a partir de sus estudiantes.
+   - **Agenda**: clases con fecha y hora, tablero y quién asiste: un estudiante, varios o un grupo. Desde una clase se abre la sala en vivo de ese tablero, y todos los que asisten ven «Entrar a la clase».
    - **Ficha de cada estudiante**: próximas clases, clases hechas (tableros vistos), tareas con sus resultados y **notas privadas del profe**.
    - Las **tareas** que ya existen siguen ahí, y ahora pueden ir dirigidas a un estudiante.
 4. **Perfil del estudiante** (`estudiantes.html`):
@@ -61,7 +62,8 @@ Es una **prueba** para saber si el espacio atrae profes. Si funciona, después v
 
 - Primera opción (espacio de trabajo, sin conseguir estudiantes ni pagos), como prueba.
 - El estudiante tiene su propio perfil, al que llega con el enlace de su profe.
-- Prueba gratis: un solo tablero sin cuenta; después, entrar con Google. Se quitan las vistas previas actuales.
+- Prueba gratis: un solo tablero sin cuenta, solo para verlo y recorrerlo él mismo (no toca las clases en vivo); después, entrar con Google. Se quitan las vistas previas actuales.
+- También hay clases en grupo, además de las individuales.
 - Sin suscripción por ahora.
 - Enfoque 1 (base actual).
 
@@ -76,6 +78,7 @@ Es una **prueba** para saber si el espacio atrae profes. Si funciona, después v
 - **El historial de tableros vistos** sale de las clases que el profe marca como hechas en la agenda, más las tareas entregadas. No se registra automáticamente qué abrió el estudiante por su cuenta.
 - **Las entregas de tareas se reconocen por la cuenta del estudiante:** si el estudiante entró con Google, su entrega queda en su ficha aunque la tarea no fuera dirigida a él.
 - **La agenda guarda la fecha y hora con zona horaria** y se muestra en la hora local de quien la mira (profe y estudiante pueden estar en países distintos).
+- **Una clase en grupo guarda la lista de asistentes del momento**: si el grupo cambia después, las clases pasadas no cambian.
 - **La prueba gratis empieza con un botón explícito** («Probar este tablero» en el catálogo), no al cargar la dirección de un tablero. Así un estudiante que abre un enlace viejo de sala o de tarea no gasta ni recibe una prueba sin querer. Los enlaces de sala y de tarea siguen funcionando igual que hoy.
 - **«Tablero visto» en el perfil del estudiante abre su práctica** (`estudiantes.html?t=`), no el tablero completo: el estudiante no necesita leer `claves` y los tableros no quedan abiertos sin límite.
 - **Quien está en «rechazado» sigue bloqueado.** Solo se aprueban a sí mismas las cuentas de Google y las de correo que ya existían; `admin.html` conserva el botón de rechazar.
@@ -92,10 +95,15 @@ profes/<uidProfe>            (ya existe) estado pasa a 'aprobado' al entrar con 
 invitaciones/<codigo>        { profe: uidProfe, creada }               código aleatorio de 12 caracteres
 invitacionDe/<uidProfe>      <codigo>                                  la invitación vigente del profe
 estudiantes/<uidEst>         { nombre, creado, profes: { <uidProfe>: true } }
-alumnos/<uidProfe>/<uidEst>  { nombre, idioma, nivel, unido, salaActiva? }
-                             lo leen el profe y ese estudiante; el profe edita idioma, nivel y salaActiva
-clases/<uidProfe>/<uidEst>/<id>  { inicio (ms UTC), zona, tablero, hecha?, nota? }
-                             lo leen el profe y ese estudiante; solo el profe escribe
+alumnos/<uidProfe>/<uidEst>  { nombre, idioma, nivel, unido }
+                             lo leen el profe y ese estudiante; el profe edita idioma y nivel
+grupos/<uidProfe>/<idGrupo>  { nombre, estudiantes: { <uidEst>: true } }   solo el profe
+clases/<uidProfe>/<id>       { inicio (ms UTC), zona, tablero, estudiantes: { <uidEst>: true },
+                               grupo?, sala?, hecha?, nota? }
+                             la lee el profe y cada estudiante que asiste; solo el profe escribe;
+                             sala = sala en vivo abierta para esa clase
+clasesDe/<uidEst>/<uidProfe>/<id>  true                                índice para que el estudiante
+                                                                       encuentre sus clases; lo escribe el profe
 notas/<uidProfe>/<uidEst>    texto                                     solo el profe
 prueba/<uidAnonimo>          <nombreTablero>                           se escribe una sola vez
 claves/<tablero>             (ya existe) además la lee quien tenga prueba/<uid> === <tablero>
