@@ -18,7 +18,7 @@ Es una **prueba** para saber si el espacio atrae profes. Si funciona, después v
    - Su **enlace de invitación** para estudiantes (copiar, y crear uno nuevo si el anterior se filtró).
    - **Lista de estudiantes**: nombre, idioma, nivel.
    - **Grupos**: el profe arma grupos con nombre (por ejemplo «B1 martes») a partir de sus estudiantes.
-   - **Agenda**: clases con fecha y hora, tablero y quién asiste: un estudiante, varios o un grupo. Desde una clase se abre la sala en vivo de ese tablero, y todos los que asisten ven «Entrar a la clase».
+   - **Agenda**: clases con fecha y hora, tablero y quién asiste: un solo estudiante (clase individual), varios estudiantes o un grupo. Desde una clase se abre la sala en vivo de ese tablero, y todos los que asisten ven «Entrar a la clase».
    - **Ficha de cada estudiante**: próximas clases, clases hechas (tableros vistos), tareas con sus resultados y **notas privadas del profe**.
    - Las **tareas** que ya existen siguen ahí, y ahora pueden ir dirigidas a un estudiante.
 4. **Perfil del estudiante** (`estudiantes.html`):
