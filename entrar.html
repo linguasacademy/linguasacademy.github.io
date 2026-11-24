@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>document.documentElement.classList.add('js')</script>
-<script src="assets/i18n.js?v=2026112203"></script>
+<script src="assets/i18n.js?v=2026112301"></script>
 <meta name="robots" content="noindex">
 <title data-i18n="entrar.meta.titulo">Entrar · Lingua's Academy</title>
 <meta name="description" content="Entrada al catálogo de tableros de Lingua's Academy." data-i18n-content="entrar.meta.descripcion">
@@ -57,7 +57,7 @@
     <div class="nav__actions">
       <div class="nav__idioma" data-selector-idioma></div>
       <a class="nav__entrar" href="entrar.html" aria-current="page" data-cuenta-link data-i18n="nav.entrar">Entrar</a>
-      <a class="btn btn--primary btn--sm nav__registro" href="entrar.html" data-i18n="nav.registrarse">Registrarse</a>
+      <a class="btn btn--primary btn--sm nav__registro" href="entrar.html#crear" data-i18n="nav.registrarse">Registrarse</a>
       <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir el menú" data-i18n-aria="nav.menu_abrir_aria" data-txt-abrir-aria="Abrir el menú" data-txt-cerrar-aria="Cerrar el menú" data-i18n-txt-abrir-aria="nav.menu_abrir_aria" data-i18n-txt-cerrar-aria="nav.menu_cerrar_aria"><svg class="menu-btn__ico" viewBox="0 0 24 24" aria-hidden="true"><path class="l1" d="M4 7h16"/><path class="l2" d="M4 12h16"/><path class="l3" d="M4 17h16"/></svg></button>
     </div>
   </div>
@@ -66,7 +66,7 @@
   <a href="estudiantes.html" data-i18n="nav.estudiante">Estudiante</a>
   <a href="panel.html" data-i18n="nav.profesor">Profesor</a>
   <a href="tableros.html" data-i18n="nav.tableros">Tableros</a>
-  <a class="btn btn--primary" href="entrar.html" data-i18n="nav.registrarse">Registrarse</a>
+  <a class="btn btn--primary" href="entrar.html#crear" data-i18n="nav.registrarse">Registrarse</a>
   <a class="sheet__sec" href="entrar.html" aria-current="page" data-cuenta-link data-i18n="nav.entrar_largo">Entrar con mi cuenta</a>
 </nav>
 
@@ -101,6 +101,22 @@
         </form>
         <div class="alt-links">
           <button class="plain-btn link" type="button" data-ir="clave" data-i18n="entrar.olvide">Olvidé mi contraseña</button>
+          <p class="muted"><span data-i18n="entrar.nuevo">¿Primera vez aquí?</span> <button class="plain-btn link" type="button" data-ir="crear" data-i18n="entrar.ir_crear">Crear cuenta</button></p>
+        </div>
+      </div>
+
+      <!-- 1b · crear cuenta (solo con Google) -->
+      <div data-modo="crear" style="gap:28px">
+        <div style="display:grid;gap:16px">
+          <h1 data-i18n="crear.titulo">Crear tu cuenta de profe</h1>
+          <p class="lead" data-i18n="crear.lead">Con tu cuenta de Google, en un paso. Abres todos los tableros, gratis.</p>
+        </div>
+        <div class="google-box">
+          <button class="btn btn--google" type="button" data-google><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.4c-.5 2.8-2.1 5.2-4.5 6.8l7.3 5.7c4.3-4 6.9-9.9 6.9-16.5z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.3-5.7c-2 1.4-4.7 2.3-8.6 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg><span data-i18n="crear.google">Continuar con Google</span></button>
+          <p class="form__status" role="status" data-google-status></p>
+        </div>
+        <div class="alt-links">
+          <p class="muted"><span data-i18n="crear.ya">¿Ya tienes cuenta?</span> <button class="plain-btn link" type="button" data-ir="entrar" data-i18n="crear.ir_entrar">Entrar</button></p>
         </div>
       </div>
 
@@ -168,8 +184,15 @@
   const volver = /^[a-z0-9-]+\.html(\?[a-z0-9=&-]*)?$/i.test(q.get('volver') || '') ? q.get('volver') : 'tableros.html';
 
   const modos = [...document.querySelectorAll('[data-modo]')];
-  const ir = m => { modos.forEach(x => x.classList.toggle('on', x.dataset.modo === m)); const h = document.querySelector('[data-modo="' + m + '"] h1'); h.tabIndex = -1; h.focus(); };
+  const ir = (m, foco = true) => {
+    modos.forEach(x => x.classList.toggle('on', x.dataset.modo === m));
+    const crear = m === 'crear';
+    if (crear !== (location.hash === '#crear')) history.replaceState(null, '', location.pathname + location.search + (crear ? '#crear' : ''));
+    const t = document.querySelector('[data-modo="' + m + '"] h1'); t.tabIndex = -1; if (foco) t.focus();
+  };
   document.querySelectorAll('[data-ir]').forEach(b => b.addEventListener('click', () => ir(b.dataset.ir)));
+  if (location.hash === '#crear') ir('crear', false);
+  addEventListener('hashchange', () => ir(location.hash === '#crear' ? 'crear' : 'entrar'));
 
   function mostrar(perfil) {
     if (!perfil) return false;
@@ -217,8 +240,8 @@
   });
 
   /* Entrar con Google */
-  const bg = document.querySelector('[data-google]'), sg = document.querySelector('[data-google-status]');
-  bg.addEventListener('click', async () => {
+  document.querySelectorAll('[data-google]').forEach(bg => bg.addEventListener('click', async () => {
+    const sg = bg.closest('.google-box').querySelector('[data-google-status]');
     bg.disabled = true; sg.textContent = ''; delete sg.dataset.tone;
     try {
       const p = await LA.conGoogle();
@@ -228,7 +251,7 @@
       sg.textContent = motivo(err); sg.dataset.tone = 'error';
     }
     bg.disabled = false;
-  });
+  }));
 
   document.querySelectorAll('[data-salir]').forEach(x => x.addEventListener('click', async () => { await LA.salir().catch(() => {}); location.reload(); }));
 })();
