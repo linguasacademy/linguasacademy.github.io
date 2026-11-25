@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>document.documentElement.classList.add('js')</script>
-<script src="assets/i18n.js?v=2026112301"></script>
+<script src="assets/i18n.js?v=2026112401"></script>
 <meta name="robots" content="noindex">
 <title data-i18n="entrar.meta.titulo">Entrar · Lingua's Academy</title>
 <meta name="description" content="Entrada al catálogo de tableros de Lingua's Academy." data-i18n-content="entrar.meta.descripcion">
@@ -36,6 +36,10 @@
 .plain-btn { background-color: transparent; border: 0; padding: 0; font: inherit; cursor: pointer; min-height: 44px; }
 .alt-links .link { display: inline-block; padding: 11px 0; background-position: 0 calc(100% - 9px); }
 .alt-links .link:hover { background-position: 100% calc(100% - 9px); }
+.grupo { border: 0; margin: 0; padding: 0; display: grid; gap: 2px; }
+.grupo legend { padding: 0; margin-bottom: 6px; font-size: 15px; font-weight: 500; color: var(--ink); }
+.opcion { display: flex; align-items: center; gap: 12px; min-height: 44px; cursor: pointer; }
+.opcion input { width: 22px; height: 22px; margin: 0; flex: none; accent-color: var(--ink); cursor: pointer; }
 [data-modo] { display: none; }
 [data-modo].on { display: grid; }
 @media (max-width: 1023px) { .login__panel { grid-column: 1 / span 8; } .pila { display: none; } }
@@ -120,6 +124,31 @@
         </div>
       </div>
 
+      <!-- 1c · primera entrada con Google: nombre e idiomas -->
+      <div data-modo="confirmar" style="gap:28px">
+        <div style="display:grid;gap:16px">
+          <h1 data-i18n="ficha.titulo">Tus datos de profe</h1>
+          <p class="lead" data-i18n="ficha.lead">Tus estudiantes verán este nombre.</p>
+        </div>
+        <form class="form" id="f-confirmar" novalidate>
+          <div class="field">
+            <label for="p-nombre" data-i18n="ficha.nombre">Nombre</label>
+            <input id="p-nombre" name="nombre" type="text" autocomplete="name" maxlength="80" aria-describedby="p-nombre-error">
+            <p class="field__error" id="p-nombre-error"></p>
+          </div>
+          <fieldset class="grupo" aria-describedby="p-idiomas-error">
+            <legend data-i18n="ficha.idiomas">Idiomas que enseñas</legend>
+            <label class="opcion"><input type="checkbox" name="idiomas" value="es"> <span data-i18n="ficha.es">Español</span></label>
+            <label class="opcion"><input type="checkbox" name="idiomas" value="en"> <span data-i18n="ficha.en">Inglés</span></label>
+            <label class="opcion"><input type="checkbox" name="idiomas" value="pt"> <span data-i18n="ficha.pt">Portugués</span></label>
+            <p class="field__error" id="p-idiomas-error"></p>
+          </fieldset>
+          <button class="btn btn--primary" type="submit" data-i18n="ficha.boton">Guardar y entrar</button>
+          <p class="form__status" role="status" data-form-status></p>
+        </form>
+        <div class="alt-links"><button class="plain-btn link" type="button" data-salir data-i18n="ficha.otra">Usar otra cuenta</button></div>
+      </div>
+
       <!-- 2 · cambiar la contraseña -->
       <div data-modo="clave" style="gap:28px">
         <div style="display:grid;gap:16px">
@@ -158,7 +187,7 @@
 
 <script src="assets/site.js?v=2026111802"></script>
 <script src="assets/fb.js?v=2026111802"></script>
-<script src="assets/auth.js?v=2026112203"></script>
+<script src="assets/auth.js?v=2026112401"></script>
 <script>
 (() => {
   'use strict';
@@ -197,6 +226,11 @@
   function mostrar(perfil) {
     if (!perfil) return false;
     if (perfil.estado === 'aprobado' || perfil.admin) { location.replace(window.LAi18n ? LAi18n.enlace(volver) : volver); return true; }
+    if (perfil.estado === 'sin-solicitud') {
+      document.getElementById('p-nombre').value = perfil.nombreGoogle || (perfil.correo || '').split('@')[0];
+      ir('confirmar');
+      return true;
+    }
     document.querySelector('[data-estado-correo]').textContent = perfil.correo || perfil.nombre || '';
     ir('estado');
     return true;
@@ -222,6 +256,31 @@
     } catch (err) {
       clearTimeout(t); console.warn(err);
       Forma.estado(fe, motivo(err), 'error');
+    }
+    b.disabled = false;
+  });
+
+  const fp = document.getElementById('f-confirmar');
+  fp.addEventListener('submit', async e => {
+    e.preventDefault(); Forma.limpiar(fp);
+    const nombre = fp.elements.nombre.value.trim();
+    const idiomas = [...fp.querySelectorAll('input[name="idiomas"]:checked')].map(x => x.value);
+    if (!nombre) Forma.error(fp, 'nombre', T('ficha.msg.nombre', 'Escribe tu nombre.'));
+    if (!idiomas.length) {
+      fp.querySelector('input[name="idiomas"]').setAttribute('aria-invalid', 'true');
+      document.getElementById('p-idiomas-error').textContent = T('ficha.msg.idiomas', 'Marca al menos un idioma.');
+    }
+    const n = Forma.enfocarPrimero(fp);
+    if (n) { Forma.estado(fp, revisa(n), 'error'); return; }
+    const b = fp.querySelector('button[type="submit"]'); b.disabled = true;
+    const t = setTimeout(() => Forma.estado(fp, T('ficha.msg.guardando', 'Guardando…')), 300);
+    try {
+      const p = await LA.crearFicha({ nombre, idiomas });
+      clearTimeout(t); Forma.estado(fp, '');
+      mostrar(p);
+    } catch (err) {
+      clearTimeout(t); console.warn(err);
+      Forma.estado(fp, motivo(err), 'error');
     }
     b.disabled = false;
   });

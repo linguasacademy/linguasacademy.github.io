@@ -30,6 +30,12 @@
         "creado": {
           ".validate": "newData.isNumber()"
         },
+        "idiomas": {
+          ".validate": "newData.hasChildren()",
+          "$l": {
+            ".validate": "($l === 'es' || $l === 'en' || $l === 'pt') && newData.val() === true"
+          }
+        },
         "$other": {
           ".validate": false
         }
