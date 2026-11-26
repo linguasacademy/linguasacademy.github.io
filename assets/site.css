@@ -271,6 +271,10 @@ html.i18n-pendiente [data-i18n], html.i18n-pendiente [data-i18n-html] { visibili
 .btn--primary.btn--sm { font-size: 18.66px; }
 .btn svg:not(.arrow) { width: 18px; height: 18px; flex: none; }
 .btn[disabled], .btn[aria-disabled="true"] { opacity: .55; cursor: progress; transform: none; }
+/* En espera: un anillo junto al texto; con «reducir movimiento» queda quieto */
+.btn[aria-busy="true"] { opacity: .8; }
+.btn[aria-busy="true"]::after { content: ""; width: 16px; height: 16px; flex: none; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: btn-gira .7s linear infinite; }
+@keyframes btn-gira { to { transform: rotate(1turn); } }
 .btn .arrow { width: 16px; height: 16px; transition: transform var(--dur-ui) var(--ease-out); }
 @media (hover: hover) and (pointer: fine) { .btn:hover .arrow { transform: translateX(3px); } }
 .btn-row { display: flex; flex-wrap: wrap; gap: 12px; }

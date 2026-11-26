@@ -19,7 +19,7 @@
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js">
-<link rel="stylesheet" href="assets/site.css?v=2026112202">
+<link rel="stylesheet" href="assets/site.css?v=2026112501">
 <style>
 .login { min-height: 100vh; min-height: 100svh; padding: calc(var(--nav) + 48px) 0 64px; display: flex; align-items: center; }
 .login .wrap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: center; }
@@ -193,9 +193,9 @@
   'use strict';
   /* Textos del script: claves de assets/i18n.js (entrar.msg.*, auth.err.*), con respaldo en español */
   const T = (k, es) => (window.LAi18n ? LAi18n.t(k) : null) || es;
-  const motivo = e => {
+  const tipo = e => {
     const c = (e && e.code) || (e && e.message) || '';
-    const k = /invalid-credential|wrong-password|user-not-found|invalid-login/.test(c) ? 'credenciales'
+    return /invalid-credential|wrong-password|user-not-found|invalid-login/.test(c) ? 'credenciales'
       : /email-already-in-use/.test(c) ? 'en_uso'
       : /weak-password/.test(c) ? 'clave_debil'
       : /invalid-email/.test(c) ? 'correo'
@@ -206,8 +206,24 @@
       : /operation-not-allowed/.test(c) ? 'no_activado'
       : /permission[_-]denied|PERMISSION_DENIED/i.test(c) ? 'permiso'
       : /red|tiempo|network/.test(c) ? 'red' : 'otro';
-    return T('auth.err.' + k, LA.motivo(e));
   };
+  const motivo = e => T('auth.err.' + tipo(e), LA.motivo(e));
+  /* Botón en espera: deshabilitado y con el indicador de carga (aria-busy) */
+  const ocupar = (b, si) => { b.disabled = si; if (si) b.setAttribute('aria-busy', 'true'); else b.removeAttribute('aria-busy'); };
+  /* Un error del servidor va bajo su campo si tiene uno; si no, en el estado del formulario */
+  const CAMPO = { credenciales: 'clave', correo: 'correo' };
+  const fallo = (form, err) => {
+    const c = CAMPO[tipo(err)];
+    if (c && form.elements[c]) { Forma.error(form, c, motivo(err)); Forma.enfocarPrimero(form); Forma.estado(form, ''); }
+    else Forma.estado(form, motivo(err), 'error');
+  };
+  /* Al corregir un campo marcado, su error se borra */
+  document.querySelectorAll('.login form').forEach(f => f.addEventListener('input', e => {
+    const el = e.target.name === 'idiomas' ? f.querySelector('input[name="idiomas"]') : e.target;
+    if (el.getAttribute('aria-invalid') !== 'true') return;
+    el.removeAttribute('aria-invalid');
+    const err = document.getElementById((el.name === 'idiomas' ? 'p-idiomas' : el.id) + '-error'); if (err) err.textContent = '';
+  }));
   const revisa = n => n === 1 ? T('entrar.msg.revisa_uno', 'Revisa el campo marcado.') : T('entrar.msg.revisa_varios', 'Revisa los {n} campos marcados.').replace('{n}', n);
   const q = new URLSearchParams(location.search);
   const volver = /^[a-z0-9-]+\.html(\?[a-z0-9=&-]*)?$/i.test(q.get('volver') || '') ? q.get('volver') : 'tableros.html';
@@ -247,7 +263,7 @@
     if (!d.clave) Forma.error(fe, 'clave', T('entrar.msg.clave', 'Escribe tu contraseña.'));
     const n = Forma.enfocarPrimero(fe);
     if (n) { Forma.estado(fe, revisa(n), 'error'); return; }
-    const b = fe.querySelector('button[type="submit"]'); b.disabled = true;
+    const b = fe.querySelector('button[type="submit"]'); ocupar(b, true);
     const t = setTimeout(() => Forma.estado(fe, T('entrar.msg.entrando', 'Entrando…')), 300);
     try {
       const p = await LA.entrar(d.correo, d.clave);
@@ -255,9 +271,9 @@
       mostrar(p);
     } catch (err) {
       clearTimeout(t); console.warn(err);
-      Forma.estado(fe, motivo(err), 'error');
+      fallo(fe, err);
     }
-    b.disabled = false;
+    ocupar(b, false);
   });
 
   const fp = document.getElementById('f-confirmar');
@@ -272,7 +288,7 @@
     }
     const n = Forma.enfocarPrimero(fp);
     if (n) { Forma.estado(fp, revisa(n), 'error'); return; }
-    const b = fp.querySelector('button[type="submit"]'); b.disabled = true;
+    const b = fp.querySelector('button[type="submit"]'); ocupar(b, true);
     const t = setTimeout(() => Forma.estado(fp, T('ficha.msg.guardando', 'Guardando…')), 300);
     try {
       const p = await LA.crearFicha({ nombre, idiomas });
@@ -282,7 +298,7 @@
       clearTimeout(t); console.warn(err);
       Forma.estado(fp, motivo(err), 'error');
     }
-    b.disabled = false;
+    ocupar(b, false);
   });
 
   const fc = document.getElementById('f-clave');
@@ -290,18 +306,18 @@
     e.preventDefault(); Forma.limpiar(fc);
     const d = Object.fromEntries(new FormData(fc));
     if (!Forma.correoValido(d.correo)) { Forma.error(fc, 'correo', T('entrar.msg.correo', 'Escribe tu correo con @ y dominio.')); Forma.enfocarPrimero(fc); Forma.estado(fc, revisa(1), 'error'); return; }
-    const b = fc.querySelector('button[type="submit"]'); b.disabled = true;
+    const b = fc.querySelector('button[type="submit"]'); ocupar(b, true);
     try {
       await LA.restablecer(d.correo);
       Forma.estado(fc, T('entrar.msg.enviado', 'Listo: si ese correo tiene cuenta, te llegará el enlace en unos minutos. Revisa también el correo no deseado.'), 'ok');
-    } catch (err) { console.warn(err); Forma.estado(fc, motivo(err), 'error'); }
-    b.disabled = false;
+    } catch (err) { console.warn(err); fallo(fc, err); }
+    ocupar(b, false);
   });
 
   /* Entrar con Google */
   document.querySelectorAll('[data-google]').forEach(bg => bg.addEventListener('click', async () => {
     const sg = bg.closest('.google-box').querySelector('[data-google-status]');
-    bg.disabled = true; sg.textContent = ''; delete sg.dataset.tone;
+    ocupar(bg, true); sg.textContent = ''; delete sg.dataset.tone;
     try {
       const p = await LA.conGoogle();
       if (p) mostrar(p);
@@ -309,7 +325,7 @@
       console.warn(err);
       sg.textContent = motivo(err); sg.dataset.tone = 'error';
     }
-    bg.disabled = false;
+    ocupar(bg, false);
   }));
 
   document.querySelectorAll('[data-salir]').forEach(x => x.addEventListener('click', async () => { await LA.salir().catch(() => {}); location.reload(); }));
