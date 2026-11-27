@@ -9,7 +9,7 @@
    ===================================================================== */
 (() => {
   'use strict';
-  const VERSION_VIVO = '2026111702';   // súbela cada vez que cambie vivo.js
+  const VERSION_VIVO = '2026112701';   // súbela cada vez que cambie vivo.js
   const { CFG, SDK, carga, conTiempo, denegado, leer2 } = window.LA_FB;
   const NOMBRE = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
   const q = new URLSearchParams(location.search);
