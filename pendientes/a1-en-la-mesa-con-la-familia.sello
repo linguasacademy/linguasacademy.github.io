@@ -1,0 +1,8 @@
+{
+ "v": 1,
+ "nombre": "a1-en-la-mesa-con-la-familia",
+ "alg": "RSA-OAEP-256",
+ "huella": "80efa00128d26803",
+ "clave": "BRanZAmSMwA0vORbmpgKCLcOTNus7WA6hh3HiMkhlcAolZuwQsSowkQkc4tUppMSUyHxtl3t2N0UXAtkum+i1UPxq6HN4vI4AM6epgbj3jcZtuy1WYShW8g5q/DaXw6VbLF/iTv2gE8ResTd5AYh3QlDFXgKBgaTewClrHpnLSmhU1KBSdV6TaOMZWgGVoNg8Mve2HmGcNfdthiMvm6Xzx86hAxa7pR4+nFcik1fpywFl4I1uARN7atWpyGqlQkJhxeslNtPY5Y4rvPJqDYlx1Bu+ttUYMsa/rAc5iEUL5A94AvE4HtO+UNiUHaq1crUReNZgv5gQuANfRwIdd1X7KAM2avOgL62RMzU2ZM4Cw0QXcZGvqyWxxHb6gP7aeApsCGXbG+e6DzzXGooQwWh2sM0zjafw/E6GQunQ1/EgrfEpCVLOu0eDgB/XGJBz5R7jvlwZrFLs5LhPXXbP2s+1bpxQbRLjdr5q/FrRPgj5la1g7DlSHYVPPmYuKVKyM6+tmKYANfDSRSbXe0o7+TWt3AnY2JdGIG+UAsSbiIrmaYfdjnS91Khc99+pAS0YYby3Qkg/srv43I/UeCUjOIdn6MlYayo5Ib8pGGKWQNuG+AChl1vlDjtIL4dHcp9fGTitVzcFDPH72HVGEffcWxNQHC79NRtygdYyWNfUE3VMHE=",
+ "bin_sha256": "46c15588aa2420c4084a32cf1929e68d0beb6d73f22400168739aa1d1b32988b"
+}
