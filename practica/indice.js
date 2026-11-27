@@ -1,6 +1,7 @@
 /* Generado por herramientas/indice_practica.py a partir de practica/datos/*.js. No lo edites a mano. */
 window.PRACTICA_INDICE = [
   "a1-el-menu-de-chispa",
+  "a1-en-la-mesa-con-la-familia",
   "a1-esta-es-mi-familia",
   "a1-fui-vi-y-comi",
   "a1-los-numeros-del-pirata",
@@ -56,6 +57,7 @@ window.PRACTICA_INDICE = [
 ];
 window.PRACTICA_META = {
   "a1-el-menu-de-chispa": {"tematica": "comida", "nivel": "A1", "items": 28},
+  "a1-en-la-mesa-con-la-familia": {"tematica": "familia", "nivel": "A1", "items": 36},
   "a1-esta-es-mi-familia": {"tematica": "familia", "nivel": "A1", "items": 34},
   "a1-fui-vi-y-comi": {"tematica": "viajes", "nivel": "A1", "items": 35},
   "a1-los-numeros-del-pirata": {"tematica": "numeros", "nivel": "A1", "items": 34},
