@@ -81,7 +81,7 @@
 
     /* Sin créditos de fotos: las imágenes son de uso libre */
     const sc = document.createElement('script');
-    sc.src = 'assets/sin-creditos.js?v=1';
+    sc.src = 'assets/sin-creditos.js?v=2';
     document.head.appendChild(sc);
 
     if (esProfe) {

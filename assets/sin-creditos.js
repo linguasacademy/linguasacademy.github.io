@@ -1,7 +1,8 @@
 /* Lingua's Academy · sin créditos de fotos
    Las fotos de los tableros son de uso libre: no se muestra «Foto: Autor · Unsplash».
    Oculta cualquier línea corta cuyo texto completo sea un crédito de foto, también
-   las que el tablero dibuja después (por eso el observador). No toca nada más. */
+   las que el tablero dibuja después (por eso el observador). Nunca oculta un
+   contenedor que lleva una imagen dentro. No toca nada más. */
 (function () {
   var RE = /^\s*(fotos?|photos?)\s*:[\s\S]*\b(unsplash|pexels|pixabay)\s*$/i;
   function limpiar(raiz) {
@@ -9,6 +10,8 @@
     var els = raiz.querySelectorAll('p, figcaption, small, span, div');
     for (var i = 0; i < els.length; i++) {
       var e = els[i], t = e.textContent;
+      /* nunca ocultar un contenedor que tiene la foto dentro: solo la línea del crédito */
+      if (e.querySelector('img, picture, video, iframe, canvas')) continue;
       if (t && t.length < 240 && RE.test(t)) e.style.setProperty('display', 'none', 'important');
     }
   }
