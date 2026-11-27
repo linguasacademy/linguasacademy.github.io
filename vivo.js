@@ -779,105 +779,80 @@
   }
 
   /* ---------- señalar en vivo: no se ve el puntero de nadie ----------
-     Cuando el PROFE deja el ratón sobre una palabra o una expresión del tablero, esa palabra o
-     expresión se subraya en las dos pantallas. Una expresión es una pieza corta del tablero
-     (botón, etiqueta, palabra resaltada, ruta, ficha…); si no, se subraya la palabra que hay bajo
-     el ratón. Viaja en la presencia de la sala como ruta de nodos dentro de la lámina (o de la
-     ventana emergente), así coincide aunque las pantallas tengan tamaños distintos. */
+     El PROFE selecciona con el ratón (arrastrando, doble clic en una palabra o triple clic en una
+     línea) y el estudiante ve exactamente la misma selección, con el mismo color, en su pantalla.
+     La selección viaja en la presencia de la sala como inicio y fin (ruta de nodos + posición)
+     dentro de la lámina o de la ventana emergente, así coincide aunque las pantallas midan distinto.
+     Se borra cuando el profe hace clic en otro sitio o cambia de pestaña o de sección. */
   function punteros() {
     if (!SALA || typeof window.addEventListener !== 'function') return;
     const raiz = r => r === 'V' ? document.getElementById('popC') : (document.getElementById('lamina') || document.querySelector('.lamina') || document.getElementById('escena') || document.querySelector('main'));
+    const COLOR = 'background-color:#7EBFE9;color:#1E3F2F';
+    const conHL = !!(window.CSS && CSS.highlights && window.Highlight);
     const st = document.createElement('style');
     st.id = 'vivoPunteroStyle';
-    st.textContent =
-      '.vivoSena{position:fixed;z-index:40;pointer-events:none;height:4px;border-radius:3px;background:#D96C38;box-shadow:0 0 0 1px #FFFFFFcc;animation:vivoSena .18s ease-out}' +
-      '@keyframes vivoSena{from{opacity:0;transform:scaleX(.4)}to{opacity:1;transform:none}}' +
-      '@media (prefers-reduced-motion:reduce){.vivoSena{animation:none}}';
+    st.textContent = '::selection{' + COLOR + '}' + (conHL ? '::highlight(vivo-profe){' + COLOR + '}' : '') +
+      '.vivoSel{position:fixed;z-index:40;pointer-events:none;background:#7EBFE9;mix-blend-mode:multiply}';
     (document.head || document.documentElement).appendChild(st);
     const capa = document.createElement('div');
     capa.setAttribute('aria-hidden', 'true');
-    const montar = () => { if (!capa.isConnected && document.body) document.body.appendChild(capa); };
     function ruta(el, root) { const a = []; while (el && el !== root) { const pa = el.parentNode; if (!pa) return null; a.unshift([...pa.childNodes].indexOf(el)); el = pa; } return el === root ? a : null; }
     function nodo(r, root) { let el = root; for (const i of r) { el = el && el.childNodes[i]; } return el || null; }
-    const CORTO = 'mark,button,.ruta,.chip,.tok,.op,.gl,.tag,.es,b,strong,em,i,small,label,.casilla';
-    /* qué hay bajo el ratón: {r, p, w:[ini,fin]} o null */
-    function objetivo(x, y) {
-      const el = document.elementFromPoint(x, y);
-      if (!el || el.closest('.vivoSena,#vivoChip,#vivoAviso')) return null;
-      const enPop = el.closest('#popC'), r = enPop ? 'V' : 'L', root = raiz(r);
-      if (!root || !root.contains(el)) return null;
-      let rango = null;
-      if (document.caretRangeFromPoint) rango = document.caretRangeFromPoint(x, y);
-      else if (document.caretPositionFromPoint) { const c = document.caretPositionFromPoint(x, y); if (c) { rango = document.createRange(); rango.setStart(c.offsetNode, c.offset); } }
-      const tn = rango && rango.startContainer;
-      if (!tn || tn.nodeType !== 3 || !root.contains(tn)) return null;
-      /* ¿el ratón está de verdad encima del texto? */
-      const t = tn.textContent; let k = rango.startOffset;
-      const esLetra = ch => /[\p{L}\p{N}'’\-]/u.test(ch || '');
-      if (!esLetra(t[k]) && esLetra(t[k - 1])) k--;
-      if (!esLetra(t[k])) return null;
-      let a = k, b = k + 1; while (a > 0 && esLetra(t[a - 1])) a--; while (b < t.length && esLetra(t[b])) b++;
-      const rw = document.createRange(); rw.setStart(tn, a); rw.setEnd(tn, b);
-      const caja = rw.getBoundingClientRect();
-      if (!(x >= caja.left - 2 && x <= caja.right + 2 && y >= caja.top - 2 && y <= caja.bottom + 2)) return null;
-      const corto = tn.parentElement && tn.parentElement.closest(CORTO);
-      if (corto && root.contains(corto) && corto !== root) {
-        const txt = (corto.textContent || '').trim();
-        if (txt && txt.length <= 48 && corto.getBoundingClientRect().height < 90) { const p = ruta(corto, root); if (p) return { r, p }; }
-      }
-      const p = ruta(tn, root); return p ? { r, p, w: [a, b] } : null;
+    function codifica(sel) {
+      if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return null;
+      const rg = sel.getRangeAt(0), base = rg.commonAncestorContainer;
+      const el = base.nodeType === 1 ? base : base.parentElement;
+      const r = el && el.closest('#popC') ? 'V' : 'L', root = raiz(r);
+      if (!root || !root.contains(rg.startContainer) || !root.contains(rg.endContainer)) return null;
+      const a = ruta(rg.startContainer, root), b = ruta(rg.endContainer, root);
+      return a && b ? { r, a: [a, rg.startOffset], b: [b, rg.endOffset] } : null;
     }
-    function rects(o) {
-      const root = raiz(o.r); if (!root) return [];
-      const n = nodo(o.p, root); if (!n) return [];
-      const rg = document.createRange();
-      try { if (o.w) { rg.setStart(n, Math.min(o.w[0], n.length)); rg.setEnd(n, Math.min(o.w[1], n.length)); } else rg.selectNodeContents(n); } catch (e) { return []; }
-      return [...rg.getClientRects()].filter(c => c.width > 2 && c.height > 2);
+    function rango(o) {
+      const root = raiz(o.r); if (!root) return null;
+      const na = nodo(o.a[0], root), nb = nodo(o.b[0], root); if (!na || !nb) return null;
+      const lim = n => n.nodeType === 3 ? n.length : n.childNodes.length;
+      try { const rg = document.createRange(); rg.setStart(na, Math.min(o.a[1], lim(na))); rg.setEnd(nb, Math.min(o.b[1], lim(nb))); return rg; } catch (e) { return null; }
     }
     let actual = null;
     function pintar() {
-      montar(); capa.innerHTML = '';
-      if (CERRADA || !actual) return;
-      rects(actual).forEach(c => {
-        const d = document.createElement('div'); d.className = 'vivoSena';
-        d.style.left = Math.round(c.left) + 'px'; d.style.top = Math.round(c.bottom - 1) + 'px'; d.style.width = Math.round(c.width) + 'px';
+      if (conHL) CSS.highlights.delete('vivo-profe');
+      capa.innerHTML = '';
+      const rg = !CERRADA && actual && rango(actual);
+      if (!rg) return;
+      if (conHL) { CSS.highlights.set('vivo-profe', new Highlight(rg)); return; }
+      if (!capa.isConnected && document.body) document.body.appendChild(capa);
+      [...rg.getClientRects()].filter(c => c.width > 1 && c.height > 1).forEach(c => {
+        const d = document.createElement('div'); d.className = 'vivoSel';
+        d.style.cssText = 'left:' + c.left + 'px;top:' + c.top + 'px;width:' + c.width + 'px;height:' + c.height + 'px';
         capa.appendChild(d);
       });
     }
     window.claude.use('room').then(room => {
       if (!room) return;
-      let soyProfe = false, firma = '';
+      let soyProfe = false, firma = '', tEnvio = null;
       room.onPeers(ch => {
         const yo = ch.peers.find(p => p.isMe); soyProfe = !!(yo && yo.peer === 'P');
         if (soyProfe) return;
         const pf = ch.peers.find(p => !p.isMe && (p.peer === 'P' || (p.presence && p.presence.rol === 'P')));
         const o = pf && pf.presence && pf.presence.sena;
-        actual = o && typeof o === 'object' && Array.isArray(o.p) ? o : null;
+        actual = o && typeof o === 'object' && Array.isArray(o.a) && Array.isArray(o.b) ? o : null;
         pintar();
       });
-      const repintar = () => pintar();
+      const repintar = () => { if (!conHL) pintar(); };
       window.addEventListener('resize', repintar);
       document.addEventListener('scroll', repintar, true);
-      /* la lámina se vuelve a dibujar al cambiar de pestaña o de sección: la seña se borra */
-      const obs = new MutationObserver(() => { if (soyProfe && actual) { const o = actual; actual = null; firma = ''; pintar(); room.presence({ sena: null }).catch(() => {}); } else pintar(); });
-      const vigila = () => { const l = raiz('L'); if (l) obs.observe(l, { childList: true }); };
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vigila); else vigila();
-      let tEnvio = null;
       const manda = o => {
         const f = o ? JSON.stringify(o) : '';
         if (f === firma) return;
-        firma = f; actual = o; pintar();
+        firma = f;
         clearTimeout(tEnvio);
-        tEnvio = setTimeout(() => room.presence({ sena: o || null }).catch(() => {}), 90);
+        tEnvio = setTimeout(() => room.presence({ sena: o || null }).catch(() => {}), 80);
       };
-      let tQuita = null;
-      window.addEventListener('pointermove', e => {
-        if (CERRADA || !soyProfe || e.pointerType === 'touch') return;
-        const o = objetivo(e.clientX, e.clientY);
-        clearTimeout(tQuita);
-        if (o) manda(o); else tQuita = setTimeout(() => manda(null), 350);
-      }, { passive: true });
-      document.addEventListener('mouseleave', () => { if (soyProfe) manda(null); });
+      document.addEventListener('selectionchange', () => { if (soyProfe && !CERRADA) manda(codifica(document.getSelection())); });
+      /* al cambiar de pestaña o de sección la lámina se vuelve a dibujar: la selección se borra */
+      const obs = new MutationObserver(() => { if (soyProfe) manda(null); else pintar(); });
+      const vigila = () => { const l = raiz('L'); if (l) obs.observe(l, { childList: true }); };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vigila); else vigila();
     }).catch(() => {});
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', punteros); else punteros();
