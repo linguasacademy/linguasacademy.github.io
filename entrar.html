@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>document.documentElement.classList.add('js')</script>
-<script src="assets/i18n.js?v=2026112401"></script>
+<script src="assets/i18n.js?v=2026112601"></script>
 <meta name="robots" content="noindex">
 <title data-i18n="entrar.meta.titulo">Entrar · Lingua's Academy</title>
 <meta name="description" content="Entrada al catálogo de tableros de Lingua's Academy." data-i18n-content="entrar.meta.descripcion">
@@ -171,7 +171,7 @@
       <div data-modo="estado" style="gap:24px">
         <h1 data-i18n="estado.rechazado_titulo">Esta cuenta no tiene acceso al catálogo</h1>
         <p class="lead" data-i18n="estado.rechazado_texto">Si crees que es un error, escríbele a la administración de Lingua’s Academy.</p>
-        <p class="muted"><span data-i18n="estado.sesion">Sesión abierta como</span> <b data-estado-correo></b>.</p>
+        <p class="muted" data-estado-linea hidden><span data-i18n="estado.sesion">Sesión abierta como</span> <b data-estado-nombre></b><span data-estado-correo></span>.</p>
         <div class="btn-row"><button class="btn btn--secondary" type="button" data-salir data-i18n="estado.salir">Salir</button></div>
       </div>
 
@@ -239,15 +239,26 @@
   if (location.hash === '#crear') ir('crear', false);
   addEventListener('hashchange', () => ir(location.hash === '#crear' ? 'crear' : 'entrar'));
 
-  function mostrar(perfil) {
+  /* Confirmación final: tras entrar desde un formulario, «Hola, <nombre>» antes de pasar al catálogo */
+  function mostrar(perfil, aviso) {
     if (!perfil) return false;
-    if (perfil.estado === 'aprobado' || perfil.admin) { location.replace(window.LAi18n ? LAi18n.enlace(volver) : volver); return true; }
+    const nombre = (perfil.nombre || perfil.nombreGoogle || '').trim(), correo = (perfil.correo || '').trim();
+    if (perfil.estado === 'aprobado' || perfil.admin) {
+      const seguir = () => location.replace(window.LAi18n ? LAi18n.enlace(volver) : volver);
+      const quien = nombre || correo;
+      if (!aviso || !quien) { seguir(); return true; }
+      aviso(T('entrar.msg.hola', 'Hola, {nombre}. Ya estás dentro.').replace('{nombre}', quien));
+      setTimeout(seguir, 900);
+      return true;
+    }
     if (perfil.estado === 'sin-solicitud') {
       document.getElementById('p-nombre').value = perfil.nombreGoogle || (perfil.correo || '').split('@')[0];
       ir('confirmar');
       return true;
     }
-    document.querySelector('[data-estado-correo]').textContent = perfil.correo || perfil.nombre || '';
+    document.querySelector('[data-estado-nombre]').textContent = nombre || correo;
+    document.querySelector('[data-estado-correo]').textContent = nombre && correo ? ' (' + correo + ')' : '';
+    document.querySelector('[data-estado-linea]').hidden = !(nombre || correo);
     ir('estado');
     return true;
   }
@@ -268,7 +279,7 @@
     try {
       const p = await LA.entrar(d.correo, d.clave);
       clearTimeout(t); Forma.estado(fe, '');
-      mostrar(p);
+      mostrar(p, m => Forma.estado(fe, m, 'ok'));
     } catch (err) {
       clearTimeout(t); console.warn(err);
       fallo(fe, err);
@@ -293,7 +304,7 @@
     try {
       const p = await LA.crearFicha({ nombre, idiomas });
       clearTimeout(t); Forma.estado(fp, '');
-      mostrar(p);
+      mostrar(p, m => Forma.estado(fp, m, 'ok'));
     } catch (err) {
       clearTimeout(t); console.warn(err);
       Forma.estado(fp, motivo(err), 'error');
@@ -320,7 +331,7 @@
     ocupar(bg, true); sg.textContent = ''; delete sg.dataset.tone;
     try {
       const p = await LA.conGoogle();
-      if (p) mostrar(p);
+      if (p) mostrar(p, m => { sg.textContent = m; sg.dataset.tone = 'ok'; });
     } catch (err) {
       console.warn(err);
       sg.textContent = motivo(err); sg.dataset.tone = 'error';
