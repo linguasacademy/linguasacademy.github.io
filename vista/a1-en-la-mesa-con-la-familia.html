@@ -10,7 +10,7 @@
 <title>Vista previa · En la mesa con la familia</title>
 <link rel="icon" href="../logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 /* Estilo de Lingua's Academy: barra oscura flotante, mapa lateral claro con ficha-etiqueta, lámina de papel con borde de tinta, sombra dura y sellos. Un solo aspecto claro, a propósito: se comparte por videollamada. */
 :root{
@@ -486,10 +486,65 @@ p.lead{margin:0 0 14px;max-width:62ch}
   .cel{min-height:88px;font-size:13.5px}
 }
 
+/* ===== Estilo de la web de Lingua's Academy (assets/tokens.css · site.css) ===== */
+:root{
+  --papel:#F3F0E7; --hoja:#FFFFFF; --tinta:#1E3F2F; --tinta2:#2C4A3B; --ayuda:#4A6558; --linea:#D3D9D0;
+  --terra:#C45E2E; --mar:#2B6E9B; --mostaza:#6B7A1E; --verde:#2F7A3C; --ciruela:#6B3FA0;
+  --terraf:#F8E5DA; --marf:#E3F1FB; --mostazaf:#F1F5DA; --verdef:#E2F1E4; --ciruelaf:#EDE4F7;
+  --ok:#2F7A3C; --mal:#B03A2E; --okf:#E2F1E4; --malf:#FBE4E0;
+  --lima:#C6D86B; --naranja:#D96C38; --cielo:#7EBFE9;
+  --display:'Newsreader','Iowan Old Style',Georgia,serif;
+  --texto:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --r:20px; --sombra:4px 4px 0 var(--tinta);
+}
+body{background:var(--papel);background-image:none;font-weight:400}
+.es{font-weight:600}
+mark{background:var(--lima);color:var(--tinta)}
+h2.t,.cab h1,.sub,.glosa-big,.frase,.dicho,.preg,.carta .q,.libro .tit,.ficha b,.meta .es{letter-spacing:-.018em}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline-color:var(--naranja)}
+#top{background:var(--tinta);box-shadow:none}
+.tmenu{background:var(--tinta);border-right:1px solid #ffffff22}
+.tnav i{background:var(--naranja);color:var(--tinta)}
+.tedit{background:var(--lima)}
+.crono.va{background:var(--mar)}
+.ficha{background:var(--lima);border-color:var(--tinta)}
+.chip.visto,.caja.abierta,.tresb.abierta,.dorso{background:var(--mostazaf)}
+.btn.sol{background:var(--lima);color:var(--tinta)}
+.btn{background:var(--naranja);color:var(--tinta)}
+.btn.terra{background:var(--mal);color:#fff}
+.dado{background:var(--naranja)!important;color:var(--tinta)!important}
+.final-task,.final{background:var(--mostazaf)}
+.final-task{border-color:var(--mostaza)}
+.ruta{background:var(--marf);border-color:var(--mar)}
+.gl{border-bottom-color:var(--naranja)!important}
+
+/* barra de menú: se oculta y aparece al acercar el ratón arriba (en pantallas táctiles queda fija) */
+#zonaTop{display:none}
+@media (hover:hover) and (pointer:fine){
+  #app{grid-template-rows:minmax(0,1fr)}
+  #lado,#escena{grid-row:1}
+  #zonaTop{display:block;position:fixed;left:0;right:0;top:0;height:18px;z-index:30}
+  #top{position:fixed;left:0;right:0;top:0;z-index:31;transform:translateY(calc(-100% - 10px));transition:transform .22s cubic-bezier(.23,1,.32,1)}
+  #zonaTop:hover+#top,#top:hover,#top:focus-within,body.verTop #top{transform:none}
+}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:reduce){#top{transition:none}}
+
+/* el tablero ocupa toda la ventana y las fotos se ven enteras */
+.lamina{max-width:none}
+#escena{padding:10px 12px 12px}
+.foto{width:fit-content;max-width:100%;margin:0 auto}
+.foto img{width:auto;max-width:100%;max-height:min(58vh,640px);object-fit:contain}
+.pop-foto{object-fit:contain;max-height:52vh;background:var(--papel)}
+.libro .ilu img{object-fit:contain}
+.imgdesc .marco img{max-height:62vh;object-fit:contain}
+.escr .foto img{max-height:40vh}
+
 </style>
 </head>
 <body>
 <div id="app">
+  <div id="zonaTop" aria-hidden="true"></div>
   <header id="top">
     <button id="bMenu" class="tmenu" title="Mostrar u ocultar el menú (tecla S)" aria-label="Mostrar u ocultar el menú">
       <img src="../logo.svg" width="28" height="28" alt="" style="display:block;flex:none">
@@ -716,7 +771,7 @@ function pintarIndice(){
   $('#indice').innerHTML=SECS.map((s,i)=>`<button class="it ${i===estado.pantalla?'on':''} ${hecha(s.id)?'ok':''}" data-i="${i}" style="--mcol:${MOM[s.m].c}" title="${esc(s.t)}"><span class="pt">${hecha(s.id)?ic('check',18):corto(s)}</span><span class="tx"><small>${MOM[s.m].n}${s.n?' '+s.n:''} · ${s.min} MIN</small>${s.t}</span></button>`).join('');
   $$('#indice .it').forEach(b=>b.onclick=()=>{if(window.innerWidth<900)plegar(true);irA(+b.dataset.i,0)});
 }
-function pintarProg(){$('#prog').innerHTML=SECS.map(s=>sello('#D6992A',22,hecha(s.id))).join('')}
+function pintarProg(){$('#prog').innerHTML=SECS.map(s=>sello('#C6D86B',22,hecha(s.id))).join('')}
 function irA(i,tab){if(VIVO.rol==='alumno')return;estado.pantalla=i;estado.tab=tab==='ultima'?tabsDe(SECS[i]).length-1:(tab||0);reiniciaCrono();pintar();$('#escena').scrollTop=0;guardar()}
 function avanzar(d){
   if(VIVO.rol==='alumno')return;
@@ -860,7 +915,7 @@ function editarBloque(s,b,nuevo,alGuardar){
     cerrar();pintar();guardarContenido()}}
 
 /* ================= contenido de esta clase: clase de prueba · En la mesa con la familia ================= */
-const U=(id,w=1280)=>`https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=70`;
+const U=(id,w=1280)=>`https://images.unsplash.com/${id}?auto=format&w=${w}&q=70`;
 const FOTOS={
  mesa:{id:'photo-1686489356516-a54af456d168',a:'Annie Spratt',p:'https://unsplash.com/photos/a-group-of-people-sitting-around-a-dinner-table-OssO-J9eNyI',alt:'Una familia sentada alrededor de una mesa para comer'},
  almuerzo:{id:'photo-1786052599586-344b949de861',a:'César O’neill',p:'https://unsplash.com/photos/grilled-meat-rice-radish-and-lime-on-a-wooden-table-a1ATPwkaCtQ',alt:'Carne asada, arroz y limón sobre una mesa de madera'},
