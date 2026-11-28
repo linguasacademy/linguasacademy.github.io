@@ -778,72 +778,81 @@
     }, true);
   }
 
-  /* ---------- punteros en vivo: el profe ve el del estudiante y el estudiante ve el del profe ----------
-     La posición viaja en la presencia de la sala como fracción (0–1) del área del tablero,
-     así coincide aunque las dos pantallas tengan tamaños distintos. */
+  /* ---------- señalar en vivo: no se ve el puntero de nadie ----------
+     El PROFE selecciona con el ratón (arrastrando, doble clic en una palabra o triple clic en una
+     línea) y el estudiante ve exactamente la misma selección, con el mismo color, en su pantalla.
+     La selección viaja en la presencia de la sala como inicio y fin (ruta de nodos + posición)
+     dentro de la lámina o de la ventana emergente, así coincide aunque las pantallas midan distinto.
+     Se borra cuando el profe hace clic en otro sitio o cambia de pestaña o de sección. */
   function punteros() {
     if (!SALA || typeof window.addEventListener !== 'function') return;
-    const area = () => document.getElementById('lamina') || document.querySelector('.lamina') || document.getElementById('escena') || document.querySelector('main') || document.body;
+    const raiz = r => r === 'V' ? document.getElementById('popC') : (document.getElementById('lamina') || document.querySelector('.lamina') || document.getElementById('escena') || document.querySelector('main'));
+    const COLOR = 'background-color:#7EBFE9;color:#1E3F2F';
+    const conHL = !!(window.CSS && CSS.highlights && window.Highlight);
     const st = document.createElement('style');
     st.id = 'vivoPunteroStyle';
-    st.textContent =
-      '.vivoPtr{position:fixed;left:0;top:0;z-index:30;pointer-events:none;display:flex;align-items:flex-start;gap:2px;transition:transform .12s linear,opacity .2s;will-change:transform}' +
-      '.vivoPtr[hidden]{display:none}' +
-      '.vivoPtr svg{filter:drop-shadow(0 1px 1px #0006)}' +
-      '.vivoPtr span{margin-top:16px;font:700 12px/1 system-ui,sans-serif;color:#fff;padding:4px 8px;border-radius:9px;white-space:nowrap}' +
-      '@media (prefers-reduced-motion:reduce){.vivoPtr{transition:none}}';
+    st.textContent = '::selection{' + COLOR + '}' + (conHL ? '::highlight(vivo-profe){' + COLOR + '}' : '') +
+      '.vivoSel{position:fixed;z-index:40;pointer-events:none;background:#7EBFE9;mix-blend-mode:multiply}';
     (document.head || document.documentElement).appendChild(st);
-    const capas = new Map();
-    function capa(id, profe) {
-      let el = capas.get(id);
-      if (el) return el;
-      const color = profe ? '#C2533A' : '#1B7A88';
-      el = document.createElement('div');
-      el.className = 'vivoPtr';
-      el.setAttribute('aria-hidden', 'true');
-      el.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="' + color + '" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"><path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"/></svg><span style="background:' + color + '">' + (profe ? 'Profe' : 'Estudiante') + '</span>';
-      document.body.appendChild(el);
-      capas.set(id, el);
-      return el;
+    const capa = document.createElement('div');
+    capa.setAttribute('aria-hidden', 'true');
+    function ruta(el, root) { const a = []; while (el && el !== root) { const pa = el.parentNode; if (!pa) return null; a.unshift([...pa.childNodes].indexOf(el)); el = pa; } return el === root ? a : null; }
+    function nodo(r, root) { let el = root; for (const i of r) { el = el && el.childNodes[i]; } return el || null; }
+    function codifica(sel) {
+      if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return null;
+      const rg = sel.getRangeAt(0), base = rg.commonAncestorContainer;
+      const el = base.nodeType === 1 ? base : base.parentElement;
+      const r = el && el.closest('#popC') ? 'V' : 'L', root = raiz(r);
+      if (!root || !root.contains(rg.startContainer) || !root.contains(rg.endContainer)) return null;
+      const a = ruta(rg.startContainer, root), b = ruta(rg.endContainer, root);
+      return a && b ? { r, a: [a, rg.startOffset], b: [b, rg.endOffset] } : null;
     }
-    function pintar(peers) {
-      if (CERRADA) { capas.forEach(el => el.remove()); capas.clear(); return; }
-      const r = area().getBoundingClientRect();
-      const vistos = new Set();
-      (peers || []).forEach(p => {
-        if (p.isMe) return;
-        const c = p.presence && p.presence.cur;
-        if (!Array.isArray(c) || c.length !== 2) return;
-        vistos.add(p.peer);
-        const el = capa(p.peer, p.peer === 'P' || p.presence.rol === 'P');
-        el.hidden = false;
-        el.style.transform = 'translate(' + Math.round(r.left + c[0] * r.width) + 'px,' + Math.round(r.top + c[1] * r.height) + 'px)';
+    function rango(o) {
+      const root = raiz(o.r); if (!root) return null;
+      const na = nodo(o.a[0], root), nb = nodo(o.b[0], root); if (!na || !nb) return null;
+      const lim = n => n.nodeType === 3 ? n.length : n.childNodes.length;
+      try { const rg = document.createRange(); rg.setStart(na, Math.min(o.a[1], lim(na))); rg.setEnd(nb, Math.min(o.b[1], lim(nb))); return rg; } catch (e) { return null; }
+    }
+    let actual = null;
+    function pintar() {
+      if (conHL) CSS.highlights.delete('vivo-profe');
+      capa.innerHTML = '';
+      const rg = !CERRADA && actual && rango(actual);
+      if (!rg) return;
+      if (conHL) { CSS.highlights.set('vivo-profe', new Highlight(rg)); return; }
+      if (!capa.isConnected && document.body) document.body.appendChild(capa);
+      [...rg.getClientRects()].filter(c => c.width > 1 && c.height > 1).forEach(c => {
+        const d = document.createElement('div'); d.className = 'vivoSel';
+        d.style.cssText = 'left:' + c.left + 'px;top:' + c.top + 'px;width:' + c.width + 'px;height:' + c.height + 'px';
+        capa.appendChild(d);
       });
-      capas.forEach((el, id) => { if (!vistos.has(id)) el.hidden = true; });
     }
     window.claude.use('room').then(room => {
       if (!room) return;
-      let ult = [];
-      room.onPeers(ch => { ult = ch.peers; pintar(ult); });
-      /* al desplazar o cambiar el tamaño, los punteros de los demás se recolocan */
-      const repintar = () => pintar(ult);
+      let soyProfe = false, firma = '', tEnvio = null;
+      room.onPeers(ch => {
+        const yo = ch.peers.find(p => p.isMe); soyProfe = !!(yo && yo.peer === 'P');
+        if (soyProfe) return;
+        const pf = ch.peers.find(p => !p.isMe && (p.peer === 'P' || (p.presence && p.presence.rol === 'P')));
+        const o = pf && pf.presence && pf.presence.sena;
+        actual = o && typeof o === 'object' && Array.isArray(o.a) && Array.isArray(o.b) ? o : null;
+        pintar();
+      });
+      const repintar = () => { if (!conHL) pintar(); };
       window.addEventListener('resize', repintar);
       document.addEventListener('scroll', repintar, true);
-      let ultimoEnvio = 0, tFin = null, fuera = true;
-      window.addEventListener('pointermove', e => {
-        if (CERRADA) return;
-        const r = area().getBoundingClientRect();
-        if (!r.width || !r.height) return;
-        const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-        const dentro = x >= -0.02 && x <= 1.02 && y >= -0.02 && y <= 1.02;
-        if (!dentro) { if (!fuera) { fuera = true; room.presence({ cur: null }).catch(() => {}); } return; }
-        fuera = false;
-        const ahora = Date.now();
-        clearTimeout(tFin);
-        const manda = () => { ultimoEnvio = Date.now(); room.presence({ cur: [Math.round(x * 1000) / 1000, Math.round(y * 1000) / 1000] }).catch(() => {}); };
-        if (ahora - ultimoEnvio >= 100) manda(); else tFin = setTimeout(manda, 100);
-      }, { passive: true });
-      document.addEventListener('mouseleave', () => { fuera = true; room.presence({ cur: null }).catch(() => {}); });
+      const manda = o => {
+        const f = o ? JSON.stringify(o) : '';
+        if (f === firma) return;
+        firma = f;
+        clearTimeout(tEnvio);
+        tEnvio = setTimeout(() => room.presence({ sena: o || null }).catch(() => {}), 80);
+      };
+      document.addEventListener('selectionchange', () => { if (soyProfe && !CERRADA) manda(codifica(document.getSelection())); });
+      /* al cambiar de pestaña o de sección la lámina se vuelve a dibujar: la selección se borra */
+      const obs = new MutationObserver(() => { if (soyProfe) manda(null); else pintar(); });
+      const vigila = () => { const l = raiz('L'); if (l) obs.observe(l, { childList: true }); };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vigila); else vigila();
     }).catch(() => {});
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', punteros); else punteros();

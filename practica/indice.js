@@ -1,6 +1,7 @@
 /* Generado por herramientas/indice_practica.py a partir de practica/datos/*.js. No lo edites a mano. */
 window.PRACTICA_INDICE = [
   "a1-el-menu-de-chispa",
+  "a1-en-la-mesa-con-la-familia",
   "a1-esta-es-mi-familia",
   "a1-fui-vi-y-comi",
   "a1-los-numeros-del-pirata",
@@ -19,6 +20,7 @@ window.PRACTICA_INDICE = [
   "a2-a-como-esta-la-pina",
   "a2-a-dos-cuadras",
   "a2-ayer-fue-diferente",
+  "a2-ayer-fui",
   "a2-cada-uno-a-su-hora",
   "a2-casa-o-apartamento",
   "a2-el-viaje-a-la-finca",
@@ -37,6 +39,7 @@ window.PRACTICA_INDICE = [
   "a2-y-tu-que-opinas",
   "a2-ya-lo-has-probado",
   "b1-aquel-dia",
+  "b1-desde-casa-o-en-la-oficina",
   "b1-dice-un-estudio",
   "b1-en-version-original",
   "b1-escribir-sin-prisa",
@@ -55,6 +58,7 @@ window.PRACTICA_INDICE = [
 ];
 window.PRACTICA_META = {
   "a1-el-menu-de-chispa": {"tematica": "comida", "nivel": "A1", "items": 28},
+  "a1-en-la-mesa-con-la-familia": {"tematica": "familia", "nivel": "A1", "items": 36},
   "a1-esta-es-mi-familia": {"tematica": "familia", "nivel": "A1", "items": 34},
   "a1-fui-vi-y-comi": {"tematica": "viajes", "nivel": "A1", "items": 35},
   "a1-los-numeros-del-pirata": {"tematica": "numeros", "nivel": "A1", "items": 34},
@@ -73,6 +77,7 @@ window.PRACTICA_META = {
   "a2-a-como-esta-la-pina": {"tematica": "compras", "nivel": "A2", "items": 36},
   "a2-a-dos-cuadras": {"tematica": "ciudad", "nivel": "A2", "items": 45},
   "a2-ayer-fue-diferente": {"tematica": "relatos", "nivel": "A2", "items": 36},
+  "a2-ayer-fui": {"tematica": "viajes", "nivel": "A2", "items": 41},
   "a2-cada-uno-a-su-hora": {"tematica": "rutina", "nivel": "A2", "items": 36},
   "a2-casa-o-apartamento": {"tematica": "casa", "nivel": "A2", "items": 35},
   "a2-el-viaje-a-la-finca": {"tematica": "viajes", "nivel": "A2", "items": 37},
@@ -91,6 +96,7 @@ window.PRACTICA_META = {
   "a2-y-tu-que-opinas": {"tematica": "opiniones", "nivel": "A2", "items": 35},
   "a2-ya-lo-has-probado": {"tematica": "experiencias", "nivel": "A2", "items": 46},
   "b1-aquel-dia": {"tematica": "relatos", "nivel": "B1", "items": 48},
+  "b1-desde-casa-o-en-la-oficina": {"tematica": "opiniones", "nivel": "B1", "items": 50},
   "b1-dice-un-estudio": {"tematica": "noticias", "nivel": "B1", "items": 39},
   "b1-en-version-original": {"tematica": "ocio", "nivel": "B1", "items": 46},
   "b1-escribir-sin-prisa": {"tematica": "viajes", "nivel": "B1", "items": 45},
