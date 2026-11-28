@@ -1,0 +1,8 @@
+{
+ "v": 1,
+ "nombre": "b1-quien-sera",
+ "alg": "RSA-OAEP-256",
+ "huella": "80efa00128d26803",
+ "clave": "RqOJczmHH4wzKwOfk5v6nbvBMoIY7FI6SrddRcGDYLFzgZsxPfoSXDGw1cWP8Fe/1aK0WfaHc2QV3Jir6BDuX1XozrZT+dRjfyWtJ0csRqc/foJp1vt+YTjGBBGO6Qm1OTCr/KjrsAcrflsBtBwYQbS13K3DsEvJEZVXP+436nr7AtIQJYlkpEU+iQ+1PB70ve9vg9XY/G/9TuAHPhi19uZAFatTEHyx2jhhCKs2ALC/JdeibXmbOOFJxZd28B+3p5B3BItsz4Remvf2YfuBDiDijG4wrQyT1PBvhw+pz7KPyIXz2D64FH2R3rqS9SP9PDcaehbe7Ms/mGV5xHt16vHjqVhz0/HQjILI83TfmST8YTdpu8GBYy+VAkhT4U58VugoH1KcbFdETsbX2cNH2OIfPxGW/P6Gd/bclBIJqmytLGLg3X4OceR+vhcWl8mFVQysxvOxc0a00KiveNmF7IQWZgEe2ODefFGuVzX8Ux7axeYCrVKlWBCKtnnVpbVcvqaFvXUVJmawCagimn3VksbJMBpmeHjWymbdJOxmbj7YxxpLA5BUsKot9FqA3+FIDldvwzSAjyuJTeLAjgKn12NFllhX4Yak7SDx60wuf8Z81w52aWegAUvMD/9A61seMjOXYlvez+zRjkoZLMxgFP67I+tlBU2O+SxWyGC4mNQ=",
+ "bin_sha256": "f50c8cac3aa404ffdc9c1fe41960439a77bae768ec25a8978dce82844027e2d8"
+}
