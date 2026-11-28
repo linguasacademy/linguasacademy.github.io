@@ -4,9 +4,14 @@
    usan las salas en vivo (vivo.js).
 
    Datos en Realtime Database:
-     profes/<uid>  { nombre, correo, idioma, mensaje, estado, creado }
-                   estado: "pendiente" | "aprobado" | "rechazado"
-     admins/<uid>  true   (quien puede aprobar solicitudes)
+     profes/<uid>  { nombre, correo, idioma, idiomas, mensaje, estado, creado }
+                   idiomas: { es, en, pt: true } (los que enseña); idioma: el único o "varios"
+                   estado: "aprobado" | "rechazado" ("pendiente" solo en cuentas antiguas)
+     admins/<uid>  true   (quien puede quitar o devolver el acceso)
+
+   Quien crea la cuenta entra directo: la primera vez confirma su nombre
+   y sus idiomas (crearFicha) y la ficha nace "aprobado"; las cuentas
+   antiguas en "pendiente" se activan solas al entrar.
 
    Las reglas que protegen estos datos están en database.rules.json.
    ===================================================================== */
@@ -43,8 +48,34 @@
     const F = await app();
     const [p, adm] = await Promise.all([leer2(F.db.ref('profes/' + u.uid)), leer2(F.db.ref('admins/' + u.uid)).then(v => v === true)]);
     const r = Object.assign({ uid: u.uid, correo: u.email, estado: 'sin-solicitud', nombre: '', nombreGoogle: u.displayName || '' }, p || {}, { admin: adm });
+    await activar(F, u, r);
     try { localStorage.setItem(CK, JSON.stringify(r)); } catch (e) {}
     return r;
+  }
+  /* Acceso directo: activa una cuenta antigua en "pendiente". La ficha que falta
+     ("sin-solicitud") la crea crearFicha cuando el profe confirma nombre e idiomas.
+     Si la escritura falla (por ejemplo, reglas sin publicar), el perfil queda como estaba. */
+  async function activar(F, u, r) {
+    if (r.admin) return;
+    try {
+      if (r.estado === 'pendiente') {
+        await F.db.ref('profes/' + u.uid + '/estado').set('aprobado');
+        r.estado = 'aprobado';
+      }
+    } catch (e) { console.warn(e); }
+  }
+
+  /* Primera entrada: el profe confirma su nombre y los idiomas que enseña ('es', 'en', 'pt') */
+  async function crearFicha({ nombre, idiomas }) {
+    const F = await app();
+    const u = F.auth.currentUser;
+    const l = ['es', 'en', 'pt'].filter(x => (idiomas || []).includes(x));
+    await F.db.ref('profes/' + u.uid).set({
+      nombre: (nombre || '').trim().slice(0, 80), correo: (u.email || '').toLowerCase(),
+      idioma: l.length === 1 ? l[0] : 'varios', idiomas: Object.fromEntries(l.map(x => [x, true])),
+      mensaje: '', estado: 'aprobado', creado: F.TS
+    });
+    return perfil(u, true);
   }
   async function perfil(u, fresco) {
     if (!u || u.isAnonymous) return null;
@@ -78,7 +109,7 @@
     try {
       await F.db.ref('profes/' + r.user.uid).set({
         nombre: n, correo: correo.trim().toLowerCase(), idioma: idioma || 'es', mensaje: (mensaje || '').trim().slice(0, 600),
-        estado: 'pendiente', creado: F.TS
+        estado: 'aprobado', creado: F.TS
       });
     } catch (e) {
       if (typeof r.user.delete === 'function') await r.user.delete().catch(() => {});
@@ -87,7 +118,7 @@
     return r.user;
   }
 
-  /* Entrar (o pedir acceso) con una cuenta de Google.
+  /* Entrar o crear la cuenta con Google.
      Abre la ventana de Google; si el navegador la bloquea, usa la redirección. */
   async function conGoogle() {
     const F = await app();
@@ -105,19 +136,6 @@
       }
       throw e;
     }
-  }
-
-  /* Solicitud de una cuenta que ya entró (por ejemplo con Google) y aún no tiene ficha */
-  async function completarSolicitud({ nombre, idioma, mensaje }) {
-    const F = await app();
-    const u = F.auth.currentUser;
-    if (!u || u.isAnonymous) throw new Error('sin-sesion');
-    const n = (nombre || u.displayName || (u.email || '').split('@')[0]).trim().slice(0, 80);
-    await F.db.ref('profes/' + u.uid).set({
-      nombre: n, correo: (u.email || '').toLowerCase(), idioma: idioma || 'es',
-      mensaje: (mensaje || '').trim().slice(0, 600), estado: 'pendiente', creado: F.TS
-    });
-    return perfil(u, true);
   }
 
   async function salir() {
@@ -165,5 +183,5 @@
     return 'Algo falló. Inténtalo otra vez en un momento.';
   }
 
-  window.LA = { app, estado, entrar, conGoogle, completarSolicitud, solicitar, salir, restablecer, solicitudes, decidir, motivo };
+  window.LA = { app, estado, entrar, conGoogle, crearFicha, solicitar, salir, restablecer, solicitudes, decidir, motivo };
 })();

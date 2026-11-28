@@ -9,9 +9,10 @@
       ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
-        ".write": "auth != null && ((auth.uid === $uid && auth.provider !== 'anonymous' && !data.exists() && newData.child('estado').val() === 'pendiente') || root.child('admins').child(auth.uid).val() === true)",
+        ".write": "auth != null && ((auth.uid === $uid && auth.provider !== 'anonymous' && !data.exists() && newData.child('estado').val() === 'aprobado') || root.child('admins').child(auth.uid).val() === true)",
         ".validate": "newData.hasChildren(['nombre', 'correo', 'estado'])",
         "estado": {
+          ".write": "auth != null && auth.uid === $uid && auth.provider !== 'anonymous' && data.val() === 'pendiente' && newData.val() === 'aprobado'",
           ".validate": "newData.val() === 'pendiente' || newData.val() === 'aprobado' || newData.val() === 'rechazado'"
         },
         "nombre": {
@@ -28,6 +29,12 @@
         },
         "creado": {
           ".validate": "newData.isNumber()"
+        },
+        "idiomas": {
+          ".validate": "newData.hasChildren()",
+          "$l": {
+            ".validate": "($l === 'es' || $l === 'en' || $l === 'pt') && newData.val() === true"
+          }
         },
         "$other": {
           ".validate": false

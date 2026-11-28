@@ -169,7 +169,7 @@
     }
     if (!clave) {
       if (u && !u.isAnonymous) {
-        decir('Tu cuenta todavía no tiene acceso a los tableros. <a href="entrar.html">Ver el estado de mi solicitud</a>');
+        decir('Tu cuenta todavía no tiene acceso a los tableros. <a href="entrar.html">Activar mi acceso</a>');
       } else {
         location.replace('entrar.html?volver=' + encodeURIComponent(NOMBRE + '.html'));
       }
