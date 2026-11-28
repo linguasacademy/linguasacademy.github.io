@@ -1,8 +1,0 @@
-{
- "v": 1,
- "nombre": "b1-desde-casa-o-en-la-oficina",
- "alg": "RSA-OAEP-256",
- "huella": "80efa00128d26803",
- "clave": "av5mV61xKRwbsL8RChXCbmKjK6bu3x0L5SkIgSnkxp/uiBXTcIKa1DQ12uspfZsHMgLCcleZlX0XjNvKIZClLYn2m+DO2ILxv5ga1iGciCJuZLCsJjUh6BWWq3IAC8fDEiyezOe5VCqbkQF37Fqy/7vm0+oIgCgfrEnjc3tZMHTBZrrQLgPrjLxhDNaV+b7Gc+hYa7FKE7sNTdSNICPLbdoFLKwAVAc4py5+SUs7lFCQnZa+btdNoAo+sknkpwzuK1S6hwk/H3siHthAp3GjgE4/dsf8B9ufBueXu8U1ph+VqT7qaRb/1yL/FwGfGhBu4COZetv3s+x15W05CgG06+gSr6yFRuDAcRKBpjiwxIOkKnvuKETY3O3ke9kUSi1aXTxV2xCDvmpGt4H9n952v2jyX9aKozhYSDgn5Xr7klorw/jtw5/s0C028zkkSMj0sYkpUunqGeb67vNgLkgBc552WSXPz04Kf6vmLz3sBzZ7WvD3WWgVSB1YNmS3aRmvTbGSqHaanA7ld5kywptJJwVdrGjs32bOwWg7Y+9eAuKbFl0E5lRuXrrrhYcTeD1Mv3iv4RLZxn5xVv+Tk6JHR693ovILxnV9nGknmGZs2PwsH70dMKD9ibLWq161wALSbKxDOlqzETHqanwDN3Cd1umgbMOEMENt9p7KfkYcPE4=",
- "bin_sha256": "a53db672b0b24abf1ba80479c19f61f2806ca9f1496230145cb3b5e2d3bb9adf"
-}
