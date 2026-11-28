@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>document.documentElement.classList.add('js')</script>
-<script src="assets/i18n.js?v=2026112601"></script>
+<script src="assets/i18n.js?v=2026112701"></script>
 <meta name="robots" content="noindex">
 <title data-i18n="entrar.meta.titulo">Entrar · Lingua's Academy</title>
 <meta name="description" content="Entrada al catálogo de tableros de Lingua's Academy." data-i18n-content="entrar.meta.descripcion">
@@ -235,7 +235,11 @@
     if (crear !== (location.hash === '#crear')) history.replaceState(null, '', location.pathname + location.search + (crear ? '#crear' : ''));
     const t = document.querySelector('[data-modo="' + m + '"] h1'); t.tabIndex = -1; if (foco) t.focus();
   };
-  document.querySelectorAll('[data-ir]').forEach(b => b.addEventListener('click', () => ir(b.dataset.ir)));
+  document.querySelectorAll('[data-ir]').forEach(b => b.addEventListener('click', () => {
+    /* El correo ya escrito en Entrar pasa a recuperar la contraseña */
+    if (b.dataset.ir === 'clave') { const c = document.getElementById('c-correo'); c.value = c.value || document.getElementById('e-correo').value.trim(); }
+    ir(b.dataset.ir);
+  }));
   if (location.hash === '#crear') ir('crear', false);
   addEventListener('hashchange', () => ir(location.hash === '#crear' ? 'crear' : 'entrar'));
 
@@ -318,10 +322,12 @@
     const d = Object.fromEntries(new FormData(fc));
     if (!Forma.correoValido(d.correo)) { Forma.error(fc, 'correo', T('entrar.msg.correo', 'Escribe tu correo con @ y dominio.')); Forma.enfocarPrimero(fc); Forma.estado(fc, revisa(1), 'error'); return; }
     const b = fc.querySelector('button[type="submit"]'); ocupar(b, true);
+    const t = setTimeout(() => Forma.estado(fc, T('entrar.msg.enviando', 'Enviando…')), 300);
     try {
       await LA.restablecer(d.correo);
-      Forma.estado(fc, T('entrar.msg.enviado', 'Listo: si ese correo tiene cuenta, te llegará el enlace en unos minutos. Revisa también el correo no deseado.'), 'ok');
-    } catch (err) { console.warn(err); fallo(fc, err); }
+      clearTimeout(t);
+      Forma.estado(fc, T('entrar.msg.enviado', 'Listo: si {correo} tiene cuenta, te llegará el enlace en unos minutos. Revisa también el correo no deseado.').replace('{correo}', d.correo.trim()), 'ok');
+    } catch (err) { clearTimeout(t); console.warn(err); fallo(fc, err); }
     ocupar(b, false);
   });
 
